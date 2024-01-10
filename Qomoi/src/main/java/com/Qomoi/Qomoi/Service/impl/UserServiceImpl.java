@@ -1,4 +1,4 @@
-package com.Qomoi.Qomoi.ServiceImpl;
+package com.Qomoi.Qomoi.Service.impl;
 
 
 import com.Qomoi.Qomoi.Repository.UserRepository;

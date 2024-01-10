@@ -1,4 +1,4 @@
-package com.Qomoi.Qomoi.ServiceImpl;
+package com.Qomoi.Qomoi.Service.impl;
 
 import com.Qomoi.Qomoi.Service.JWTService;
 import io.jsonwebtoken.Claims;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -32,6 +33,15 @@ public class JWTServiceImpl implements JWTService {
         return token;
     }
 
+    public String generateRefreshToken(Map<String, Object> extractClaims, UserDetails userDetails){
+        String token = Jwts.builder().setClaims(extractClaims).setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 604800000))
+                .signWith(getSiginKey(), SignatureAlgorithm.HS256)
+                .compact();
+
+        return token;
+    }
     public String extractUserName(String token){
         return extractClaim(token, Claims::getSubject);
     }
