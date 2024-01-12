@@ -4,7 +4,9 @@ package com.Qomoi1.Controller;
 
 import com.Qomoi1.Entity.UserEntity;
 import com.Qomoi1.Repository.UserRepository;
+import com.Qomoi1.Request.SigninRequest;
 import com.Qomoi1.Request.SignupRequest;
+import com.Qomoi1.Response.JWTAuthenticationResponse;
 import com.Qomoi1.Response.SignupResponse;
 import com.Qomoi1.Service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -57,10 +59,10 @@ public class AuthenticationController {
         }
     }
 
-//    @PostMapping("/signIn")
-//    public ResponseEntity<JWTAuthenticationResponse> signIn(@RequestBody SigninRequest signinRequest){
-//        return ResponseEntity.ok(authenticationService.signin(signinRequest));
-//    }
+    @PostMapping("/signIn")
+    public ResponseEntity<JWTAuthenticationResponse> signIn(@RequestBody SigninRequest signinRequest){
+        return ResponseEntity.ok(authenticationService.signin(signinRequest));
+    }
 
 
 }
