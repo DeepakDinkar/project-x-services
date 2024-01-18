@@ -7,20 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
 
-    private final CourseService courseService;
-
     @Autowired
-    public CourseController(CourseService courseService) {
-        this.courseService = courseService;
-    }
+    private  CourseService courseService;
 
-    @GetMapping("/get-course")
+
+
+    @GetMapping("/get-course/{id}")
     public ResponseEntity<CourseResponse> getCourseId(@PathVariable Long id){
         Optional<CourseResponse>  courseResponse =  courseService.getCourseId(id);
         return courseResponse.map(ResponseEntity::ok)
@@ -31,5 +30,16 @@ public class CourseController {
     public ResponseEntity<String> saveCourses(@RequestBody CoursesEntity coursesEntity) {
         courseService.saveCourse(coursesEntity);
         return ResponseEntity.ok("Course saved successfully");
+    }
+
+    @GetMapping("/course-by-topic/{id}")
+    public ResponseEntity<List<CourseResponse>> getCourseByTopic(@PathVariable Long id){
+
+       List<CourseResponse> response =  courseService.getCourseByTopic(id);
+        if (!response.isEmpty()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

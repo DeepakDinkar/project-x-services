@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,12 +17,10 @@ import java.util.Optional;
 
 public class CourseImpl implements CourseService {
 
-    private final CourseRepository courseRepository;
-
     @Autowired
-    public CourseImpl(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
-    }
+    private CourseRepository courseRepository;
+
+
 
     @Override
     public  Optional<CourseResponse> getCourseId(Long id) {
@@ -34,5 +34,10 @@ public class CourseImpl implements CourseService {
 
         courseRepository.save(coursesEntity);
 
+    }
+
+    public List<CourseResponse> getCourseByTopic(Long id) {
+        List<CourseResponse> courseList = courseRepository.getCourseByTopic(id);
+        return courseList != null ? courseList : Collections.emptyList();
     }
 }
