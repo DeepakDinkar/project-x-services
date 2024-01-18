@@ -3,7 +3,7 @@ package com.Qomoi1.Config;
 
 import com.Qomoi1.Enum.Role;
 import com.Qomoi1.Service.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,16 +18,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfiguration {
 
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
     private final UserService userService;
 
+    @Autowired
+    public SecurityConfiguration(JWTAuthenticationFilter jwtAuthenticationFilter, UserService userService) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.userService = userService;
+    }
 
 
     @Bean
@@ -36,13 +41,16 @@ public class SecurityConfiguration {
         httpSecurity.csrf(AbstractHttpConfigurer::disable).
                 authorizeHttpRequests(request -> request.requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/admin").hasAnyAuthority(Role.ADMIN.name())
+                        .requestMatchers("/topic/**").hasAnyAuthority(Role.ADMIN.name())
                         .requestMatchers("/user").hasAnyAuthority(Role.USER.name())
                         .anyRequest().authenticated())
 
+                .csrf(csrf -> {
+                    csrf.ignoringRequestMatchers("/auth/**");
+                })
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return httpSecurity.build();
     }
 

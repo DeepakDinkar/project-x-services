@@ -9,7 +9,9 @@ import com.Qomoi1.Request.SignupRequest;
 import com.Qomoi1.Response.JWTAuthenticationResponse;
 import com.Qomoi1.Service.AuthenticationService;
 import com.Qomoi1.Service.JWTService;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
+import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,16 +20,25 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
 @Service
-@RequiredArgsConstructor
+@Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private  UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private  AuthenticationManager authenticationManager;
 
-    private final AuthenticationManager authenticationManager;
+    private final  JWTService jwtService;
 
-    private final JWTService jwtService;
+    @Autowired
+    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JWTService jwtService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
 
     public UserEntity signupUser(SignupRequest signupRequest ){
 
@@ -36,6 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userEntity.setFirstName(signupRequest.getFirstName());
         userEntity.setLastName(signupRequest.getLastName());
         userEntity.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        System.out.println(passwordEncoder.matches(signupRequest.getPassword(),userEntity.getPassword()));
         userEntity.setRole(Role.USER);
 
         userRepository.save(userEntity);
@@ -56,8 +68,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public JWTAuthenticationResponse signin(SigninRequest signinRequest){
+        System.out.println(userRepository.findByEmail(signinRequest.getEmail()));
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
-
+        System.out.println(userRepository.findByEmail(signinRequest.getEmail()));
         var user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(()-> new IllegalArgumentException("Invalid mail or password"));
         var jwt = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);

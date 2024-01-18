@@ -9,7 +9,7 @@ import com.Qomoi1.Request.SignupRequest;
 import com.Qomoi1.Response.JWTAuthenticationResponse;
 import com.Qomoi1.Response.SignupResponse;
 import com.Qomoi1.Service.AuthenticationService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +22,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -30,6 +29,13 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
 
     private final UserRepository userRepository;
+
+    @Autowired
+    public AuthenticationController(AuthenticationService authenticationService, AuthenticationManager authenticationManager, UserRepository userRepository) {
+        this.authenticationService = authenticationService;
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+    }
 
     @PostMapping("/user")
     public ResponseEntity<SignupResponse> signupUser(@RequestBody SignupRequest signupRequest) {
