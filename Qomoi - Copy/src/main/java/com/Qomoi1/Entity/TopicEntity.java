@@ -20,7 +20,7 @@ public class TopicEntity {
     private Long topicId;
 
     @Column(name = "topic_name")
-    private Long topicName;
+    private String topicName;
 
     @Column(name = "topic_url")
     private String topicUrl;

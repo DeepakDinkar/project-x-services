@@ -3,21 +3,28 @@ package com.Qomoi1.SvcImplementation;
 
 import com.Qomoi1.Entity.UserEntity;
 import com.Qomoi1.Enum.Role;
+import com.Qomoi1.Exception.NotFoundException;
 import com.Qomoi1.Repository.UserRepository;
 import com.Qomoi1.Request.SigninRequest;
 import com.Qomoi1.Request.SignupRequest;
 import com.Qomoi1.Response.JWTAuthenticationResponse;
 import com.Qomoi1.Service.AuthenticationService;
 import com.Qomoi1.Service.JWTService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -30,7 +37,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private  AuthenticationManager authenticationManager;
 
-    private final  JWTService jwtService;
+    @Autowired
+    private JWTService jwtService;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Autowired
     public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JWTService jwtService) {
@@ -82,4 +93,41 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     }
 
+    public void updateResetPasswordToken(String token, String email) throws NotFoundException {
+        Optional<UserEntity> userVal = userRepository.findByEmail(email);
+        if (userVal.isPresent()) {
+          UserEntity user = userVal.get();
+          user.setUserId(user.getUserId());
+          user.setResetPasswordToken(token);
+          userRepository.save(user);
+        } else {
+            throw new NotFoundException("Email is not registered with PV: " + email);
+        }
+    }
+
+    public void sendEmail(String recipientEmail, String subject, String content)
+            throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setFrom("support@qomol.com", "Qomol Support");
+        helper.setTo(recipientEmail);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        mailSender.send(message);
+    }
+
+    public UserEntity getByResetPasswordToken(String token) {
+        return userRepository.findByResetPasswordToken(token);
+    }
+
+    public void updatePassword(UserEntity userVal, String newPassword) {
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        userVal.setPassword(encodedPassword);
+        userVal.setResetPasswordToken(null);
+
+        userRepository.save(userVal);
+    }
 }

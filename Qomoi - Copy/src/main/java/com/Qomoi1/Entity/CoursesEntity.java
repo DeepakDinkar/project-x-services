@@ -26,10 +26,10 @@ public class CoursesEntity {
     @Column(name = "course_name")
     private String courseName;
 
-    @Column(name = "course_desc")
+    @Column(name = "course_desc",length = 500)
     private String courseDesc;
 
-    @Column(name = "course_vertical")
+    @Column(name = "course_vertical",length = 500)
     private String courseVertical;
 
     @Column(name = "course_rating")
@@ -38,14 +38,13 @@ public class CoursesEntity {
     @Column(name = "course_images")
     private String courseImages;
 
-    @Column(name = "key_take_away")
+    @Column(name = "key_take_away",length = 500)
     private String keyTakeAway;
 
     @Column(name = "accredited_by")
     private String accreditedBy;
 
     @Column(name = "delivery_methods")
-    @Enumerated(EnumType.STRING)
     private DeliveryModes deliveryMethods;
 
     @Column(name = "course_dates")
@@ -57,7 +56,7 @@ public class CoursesEntity {
     @Column(name = "course_outline")
     private String courseOutline;
 
-    @Column(name = "who_should_attend")
+    @Column(name = "who_should_attend",length = 500)
     private String whoShouldAttend;
 
 }

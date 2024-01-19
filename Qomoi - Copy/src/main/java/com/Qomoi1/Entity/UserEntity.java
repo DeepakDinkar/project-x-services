@@ -41,6 +41,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "role")
     private Role role;
 
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
