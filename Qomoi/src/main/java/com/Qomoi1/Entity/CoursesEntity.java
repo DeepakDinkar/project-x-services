@@ -20,8 +20,8 @@ public class CoursesEntity {
     @Column(name = "courseId")
     private Long courseId;
 
-    @Column(name = "topicId")
-    private Long topicId;
+    @Column(name = "verticalId")
+    private Long verticalId;
 
     @Column(name = "course_name")
     private String courseName;

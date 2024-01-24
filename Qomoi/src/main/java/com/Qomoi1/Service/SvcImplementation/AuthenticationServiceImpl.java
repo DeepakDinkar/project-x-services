@@ -1,4 +1,4 @@
-package com.Qomoi1.SvcImplementation;
+package com.Qomoi1.Service.SvcImplementation;
 
 
 import com.Qomoi1.Entity.UserEntity;

@@ -7,8 +7,10 @@ import com.Qomoi1.Exception.MissingFieldException;
 import com.Qomoi1.Exception.NotFoundException;
 import com.Qomoi1.Repository.UserRepository;
 import com.Qomoi1.Request.ForgetPasswordDto;
+import com.Qomoi1.Request.GoogleSigninRequest;
 import com.Qomoi1.Request.SigninRequest;
 import com.Qomoi1.Request.SignupRequest;
+import com.Qomoi1.Response.GoogleSignupResponse;
 import com.Qomoi1.Response.JWTAuthenticationResponse;
 import com.Qomoi1.Response.ResponseDto;
 import com.Qomoi1.Response.SignupResponse;
@@ -16,6 +18,11 @@ import com.Qomoi1.Service.AuthenticationService;
 import com.Qomoi1.Service.UserService;
 import com.Qomoi1.Utility.Constants;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +37,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,8 +64,10 @@ public class AuthenticationController {
     private String frontEndUrl;
 
 
+    @Value("${google.client.id}")
+    private String clientId ;
 
-    @PostMapping("/user")
+    @PostMapping("/signup-user")
     public ResponseEntity<SignupResponse> signupUser(@RequestBody SignupRequest signupRequest) {
         Optional<UserEntity> existingUser = userRepository.findByEmail(signupRequest.getEmail());
         if (existingUser.isPresent()) {
@@ -69,7 +81,7 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/admin")
+    @PostMapping("/signup-admin")
     public ResponseEntity<SignupResponse> signupAdmin(@RequestBody SignupRequest signupRequest){
         Optional<UserEntity> existingUser = userRepository.findByEmail(signupRequest.getEmail());
         if (existingUser.isPresent()) {
@@ -113,6 +125,33 @@ public class AuthenticationController {
             model.addAttribute("error", "Error while sending email");
         }
         return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
+    }
+
+    @PostMapping("/google-login")
+    public ResponseEntity<GoogleSignupResponse> googleSignup(String token, @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException {
+        NetHttpTransport transport = new NetHttpTransport();
+        JsonFactory jsonFactory = new JacksonFactory();
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                    .setAudience(Collections.singletonList(clientId))
+                    .build();
+            GoogleIdToken idToken = verifier.verify(googleSigninRequest.getToken());
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                String email = payload.getEmail();
+                boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
+                String name = (String) payload.get("name");
+                String pictureUrl = (String) payload.get("picture");
+                String locale = (String) payload.get("locale");
+                String familyName = (String) payload.get("family_name");
+                String givenName = (String) payload.get("given_name");
+            } else {
+                System.out.println("Invalid ID token.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

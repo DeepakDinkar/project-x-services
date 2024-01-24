@@ -1,4 +1,4 @@
-package com.Qomoi1.SvcImplementation;
+package com.Qomoi1.Service.SvcImplementation;
 
 
 import com.Qomoi1.Service.JWTService;
@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
