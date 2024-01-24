@@ -79,7 +79,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public JWTAuthenticationResponse signin(SigninRequest signinRequest){
-        System.out.println(userRepository.findByEmail(signinRequest.getEmail()));
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
         System.out.println(userRepository.findByEmail(signinRequest.getEmail()));
         var user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(()-> new IllegalArgumentException("Invalid mail or password"));

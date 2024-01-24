@@ -10,25 +10,25 @@ import com.Qomoi1.Request.ForgetPasswordDto;
 import com.Qomoi1.Request.GoogleSigninRequest;
 import com.Qomoi1.Request.SigninRequest;
 import com.Qomoi1.Request.SignupRequest;
-import com.Qomoi1.Response.GoogleSignupResponse;
-import com.Qomoi1.Response.JWTAuthenticationResponse;
-import com.Qomoi1.Response.ResponseDto;
-import com.Qomoi1.Response.SignupResponse;
+import com.Qomoi1.Response.*;
 import com.Qomoi1.Service.AuthenticationService;
 import com.Qomoi1.Service.UserService;
 import com.Qomoi1.Utility.Constants;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -36,11 +36,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -128,30 +130,33 @@ public class AuthenticationController {
     }
 
     @PostMapping("/google-login")
-    public ResponseEntity<GoogleSignupResponse> googleSignup(String token, @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException {
-        NetHttpTransport transport = new NetHttpTransport();
-        JsonFactory jsonFactory = new JacksonFactory();
-        try {
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                    .setAudience(Collections.singletonList(clientId))
-                    .build();
-            GoogleIdToken idToken = verifier.verify(googleSigninRequest.getToken());
-            if (idToken != null) {
-                GoogleIdToken.Payload payload = idToken.getPayload();
-                String email = payload.getEmail();
-                boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
-                String name = (String) payload.get("name");
-                String pictureUrl = (String) payload.get("picture");
-                String locale = (String) payload.get("locale");
-                String familyName = (String) payload.get("family_name");
-                String givenName = (String) payload.get("given_name");
-            } else {
-                System.out.println("Invalid ID token.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public ResponseEntity<String> googleSignup(String token, @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException {
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        HttpEntity entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                "https://www.googleapis.com/oauth2/v3/userinfo",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+        ObjectMapper objectMapper = new ObjectMapper();
+        GoogleTokenResponse googleTokenResponse = objectMapper.readValue(response.getBody(), GoogleTokenResponse.class);
+        byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
+        String jwtToken = Jwts.builder()
+                .setSubject(googleTokenResponse.getSub())
+                .claim("name", googleTokenResponse.getName())
+                .claim("email", googleTokenResponse.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000)))
+                .signWith(SignatureAlgorithm.HS256, keyBytes)
+                .compact();
+
+        String responseBody = response.getBody();
+        String extractedBody = responseBody.substring(responseBody.indexOf("{"), responseBody.lastIndexOf("}") + 1);
+        return new ResponseEntity<>(extractedBody + "\nJWT Token: " + jwtToken, HttpStatus.OK);
     }
 
 
