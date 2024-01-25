@@ -7,6 +7,8 @@ import com.Qomoi1.Response.CourseResponse;
 import com.Qomoi1.Service.CourseService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,6 +22,10 @@ public class CourseImpl implements CourseService {
     private CourseRepository courseRepository;
 
 
+    @Override
+    public Page<CoursesEntity> getAllCourse(PageRequest pageRequest) {
+      return courseRepository.findAll(pageRequest);
+    }
 
     @Override
     public  Optional<CourseResponse> getCourseId(Long id) {
@@ -35,15 +41,15 @@ public class CourseImpl implements CourseService {
 
     }
 
-    public List<CourseResponse> getCourseByTopic(Long id) {
-        List<CourseResponse> courseList = courseRepository.getCourseByTopic(id);
+    public List<CourseResponse> getCourseByVerticals(String slug) {
+        List<CourseResponse> courseList = courseRepository.getCourseByVerticals(slug);
         return courseList != null ? courseList : Collections.emptyList();
     }
 
 
-    public Map<VerticalEntity, List<CoursesEntity>> getTopCoursesByTopic(){
+    public Map<VerticalEntity, List<CoursesEntity>> findTopCoursesByVerticals(){
 
-        List<Object[]> result = courseRepository.findTopCoursesByTopic();
+        List<Object[]> result = courseRepository.findTopCoursesByVerticals();
         Map<VerticalEntity, List<CoursesEntity>> topCoursesMap = new LinkedHashMap<>();
         for (Object[] row : result ){
             VerticalEntity vertical = (VerticalEntity) row[0];

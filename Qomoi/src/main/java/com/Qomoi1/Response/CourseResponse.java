@@ -3,11 +3,13 @@ package com.Qomoi1.Response;
 import com.Qomoi1.Entity.CoursesEntity;
 import com.Qomoi1.Enum.DeliveryModes;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,43 +19,28 @@ public class CourseResponse {
 
     private Long id;
 
-    private String courseName;
+    private String slug;
 
-    private String courseDesc;
+    private String campaignTemplateCourseName;
 
-    private String courseVertical;
+    private String courseContent;
 
-    private String courseRating;
+    private String campaignTemplateRating;
 
-    private String courseImages;
+    private String imageUrl;
 
-    private String keyTakeAway;
-
-    private String accreditedBy;
-
-    private DeliveryModes deliveryMethods;
-
-    private Date courseDates;
-
-    private String courseCity;
-
-    private String courseOutline;
-
-    private String whoShouldAttend;
+    private List<String> keyTakeAway;
 
     public CourseResponse(CoursesEntity coursesEntity) {
 
-        this.courseName = coursesEntity.getCourseName();
-        this.accreditedBy = coursesEntity.getAccreditedBy();
-        this.courseCity = coursesEntity.getCourseCity();
-        this.courseDates = coursesEntity.getCourseDates();
-        this.courseDesc = coursesEntity.getCourseDesc();
-        this.courseOutline = coursesEntity.getCourseOutline();
-        this.courseRating = coursesEntity.getCourseRating();
-        this.whoShouldAttend = coursesEntity.getWhoShouldAttend();
-        this.deliveryMethods = coursesEntity.getDeliveryMethods();
-        this.courseImages = coursesEntity.getCourseImages();
-        this.courseVertical = coursesEntity.getCourseVertical();
+
+      this.id = coursesEntity.getId();
+      this.campaignTemplateCourseName = coursesEntity.getCampaignTemplateCourseName();
+      this.campaignTemplateRating = coursesEntity.getCampaignTemplateRating();
+      this.courseContent = coursesEntity.getCourseContent();
+      this.imageUrl = coursesEntity.getImageUrl();
+      this.slug = coursesEntity.getSlug();
+      this.keyTakeAway = coursesEntity.getKeyTakeAway();
 
     }
 
