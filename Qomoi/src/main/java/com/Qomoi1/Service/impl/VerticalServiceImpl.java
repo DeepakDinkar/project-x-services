@@ -1,4 +1,4 @@
-package com.Qomoi1.Service.SvcImplementation;
+package com.Qomoi1.Service.impl;
 
 import com.Qomoi1.Entity.VerticalEntity;
 import com.Qomoi1.Repository.VerticalRepository;

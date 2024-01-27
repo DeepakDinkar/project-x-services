@@ -1,4 +1,4 @@
-package com.Qomoi1.Service.SvcImplementation;
+package com.Qomoi1.Service.impl;
 
 
 import com.Qomoi1.Entity.UserEntity;
@@ -14,7 +14,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;

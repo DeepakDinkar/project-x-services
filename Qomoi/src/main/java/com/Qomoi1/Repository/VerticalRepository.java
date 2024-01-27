@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface VerticalRepository extends JpaRepository<VerticalEntity,Long> {
 
+
+
     @Query(value = "SELECT * FROM verticals WHERE LOWER(slug) LIKE %:query%", nativeQuery = true)
     public List<VerticalEntity> searchQuery(@Param("query") String query);
 }
