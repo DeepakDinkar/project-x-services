@@ -18,7 +18,7 @@ public class VerticalController {
 
     @GetMapping()
     public ResponseEntity<List<VerticalEntity>> getAllTopics() {
-        List<VerticalEntity> allTopics = verticalService.getAllTopics();
+        List<VerticalEntity> allTopics = verticalService.getVerticals();
         return ResponseEntity.ok(allTopics);
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface VerticalService {
 
-    List<VerticalEntity> getAllTopics();
+    List<VerticalEntity> getVerticals();
 
     void saveTopic(VerticalEntity verticalEntity);
 

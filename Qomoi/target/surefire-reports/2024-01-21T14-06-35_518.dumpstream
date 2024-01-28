@@ -1,0 +1,5 @@
+# Created at 2024-01-21T14:06:37.766
+Boot Manifest-JAR contains absolute paths in classpath 'D:\Custom Project\project-x-services\Qomoi\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+
