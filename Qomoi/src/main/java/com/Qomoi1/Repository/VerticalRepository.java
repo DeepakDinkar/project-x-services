@@ -9,10 +9,25 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface VerticalRepository extends JpaRepository<VerticalEntity,Long> {
+public interface VerticalRepository extends JpaRepository<VerticalEntity, Long> {
 
+    @Query(value = """
+            SELECT
+            	   t.id,
+                   t.slug,
+                   t.title,
+                   t.image_url,
+                   COUNT(c.slug) AS no_of_courses
+            FROM
+                verticals t
+            LEFT JOIN
+                courses c ON t.slug = c.slug
+            GROUP BY
+                t.slug, t.id;
+            """, nativeQuery = true)
+    List<VerticalEntity> getAllVerticals();
 
 
     @Query(value = "SELECT * FROM verticals WHERE LOWER(slug) LIKE %:query%", nativeQuery = true)
-    public List<VerticalEntity> searchQuery(@Param("query") String query);
+    List<VerticalEntity> searchQuery(@Param("query") String query);
 }

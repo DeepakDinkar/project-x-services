@@ -17,7 +17,7 @@ public class VerticalServiceImpl implements VerticalService {
 
     @Override
     public List<VerticalEntity> getVerticals() {
-        return verticalRepository.findAll();
+        return verticalRepository.getAllVerticals();
     }
 
     @Override

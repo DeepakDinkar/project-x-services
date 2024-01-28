@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "verticals")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class VerticalEntity {
 
     @Id
@@ -27,5 +26,16 @@ public class VerticalEntity {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    private Integer noOfCourses;
+
+    public VerticalEntity(Long id, String slug, String title, String imageUrl, Integer noOfCourses) {
+        this.id = id;
+        this.slug = slug;
+        this.title = title;
+        this.imageUrl = imageUrl;
+        this.noOfCourses = noOfCourses;
+    }
+
 
 }
