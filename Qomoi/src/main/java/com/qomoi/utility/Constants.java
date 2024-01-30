@@ -1,4 +1,4 @@
-package com.qomoi.Utility;
+package com.qomoi.utility;
 
 public class Constants {
 

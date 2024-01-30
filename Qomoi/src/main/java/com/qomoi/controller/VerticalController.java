@@ -1,7 +1,7 @@
-package com.qomoi.Controller;
+package com.qomoi.controller;
 
 
-import com.qomoi.Service.VerticalService;
+import com.qomoi.service.VerticalService;
 import com.qomoi.entity.VerticalEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

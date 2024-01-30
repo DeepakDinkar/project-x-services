@@ -1,8 +1,8 @@
-package com.qomoi.Service.impl;
+package com.qomoi.service.impl;
 
 
-import com.qomoi.Repository.RefreshTokenRepository;
-import com.qomoi.Repository.UserRepository;
+import com.qomoi.repository.RefreshTokenRepository;
+import com.qomoi.repository.UserRepository;
 import com.qomoi.entity.RefreshToken;
 import com.qomoi.exception.TokenRefreshException;
 import org.springframework.beans.factory.annotation.Autowired;

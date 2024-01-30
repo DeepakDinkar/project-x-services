@@ -1,4 +1,4 @@
-package com.qomoi.Service.impl;
+package com.qomoi.service.impl;
 
 import com.qomoi.entity.UserDE;
 import com.fasterxml.jackson.annotation.JsonIgnore;

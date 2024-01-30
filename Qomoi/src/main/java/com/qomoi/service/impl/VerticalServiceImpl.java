@@ -1,8 +1,8 @@
-package com.qomoi.Service.impl;
+package com.qomoi.service.impl;
 
 
-import com.qomoi.Repository.VerticalRepository;
-import com.qomoi.Service.VerticalService;
+import com.qomoi.repository.VerticalRepository;
+import com.qomoi.service.VerticalService;
 import com.qomoi.entity.VerticalEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

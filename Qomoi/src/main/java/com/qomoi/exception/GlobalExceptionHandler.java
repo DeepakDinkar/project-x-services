@@ -2,7 +2,7 @@ package com.qomoi.exception;
 
 
 
-import com.qomoi.Utility.Constants;
+import com.qomoi.utility.Constants;
 import com.qomoi.dto.ResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

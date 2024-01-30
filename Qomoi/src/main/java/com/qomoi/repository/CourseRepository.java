@@ -1,4 +1,4 @@
-package com.qomoi.Repository;
+package com.qomoi.repository;
 
 
 import com.qomoi.entity.CoursesEntity;

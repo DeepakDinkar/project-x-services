@@ -1,4 +1,4 @@
-package com.qomoi.Service;
+package com.qomoi.service;
 
 
 import com.qomoi.dto.CourseResponse;

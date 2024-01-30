@@ -1,6 +1,6 @@
 package com.qomoi.jwt;
 
-import com.qomoi.Service.impl.UserDetailsServiceImpl;
+import com.qomoi.service.impl.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

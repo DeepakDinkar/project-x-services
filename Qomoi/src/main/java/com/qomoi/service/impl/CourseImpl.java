@@ -1,8 +1,8 @@
-package com.qomoi.Service.impl;
+package com.qomoi.service.impl;
 
-import com.qomoi.Repository.CourseRepository;
-import com.qomoi.Repository.VerticalRepository;
-import com.qomoi.Service.CourseService;
+import com.qomoi.repository.CourseRepository;
+import com.qomoi.repository.VerticalRepository;
+import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.TrendingVerticalEntity;

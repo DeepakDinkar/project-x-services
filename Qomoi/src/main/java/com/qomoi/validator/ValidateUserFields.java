@@ -1,6 +1,6 @@
 package com.qomoi.validator;
 
-import com.qomoi.Utility.Constants;
+import com.qomoi.utility.Constants;
 import com.qomoi.dto.LoginRequestDTO;
 import com.qomoi.dto.SignUpRequestDTO;
 import com.qomoi.exception.MissingFieldException;

@@ -1,6 +1,6 @@
-package com.qomoi.Controller;
+package com.qomoi.controller;
 
-import com.qomoi.Service.CourseService;
+import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.TrendingVerticalEntity;
