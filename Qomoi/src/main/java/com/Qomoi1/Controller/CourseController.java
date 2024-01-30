@@ -3,7 +3,7 @@ package com.Qomoi1.Controller;
 import com.Qomoi1.Service.CourseService;
 import com.Qomoi1.dto.CourseResponse;
 import com.Qomoi1.entity.CoursesEntity;
-import com.Qomoi1.entity.VerticalEntity;
+import com.Qomoi1.entity.TrendingVerticalEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -38,11 +37,10 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/course-by-vertical/{slug}")
-    public ResponseEntity<List<CourseResponse>> getCourseByTopic(@PathVariable String slug) {
-
+    @GetMapping("/verticals")
+    public ResponseEntity<List<CoursesEntity>> getCourseByTopic(@PathVariable String slug) {
         if (slug != null) {
-            List<CourseResponse> response = courseService.getCourseByVerticals(slug);
+            List<CoursesEntity> response = courseService.getAllCoursesByVerticalSlug(slug);
             if (!response.isEmpty()) {
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
@@ -53,9 +51,9 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/trending-courses")
-    public ResponseEntity<List<Map<String,Object>>> getTopCoursesByVertical() {
-       List<Map<String,Object>> courseByTopic= courseService.findTopCoursesByVerticals();
+    @GetMapping("/trending")
+    public ResponseEntity<List<TrendingVerticalEntity>> getTrendingVerticalCourses() {
+        List<TrendingVerticalEntity> courseByTopic= courseService.getTrendingVerticalCourses();
         return new ResponseEntity<>(courseByTopic, HttpStatus.OK);
     }
 

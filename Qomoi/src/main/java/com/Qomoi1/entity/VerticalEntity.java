@@ -16,18 +16,12 @@ public class VerticalEntity {
     @SequenceGenerator(name = "id",sequenceName = "id",allocationSize = 1)
     @Column(name = "id")
     private Long id;
-
-
     @Column(name = "image_url")
     private String imageUrl;
-
     @Column(name = "slug")
     private String slug;
-
     @Column(name = "title")
     private String title;
-
-
     private Integer noOfCourses;
 
     public VerticalEntity(Long id, String slug, String title, String imageUrl, Integer noOfCourses) {

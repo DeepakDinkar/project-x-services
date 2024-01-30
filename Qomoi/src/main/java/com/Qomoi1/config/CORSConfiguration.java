@@ -23,6 +23,9 @@ public class CORSConfiguration {
     @Value("${app.filter.cors-filter.allowed-headers}")
     String corsFilterAllowedHeaders;
 
+    @Value("${app.filter.cors-filter.allowed-path-pattern}")
+    String corsFilterAllowedPattern;
+
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();

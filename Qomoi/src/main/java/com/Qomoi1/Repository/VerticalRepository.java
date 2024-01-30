@@ -31,4 +31,7 @@ public interface VerticalRepository extends JpaRepository<VerticalEntity, Long> 
 
     @Query(value = "SELECT * FROM verticals WHERE LOWER(slug) LIKE %:query%", nativeQuery = true)
     List<VerticalEntity> searchQuery(@Param("query") String query);
+
+    @Query(value = "SELECT * FROM verticals LIMIT 3", nativeQuery = true)
+     List<VerticalEntity> getTop3VerticalEntities();
 }
