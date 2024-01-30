@@ -36,7 +36,7 @@ public class UserDE {
     private String password;
 
     @Column(name = "status")
-        private String status;
+    private String status;
 
     @Column(name = "reset_password_token")
     private String resetPasswordToken;
@@ -55,5 +55,14 @@ public class UserDE {
 
     @Column(name = "zipcode")
     private Integer zipcode;
+
+    @Column(name = "is_facebook")
+    private Boolean isFacebook;
+
+    @Column(name = "is_google")
+    private Boolean isGoogle;
+
+    @Column(name = "is_normal")
+    private Boolean isNormal;
 
 }

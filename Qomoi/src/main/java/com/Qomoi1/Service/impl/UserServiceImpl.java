@@ -3,7 +3,9 @@ package com.Qomoi1.Service.impl;
 
 import com.Qomoi1.Repository.RefreshTokenRepository;
 import com.Qomoi1.Repository.UserRepository;
+import com.Qomoi1.Utility.Decrypt;
 import com.Qomoi1.dto.AddressDto;
+import com.Qomoi1.dto.GoogleTokenResponse;
 import com.Qomoi1.dto.SignUpRequestDTO;
 import com.Qomoi1.entity.UserDE;
 import com.Qomoi1.exception.NotFoundException;
@@ -30,36 +32,21 @@ public class UserServiceImpl {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JavaMailSender mailSender;
 
-//    @Autowired
-//    private UserPermissionRepository userPermissionRepository;
-
-//    public boolean isEmailExists(String emailId) {
-//        System.out.println("Email check service");
-//        return userRepository.existsByEmailId(emailId);
-//    }
-
-    public UserDE saveUser(SignUpRequestDTO signUpRequestDTO)  {
+    public UserDE saveUser(SignUpRequestDTO signUpRequestDTO) throws Exception {
+        Decrypt cryptPass = new Decrypt();
         UserDE existingUser = userRepository.findUserByEmailAndPhoneNumber(signUpRequestDTO.getEmailId().trim(),
                 signUpRequestDTO.getMobile().trim());
-//		UserDE existingUser = userRepository.findByEmail(signUpRequestDTO.getEmailId());
         UserDE userregistered = null;
         UserDE userDE = new UserDE();
         userDE.setLastName(signUpRequestDTO.getLastName());
         userDE.setFirstName(signUpRequestDTO.getFirstName());
         userDE.setMobile(signUpRequestDTO.getMobile());
         userDE.setEmailId(signUpRequestDTO.getEmailId());
-//        userDE.setStreet(signUpRequestDTO.getStreet());
-//        userDE.setCity(signUpRequestDTO.getCity());
-//        userDE.setState(signUpRequestDTO.getState());
-//        userDE.setPincode(signUpRequestDTO.getPincode());
-
         userDE.setUserType(signUpRequestDTO.getUserType());
-        userDE.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
-
-
+        String rawPass = cryptPass.decrypt(signUpRequestDTO.getPassword());
+        userDE.setPassword(passwordEncoder.encode(rawPass));
+        userDE.setIsNormal(true);
         userregistered = userRepository.save(userDE);
 
         return userregistered;
@@ -73,18 +60,32 @@ public class UserServiceImpl {
         return userRepository.findUserByEmailAndPhoneNumber(emailId, mobile);
     }
 
-    public void updateResetPasswordToken(String token, String email) throws NotFoundException {
-        UserDE userDE = userRepository.findByEmail(email);
-        if (userDE != null) {
-            userDE.setUserId(userDE.getUserId());
-            userDE.setResetPasswordToken(token);
-            userRepository.save(userDE);
-        } else {
-            throw new NotFoundException("Email is not registered with PV: " + email);
-        }
+//    public void updateResetPasswordToken(String token, String email) throws NotFoundException {
+//        UserDE userDE = userRepository.findByEmail(email);
+//        if (userDE != null) {
+//            userDE.setUserId(userDE.getUserId());
+//            userDE.setResetPasswordToken(token);
+//            userRepository.save(userDE);
+//        } else {
+//            throw new NotFoundException("Email is not registered with PV: " + email);
+//        }
+//    }
+
+
+    public String saveGoogleLogin(GoogleTokenResponse googleTokenResponse){
+      if(userRepository.findByEmail(googleTokenResponse.getEmail()) == null) {
+          UserDE userDE = new UserDE();
+          userDE.setLastName(googleTokenResponse.getFamily_name());
+          userDE.setFirstName(googleTokenResponse.getGiven_name());
+          userDE.setEmailId(googleTokenResponse.getEmail());
+          userDE.setIsGoogle(true);
+          userRepository.save(userDE);
+          return "saved successfully ";
+      }
+      else {
+          return "user already exists ";
+      }
     }
-
-
 
     public UserDE getByResetPasswordToken(String token) {
         return userRepository.findByResetPasswordToken(token);
@@ -153,18 +154,18 @@ public class UserServiceImpl {
         }
     }
 
-    public void sendEmail(String recipientEmail, String subject, String content)
-            throws MessagingException, UnsupportedEncodingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-        helper.setFrom("support@qomol.com", "Qomol Support");
-        helper.setTo(recipientEmail);
-        helper.setSubject(subject);
-        helper.setText(content, true);
-
-        mailSender.send(message);
-    }
+//    public void sendEmail(String recipientEmail, String subject, String content)
+//            throws MessagingException, UnsupportedEncodingException {
+//        MimeMessage message = mailSender.createMimeMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+//
+//        helper.setFrom("support@qomol.com", "Qomol Support");
+//        helper.setTo(recipientEmail);
+//        helper.setSubject(subject);
+//        helper.setText(content, true);
+//
+//        mailSender.send(message);
+//    }
 
 
 }

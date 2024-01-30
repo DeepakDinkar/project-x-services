@@ -53,7 +53,7 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/get-top-courses")
+    @GetMapping("/trending-courses")
     public ResponseEntity<List<Map<String,Object>>> getTopCoursesByVertical() {
        List<Map<String,Object>> courseByTopic= courseService.findTopCoursesByVerticals();
         return new ResponseEntity<>(courseByTopic, HttpStatus.OK);
@@ -61,7 +61,7 @@ public class CourseController {
 
     @GetMapping("/explore/{page}")
     public ResponseEntity<Page<CoursesEntity>> exploreCourse(@PathVariable int page) {
-        int pageSize = 20;
+        int pageSize = 25;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         Page<CoursesEntity> pageCourse = courseService.getAllCourse(pageRequest);
 
