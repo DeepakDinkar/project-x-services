@@ -1,43 +1,46 @@
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Exception\MissingFieldException.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Request\SigninRequest.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Response\CourseResponse.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Exception\NotFoundException.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Response\SignupResponse.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Enum\DeliveryModes.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Response\JWTAuthenticationResponse.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Entity\UserEntity.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Config\CORSConfiguration.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Controller\UserController.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\UserService.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Config\JWTAuthenticationFilter.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Repository\VerticalRepository.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Config\SecurityConfiguration.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Repository\UserRepository.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Request\GoogleSigninRequest.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\impl\UserServiceImpl.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Entity\TrainerEntity.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Enum\Role.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\CourseService.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Utility\Constants.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\QomoiApplication.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Controller\CourseController.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Request\SignupRequest.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Controller\AdminController.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Request\ForgetPasswordDto.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Response\GoogleSignupResponse.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\impl\AuthenticationServiceImpl.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Controller\AuthenticationController.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Request\AddressDto.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Entity\CoursesEntity.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Controller\VerticalController.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\JWTService.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Repository\CourseRepository.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Response\ResponseDto.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\VerticalService.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\AuthenticationService.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\impl\JWTServiceImpl.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Entity\VerticalEntity.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Response\GoogleTokenResponse.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Request\UserRequest.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\impl\CourseImpl.java
-D:\Custom Project\project-x-services\Qomoi\src\main\java\com\Qomoi1\Service\impl\VerticalServiceImpl.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/SignUpRequestDTO.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Utility/Constants.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/QomoiApplication.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Controller/CourseController.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/exception/ExistingUserFoundException.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/exception/GlobalExceptionHandler.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/jwt/JwtUtils.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/jwt/AuthTokenFilter.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/validator/ValidateUserFields.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/AddressDto.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/VerticalService.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/entity/RefreshToken.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Repository/VerticalRepository.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/ForgetPasswordDto.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Controller/VerticalController.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/exception/NotFoundException.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/config/CORSConfiguration.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/impl/CourseImpl.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/CourseService.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/CourseResponse.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/LoginRequestDTO.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/JwtResponse.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Repository/UserRepository.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/impl/RefreshTokenServiceImpl.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/GoogleTokenResponse.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/impl/UserDetailsImpl.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Repository/CourseRepository.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/impl/VerticalServiceImpl.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/config/WebSecurityConfig.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/GoogleSignupResponse.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/jwt/AuthEntryPointJwt.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/ResponseDto.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/entity/TrendingVerticalEntity.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/exception/TokenRefreshException.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Controller/UserController.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/GoogleSigninRequest.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/exception/MissingFieldException.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/entity/TrainerEntity.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/entity/CoursesEntity.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/entity/VerticalEntity.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/entity/UserDE.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Utility/Decrypt.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Repository/RefreshTokenRepository.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/dto/SavedRecordResponseDto.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/impl/UserServiceImpl.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/Qomoi1/Service/impl/UserDetailsServiceImpl.java
