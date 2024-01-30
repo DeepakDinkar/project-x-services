@@ -3,7 +3,7 @@ package com.qomoi.service;
 
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
-import com.qomoi.entity.TrendingVerticalEntity;
+import com.qomoi.entity.VerticalCoursesEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -16,5 +16,5 @@ public interface CourseService {
     Optional<CourseResponse> getCourseId(Long id);
     void saveCourse(CoursesEntity coursesEntity);
     List<CoursesEntity> getAllCoursesByVerticalSlug(String slug);
-    List<TrendingVerticalEntity> getTrendingVerticalCourses();
+    List<VerticalCoursesEntity> getTrendingVerticalCourses();
 }

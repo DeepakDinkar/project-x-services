@@ -1,6 +1,7 @@
 package com.qomoi.repository;
 
 
+import com.qomoi.entity.VerticalCoursesEntity;
 import com.qomoi.entity.VerticalEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -34,4 +35,6 @@ public interface VerticalRepository extends JpaRepository<VerticalEntity, Long> 
 
     @Query(value = "SELECT * FROM verticals LIMIT 3", nativeQuery = true)
      List<VerticalEntity> getTop3VerticalEntities();
+
+    VerticalEntity getVerticalEntityBySlug(String slug);
 }

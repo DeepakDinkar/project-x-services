@@ -1,6 +1,7 @@
 package com.qomoi.controller;
 
 
+import com.qomoi.entity.VerticalCoursesEntity;
 import com.qomoi.service.VerticalService;
 import com.qomoi.entity.VerticalEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,13 @@ public class VerticalController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/{slug}")
+    public ResponseEntity<VerticalCoursesEntity> getVerticalCoursesBySlug(@PathVariable String slug) {
+
+        VerticalCoursesEntity verticalCoursesEntity = verticalService.getVerticalCoursesBySlug(slug);
+        return new ResponseEntity<>(verticalCoursesEntity, HttpStatus.OK);
     }
 
 }

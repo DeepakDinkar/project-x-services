@@ -5,7 +5,7 @@ import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
-import com.qomoi.entity.TrendingVerticalEntity;
+import com.qomoi.entity.VerticalCoursesEntity;
 import com.qomoi.entity.VerticalEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -53,21 +53,21 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public List<TrendingVerticalEntity> getTrendingVerticalCourses() {
-        List<TrendingVerticalEntity> trendingVerticalEntities = new ArrayList<>();
+    public List<VerticalCoursesEntity> getTrendingVerticalCourses() {
+        List<VerticalCoursesEntity> trendingVerticalEntities = new ArrayList<>();
 
         List<VerticalEntity> verticals = verticalRepository.getTop3VerticalEntities();
 
         verticals.forEach(verticalEntity -> {
             List<CoursesEntity> courses = courseRepository.findTop2BySlugOrderByCampaignTemplateRating(verticalEntity.getSlug());
 
-            TrendingVerticalEntity trendingVerticalEntity = new TrendingVerticalEntity();
-            trendingVerticalEntity.setSlug(verticalEntity.getSlug());
-            trendingVerticalEntity.setTitle(verticalEntity.getTitle());
-            trendingVerticalEntity.setImageUrl(verticalEntity.getImageUrl());
-            trendingVerticalEntity.setCourses(courses);
+            VerticalCoursesEntity verticalCoursesEntity = new VerticalCoursesEntity();
+            verticalCoursesEntity.setSlug(verticalEntity.getSlug());
+            verticalCoursesEntity.setTitle(verticalEntity.getTitle());
+            verticalCoursesEntity.setImageUrl(verticalEntity.getImageUrl());
+            verticalCoursesEntity.setCourses(courses);
 
-            trendingVerticalEntities.add(trendingVerticalEntity);
+            trendingVerticalEntities.add(verticalCoursesEntity);
         });
         return trendingVerticalEntities;
     }

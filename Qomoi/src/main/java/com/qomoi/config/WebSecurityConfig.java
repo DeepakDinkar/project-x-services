@@ -60,7 +60,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests().requestMatchers("/user/**").permitAll()
-                .requestMatchers("/verticals").permitAll()
+                .requestMatchers("/verticals/**").permitAll()
                 .requestMatchers("/courses/**").permitAll()
                 .anyRequest().authenticated();
 

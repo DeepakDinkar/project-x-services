@@ -3,7 +3,7 @@ package com.qomoi.controller;
 import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
-import com.qomoi.entity.TrendingVerticalEntity;
+import com.qomoi.entity.VerticalCoursesEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -54,8 +54,8 @@ public class CourseController {
     }
 
     @GetMapping("/trending")
-    public ResponseEntity<List<TrendingVerticalEntity>> getTrendingVerticalCourses() {
-        List<TrendingVerticalEntity> courseByTopic= courseService.getTrendingVerticalCourses();
+    public ResponseEntity<List<VerticalCoursesEntity>> getTrendingVerticalCourses() {
+        List<VerticalCoursesEntity> courseByTopic= courseService.getTrendingVerticalCourses();
         return new ResponseEntity<>(courseByTopic, HttpStatus.OK);
     }
 

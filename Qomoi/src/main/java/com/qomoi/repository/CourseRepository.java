@@ -12,4 +12,6 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
 
     List<CoursesEntity> findTop2BySlugOrderByCampaignTemplateRating(String slug);
+
+    List<CoursesEntity> findCoursesEntitiesBySlug(String slug);
 }

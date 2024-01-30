@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrendingVerticalEntity {
+public class VerticalCoursesEntity {
 
     private String slug;
     private String title;
