@@ -4,7 +4,6 @@ import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.TrendingVerticalEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -18,12 +17,15 @@ import java.util.Optional;
 @RequestMapping("/courses")
 public class CourseController {
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @GetMapping("/get-course/{id}")
-    public ResponseEntity<CourseResponse> getCourseId(@PathVariable Long id) {
-        Optional<CourseResponse> courseResponse = courseService.getCourseId(id);
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
+    }
+
+    @GetMapping("/{courseId}")
+    public ResponseEntity<CourseResponse> getCourseDetails(@PathVariable Long courseId) {
+        Optional<CourseResponse> courseResponse = courseService.getCourseId(courseId);
         return courseResponse.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -37,7 +39,7 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/verticals")
+    @GetMapping("/verticals/{slug}")
     public ResponseEntity<List<CoursesEntity>> getCourseByTopic(@PathVariable String slug) {
         if (slug != null) {
             List<CoursesEntity> response = courseService.getAllCoursesByVerticalSlug(slug);

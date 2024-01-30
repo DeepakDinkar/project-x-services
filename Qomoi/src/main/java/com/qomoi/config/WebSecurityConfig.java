@@ -3,7 +3,7 @@ package com.qomoi.config;
 
 
 
-import com.qomoi.Service.impl.UserDetailsServiceImpl;
+import com.qomoi.service.impl.UserDetailsServiceImpl;
 import com.qomoi.jwt.AuthEntryPointJwt;
 import com.qomoi.jwt.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;

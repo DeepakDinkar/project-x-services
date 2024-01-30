@@ -1,6 +1,6 @@
 package com.qomoi.jwt;
 
-import com.qomoi.Service.impl.UserDetailsImpl;
+import com.qomoi.service.impl.UserDetailsImpl;
 import com.qomoi.entity.UserDE;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

@@ -19,12 +19,12 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class CourseImpl implements CourseService {
+public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final VerticalRepository verticalRepository;
     private final JdbcTemplate jdbcTemplate;
 
-    public CourseImpl(CourseRepository courseRepository, VerticalRepository verticalRepository, JdbcTemplate jdbcTemplate) {
+    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository, JdbcTemplate jdbcTemplate) {
         this.courseRepository = courseRepository;
         this.verticalRepository = verticalRepository;
         this.jdbcTemplate = jdbcTemplate;

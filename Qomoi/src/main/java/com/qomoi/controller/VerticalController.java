@@ -14,8 +14,11 @@ import java.util.List;
 @RequestMapping("verticals")
 public class VerticalController {
 
-    @Autowired
-    VerticalService verticalService;
+    private final VerticalService verticalService;
+
+    public VerticalController(VerticalService verticalService) {
+        this.verticalService = verticalService;
+    }
 
     @GetMapping
     public ResponseEntity<List<VerticalEntity>> getAllTopics() {

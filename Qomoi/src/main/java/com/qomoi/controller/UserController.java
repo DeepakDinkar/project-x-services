@@ -40,27 +40,25 @@ import java.util.Date;
 @RequestMapping("/user")
 public class UserController {
 
+    private final UserServiceImpl userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    private final RefreshTokenServiceImpl refreshTokenService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserServiceImpl userService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    JwtUtils jwtUtils;
-
-    @Autowired
-    RefreshTokenServiceImpl refreshTokenService;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${front.end}")
     private String frontEndUrl;
+
+    public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, RefreshTokenServiceImpl refreshTokenService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.refreshTokenService = refreshTokenService;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> saveUser(@RequestBody SignUpRequestDTO signUpRequestDTO)
