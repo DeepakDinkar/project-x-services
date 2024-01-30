@@ -1,8 +1,9 @@
 package com.Qomoi1.Service;
 
-import com.Qomoi1.Entity.CoursesEntity;
-import com.Qomoi1.Entity.VerticalEntity;
-import com.Qomoi1.Response.CourseResponse;
+
+import com.Qomoi1.dto.CourseResponse;
+import com.Qomoi1.entity.CoursesEntity;
+import com.Qomoi1.entity.VerticalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -12,14 +13,12 @@ import java.util.Optional;
 
 public interface CourseService {
 
+    Page<CoursesEntity> getAllCourse(PageRequest pageRequest);
+    Optional<CourseResponse> getCourseId(Long id);
 
-     Page<CoursesEntity> getAllCourse(PageRequest pageRequest);
-     Optional<CourseResponse> getCourseId(Long id);
+    void saveCourse(CoursesEntity coursesEntity);
 
-     void saveCourse(CoursesEntity coursesEntity);
+    List<CourseResponse> getCourseByVerticals(String slug);
 
-     List<CourseResponse> getCourseByVerticals(String slug);
-
-     Map<VerticalEntity, List<CoursesEntity>> findTopCoursesByVerticals();
-
+    List<Map<String, Object>> findTopCoursesByVerticals();
 }

@@ -1,9 +1,9 @@
 package com.Qomoi1.Controller;
 
-import com.Qomoi1.Entity.CoursesEntity;
-import com.Qomoi1.Entity.VerticalEntity;
-import com.Qomoi1.Response.CourseResponse;
 import com.Qomoi1.Service.CourseService;
+import com.Qomoi1.dto.CourseResponse;
+import com.Qomoi1.entity.CoursesEntity;
+import com.Qomoi1.entity.VerticalEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,8 +54,8 @@ public class CourseController {
     }
 
     @GetMapping("/get-top-courses")
-    public ResponseEntity<Map<VerticalEntity, List<CoursesEntity>>> getTopCoursesByVertical() {
-        Map<VerticalEntity, List<CoursesEntity>> courseByTopic = courseService.findTopCoursesByVerticals();
+    public ResponseEntity<List<Map<String,Object>>> getTopCoursesByVertical() {
+       List<Map<String,Object>> courseByTopic= courseService.findTopCoursesByVerticals();
         return new ResponseEntity<>(courseByTopic, HttpStatus.OK);
     }
 

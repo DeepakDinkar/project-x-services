@@ -1,7 +1,8 @@
 package com.Qomoi1.Controller;
 
-import com.Qomoi1.Entity.VerticalEntity;
+
 import com.Qomoi1.Service.VerticalService;
+import com.Qomoi1.entity.VerticalEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ public class VerticalController {
     @Autowired
     VerticalService verticalService;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<VerticalEntity>> getAllTopics() {
         List<VerticalEntity> allTopics = verticalService.getVerticals();
         return ResponseEntity.ok(allTopics);

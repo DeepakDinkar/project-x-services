@@ -1,12 +1,12 @@
 package com.Qomoi1.Service.impl;
 
-import com.Qomoi1.Entity.VerticalEntity;
+
 import com.Qomoi1.Repository.VerticalRepository;
 import com.Qomoi1.Service.VerticalService;
+import com.Qomoi1.entity.VerticalEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

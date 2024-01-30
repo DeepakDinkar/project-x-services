@@ -1,6 +1,8 @@
 package com.Qomoi1.Service;
 
-import com.Qomoi1.Entity.VerticalEntity;
+
+
+import com.Qomoi1.entity.VerticalEntity;
 
 import java.util.List;
 
