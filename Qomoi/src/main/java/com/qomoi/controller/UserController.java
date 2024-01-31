@@ -222,60 +222,6 @@ public class UserController {
 //        }
 //        return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
 //    }
-//
-//    @PostMapping("/reset_password")
-//    public ResponseEntity<?> processResetPassword( HttpServletRequest request, Model model) throws MissingFieldException, JsonProcessingException {
-//
-//        String token = request.getParameter("token");
-//        String password = request.getParameter("password");
-//        if (!StringUtils.hasText(token)) {
-//            throw new MissingFieldException(Constants.TOKEN_MANDATORY);
-//        }
-//        if (!StringUtils.hasText(password)) {
-//            throw new MissingFieldException(Constants.PASSWORD_MANDATORY);
-//        }
-//
-//        UserDE user = userService.getByResetPasswordToken(token);
-//        model.addAttribute("title", "Reset your password");
-//
-//        if (user == null) {
-//            model.addAttribute("message", "Invalid Token");
-//            return ResponseEntity
-//                    .status(401)
-//                    .body(new ResponseDto(5, Constants.UNAUTHORIZED));
-//        } else {
-//            userService.updatePassword(user, password);
-//            model.addAttribute("message", "You have successfully changed your password.");
-//        }
-//
-//        return ResponseEntity.ok().body(new ResponseDto(200, Constants.PASSWORD_UPDATED_SUCCESSFULLY));
-//    }
-
-//    public void TrippleDes() throws Exception {
-//        myEncryptionKey = "ThisIsSpartaThisIsSparta";
-//        myEncryptionScheme = DESEDE_ENCRYPTION_SCHEME;
-//        arrayBytes = myEncryptionKey.getBytes(UNICODE_FORMAT);
-//        ks = new DESedeKeySpec(arrayBytes);
-//        skf = SecretKeyFactory.getInstance(myEncryptionScheme);
-//        cipher = Cipher.getInstance(myEncryptionScheme);
-//        key = skf.generateSecret(ks);
-//    }
-//
-//
-//    public String decrypt(String encryptedString) {
-//        String decryptedText=null;
-//        try {
-//            cipher.init(Cipher.DECRYPT_MODE, key);
-//            byte[] encryptedText = Base64.decodeBase64(encryptedString);
-//            byte[] plainText = cipher.doFinal(encryptedText);
-//            decryptedText= new String(plainText);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return decryptedText;
-//    }
-
-
 
 
 }
