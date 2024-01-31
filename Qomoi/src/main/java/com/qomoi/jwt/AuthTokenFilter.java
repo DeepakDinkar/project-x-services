@@ -29,7 +29,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-
             String authorizationHeader = request.getHeader("Authorization");
             String token = null;
             String userName = null;
@@ -38,28 +37,23 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 token = authorizationHeader.substring(7);
                 userName = jwtUtils.getUserNameFromJwtToken(token);
             }
-            String jwt = parseJwt(request);
-            if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
+            if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
 
                 if (jwtUtils.validateJwtToken(token)) {
-
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    usernamePasswordAuthenticationToken
-                            .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error("Cannot set user authentication: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
-    }
-    private String parseJwt(HttpServletRequest request) {
-        String jwt = jwtUtils.getJwtFromCookies(request);
-        return jwt;
     }
 }

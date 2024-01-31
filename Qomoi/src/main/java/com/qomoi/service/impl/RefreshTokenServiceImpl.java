@@ -1,12 +1,14 @@
 package com.qomoi.service.impl;
 
 
+import com.qomoi.entity.UserDE;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.entity.RefreshToken;
 import com.qomoi.exception.TokenRefreshException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +32,29 @@ public class RefreshTokenServiceImpl {
     }
 
     public RefreshToken createRefreshToken(Long userId) {
-        RefreshToken refreshToken = new RefreshToken();
+        Optional<UserDE> userOptional = userRepository.findById(userId);
 
-        refreshToken.setUser(userRepository.findById(userId).get());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-        refreshToken.setToken(UUID.randomUUID().toString());
+        if (userOptional.isPresent()) {
+            UserDE user = userOptional.get();
 
-        refreshToken = refreshTokenRepository.save(refreshToken);
-        return refreshToken;
+            Optional<RefreshToken> existingToken = refreshTokenRepository.findByUser(user);
+
+            if (existingToken.isPresent()) {
+                // Update the existing token or handle the situation accordingly
+                RefreshToken refreshToken = existingToken.get();
+                refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+                return refreshTokenRepository.save(refreshToken);
+            } else {
+                // Create a new refresh token
+                RefreshToken refreshToken = new RefreshToken();
+                refreshToken.setUser(user);
+                refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+                refreshToken.setToken(UUID.randomUUID().toString());
+                return refreshTokenRepository.save(refreshToken);
+            }
+        } else {
+            throw new UsernameNotFoundException("User not found with id: " + userId);
+        }
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
