@@ -75,8 +75,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry.requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
-                                .requestMatchers("/user/**").permitAll()
-//                                .requestMatchers("/verticals/**").permitAll()
+                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/verticals/**").permitAll()
+                                .requestMatchers("/courses/**").permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
