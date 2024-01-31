@@ -18,7 +18,7 @@ public class VerticalEntity {
     private Long id;
     @Column(name = "image_url")
     private String imageUrl;
-    @Column(name = "slug")
+    @Column(name = "slug", nullable = false, unique = true)
     private String slug;
     @Column(name = "title")
     private String title;

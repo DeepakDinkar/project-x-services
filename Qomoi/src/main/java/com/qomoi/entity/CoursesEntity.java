@@ -20,7 +20,7 @@ public class CoursesEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "slug")
+    @Column(name = "slug" , nullable = false)
     private String slug;
 
     @Column(name = "image_url")
@@ -37,6 +37,5 @@ public class CoursesEntity {
 
     @Column(name = "key_take_away",length = 500)
     private List<String> keyTakeAway;
-
 
 }
