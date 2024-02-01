@@ -78,6 +78,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/verticals/**").permitAll()
                                 .requestMatchers("/courses/**").permitAll()
+                                .requestMatchers("/search/**").permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

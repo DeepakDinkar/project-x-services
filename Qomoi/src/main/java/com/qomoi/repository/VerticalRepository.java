@@ -37,4 +37,6 @@ public interface VerticalRepository extends JpaRepository<VerticalEntity, Long> 
      List<VerticalEntity> getTop3VerticalEntities();
 
     VerticalEntity getVerticalEntityBySlug(String slug);
+
+    List<VerticalEntity> findTop3BySlugContainingIgnoreCase(String slug);
 }

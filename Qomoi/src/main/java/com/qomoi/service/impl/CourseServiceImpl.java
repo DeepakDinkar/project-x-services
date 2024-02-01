@@ -22,12 +22,10 @@ import java.util.Optional;
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final VerticalRepository verticalRepository;
-    private final JdbcTemplate jdbcTemplate;
 
-    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository, JdbcTemplate jdbcTemplate) {
+    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository) {
         this.courseRepository = courseRepository;
         this.verticalRepository = verticalRepository;
-        this.jdbcTemplate = jdbcTemplate;
     }
 
 
@@ -55,7 +53,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<VerticalCoursesEntity> getTrendingVerticalCourses() {
         List<VerticalCoursesEntity> trendingVerticalEntities = new ArrayList<>();
-
         List<VerticalEntity> verticals = verticalRepository.getTop3VerticalEntities();
 
         verticals.forEach(verticalEntity -> {
