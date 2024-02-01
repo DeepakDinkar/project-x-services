@@ -37,7 +37,7 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/user")
+    @RequestMapping("/user")
 public class UserController {
 
     private final UserServiceImpl userService;
@@ -67,7 +67,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/save-address/id")
+    @PostMapping("/save-address/{id}")
     public ResponseEntity<String> saveAddress(@RequestBody AddressDto addressDto, @PathVariable Long id) {
         if (id != null && addressDto != null) {
             userService.saveAddress(addressDto, id);

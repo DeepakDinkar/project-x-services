@@ -25,8 +25,8 @@ public class ValidateUserFields {
         if (!StringUtils.hasText(signUpRequestDTO.getPassword()))
             throw new MissingFieldException(Constants.PASSWORD_MANDATORY);
 
-        if (!StringUtils.hasText(signUpRequestDTO.getUserType()))
-            throw new MissingFieldException(Constants.USER_TYPE_MANDATORY);
+//        if (!StringUtils.hasText(signUpRequestDTO.getUserType()))
+//            throw new MissingFieldException(Constants.USER_TYPE_MANDATORY);
 
 //        if (!StringUtils.hasText(signUpRequestDTO.getStreet()))
 //            throw new MissingFieldException(Constants.STREET_MANDATORY);
