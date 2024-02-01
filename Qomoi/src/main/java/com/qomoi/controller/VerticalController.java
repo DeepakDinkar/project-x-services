@@ -36,15 +36,7 @@ public class VerticalController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/{query}")
-    public ResponseEntity<List<VerticalEntity>> searchVerticals(@PathVariable String query) {
-        if (query != null) {
-            List<VerticalEntity> response = verticalService.searchVerticals(query);
-            return ResponseEntity.ok(response);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
 
     @GetMapping("/{slug}")
     public ResponseEntity<VerticalCoursesEntity> getVerticalCoursesBySlug(@PathVariable String slug) {

@@ -37,11 +37,6 @@ public class VerticalServiceImpl implements VerticalService {
 
 
     @Override
-    public List<VerticalEntity> searchVerticals(String query) {
-        return verticalRepository.searchQuery(query);
-    }
-
-    @Override
     public VerticalCoursesEntity getVerticalCoursesBySlug(String slug) {
 
         VerticalCoursesEntity verticalCoursesEntity = new VerticalCoursesEntity();

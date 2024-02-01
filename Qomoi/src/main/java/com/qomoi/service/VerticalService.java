@@ -11,6 +11,6 @@ public interface VerticalService {
 
     List<VerticalEntity> getVerticals();
     void saveTopic(VerticalEntity verticalEntity);
-    List<VerticalEntity> searchVerticals(String query);
+//    List<VerticalEntity> searchVerticals(String query);
     VerticalCoursesEntity getVerticalCoursesBySlug(String slug);
 }

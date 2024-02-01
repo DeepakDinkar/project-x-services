@@ -30,7 +30,7 @@ public interface VerticalRepository extends JpaRepository<VerticalEntity, Long> 
     List<VerticalEntity> getAllVerticals();
 
 
-    @Query(value = "SELECT * FROM verticals WHERE LOWER(slug) LIKE %:query%", nativeQuery = true)
+    @Query(value = "SELECT * FROM courses WHERE LOWER(slug) LIKE %:query%", nativeQuery = true)
     List<VerticalEntity> searchQuery(@Param("query") String query);
 
     @Query(value = "SELECT * FROM verticals LIMIT 3", nativeQuery = true)
@@ -39,4 +39,7 @@ public interface VerticalRepository extends JpaRepository<VerticalEntity, Long> 
     VerticalEntity getVerticalEntityBySlug(String slug);
 
     List<VerticalEntity> findTop3BySlugContainingIgnoreCase(String slug);
-}
+
+    List<VerticalEntity> findBySlugStartingWithIgnoreCase(String slug);
+
+    }
