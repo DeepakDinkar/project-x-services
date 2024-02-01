@@ -10,7 +10,6 @@ import com.qomoi.entity.VerticalEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<VerticalCoursesEntity> getTrendingVerticalCourses() {
         List<VerticalCoursesEntity> trendingVerticalEntities = new ArrayList<>();
-        List<VerticalEntity> verticals = verticalRepository.getTop3VerticalEntities();
+        List<VerticalEntity> verticals = verticalRepository.findTop3ByOrderBySlugAsc();
 
         verticals.forEach(verticalEntity -> {
             List<CoursesEntity> courses = courseRepository.findTop2BySlugOrderByCampaignTemplateRating(verticalEntity.getSlug());

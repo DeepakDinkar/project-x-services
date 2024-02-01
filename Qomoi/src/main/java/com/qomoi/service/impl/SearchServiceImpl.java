@@ -1,6 +1,5 @@
 package com.qomoi.service.impl;
 
-import com.qomoi.dto.ExploreSearchDto;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.GlobalSearchEntity;
 import com.qomoi.entity.VerticalEntity;
@@ -8,9 +7,13 @@ import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,11 +23,10 @@ import java.util.List;
 @Service
 public class SearchServiceImpl implements SearchService {
 
+    private final VerticalRepository verticalRepository;
+    private final CourseRepository courseRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private final VerticalRepository verticalRepository;
-
-    private final CourseRepository courseRepository;
 
     public SearchServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository) {
         this.verticalRepository = verticalRepository;
@@ -35,7 +37,7 @@ public class SearchServiceImpl implements SearchService {
     public GlobalSearchEntity getGlobalSearchResults(String query) {
         GlobalSearchEntity globalSearchEntity = new GlobalSearchEntity();
 
-        if(!query.trim().equals("")) {
+        if (!query.trim().equals("")) {
             List<VerticalEntity> verticals = verticalRepository.findTop3BySlugContainingIgnoreCase(query);
             List<CoursesEntity> courses = courseRepository.findTop3BySlugContainingIgnoreCaseOrCampaignTemplateCourseNameContainingIgnoreCase(query, query);
 
@@ -49,10 +51,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<CoursesEntity> searchVerticals(String slug) {
 
-        StringBuilder sql = new StringBuilder("Select c.id, c.campaign_template_course_name, c.campaign_template_rating ,c.course_content,c.image_url, c.key_take_away, c.slug ");
-        sql.append(" FROM courses c WHERE LOWER(slug) = ?");
-
-        List<CoursesEntity> list = this.jdbcTemplate.query(sql.toString(), new Object[]{slug},
+        List<CoursesEntity> list = this.jdbcTemplate.query("Select c.id, c.campaign_template_course_name, c.campaign_template_rating ,c.course_content,c.image_url, c.key_take_away, c.slug " + " FROM courses c WHERE LOWER(slug) = ?", new Object[]{slug},
                 new RowMapper<CoursesEntity>() {
                     @Override
                     public CoursesEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -74,31 +73,15 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public ExploreSearchDto exploreSearch(String vertical, String courseName) {
+    public List<CoursesEntity> getExploreCourses(String slug, String query) {
 
-        ExploreSearchDto exploreSearchDto = new ExploreSearchDto();
-        List<VerticalEntity> verticals = null;
-        List<CoursesEntity> courses = null;
-
-        if (vertical != null && !vertical.trim().equals("")) {
-            verticals = verticalRepository.findBySlugStartingWithIgnoreCase(vertical);
-            exploreSearchDto.setVerticals(verticals);
-        }else{
-            exploreSearchDto.setVerticals(null);
+        if(StringUtils.hasText(slug) && StringUtils.hasText(query)) {
+            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(query, slug);
+        } else if(StringUtils.hasText(slug)) {
+            return courseRepository.findCoursesEntitiesBySlug(slug);
+        } else if(StringUtils.hasText(query)) {
+            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCase(query);
         }
-
-        if (courseName != null && !courseName.trim().equals("")) {
-            courses = courseRepository.findCoursesByCampaignTemplateCourseNameStartingWithIgnoreCase(courseName);
-            exploreSearchDto.setCourses(courses);
-            } else {
-            exploreSearchDto.setCourses(null);
-            }
-
-        return exploreSearchDto;
+        return courseRepository.findAllByOrderByCampaignTemplateRatingDesc();
     }
-
-
-
-
-
 }

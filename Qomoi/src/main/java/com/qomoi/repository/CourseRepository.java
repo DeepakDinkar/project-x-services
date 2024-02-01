@@ -17,5 +17,9 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     List<CoursesEntity> findTop3BySlugContainingIgnoreCaseOrCampaignTemplateCourseNameContainingIgnoreCase(String slug, String name);
 
-    List<CoursesEntity> findCoursesByCampaignTemplateCourseNameStartingWithIgnoreCase(String campaignTemplateCourseName);
+    List<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCase(String campaignTemplateCourseName);
+
+    List<CoursesEntity> findAllByOrderByCampaignTemplateRatingDesc();
+
+    List<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(String campaignTemplateCourseName, String slug);
 }

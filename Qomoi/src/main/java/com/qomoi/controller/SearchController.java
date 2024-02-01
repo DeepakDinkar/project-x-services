@@ -1,9 +1,7 @@
 package com.qomoi.controller;
 
-import com.qomoi.dto.ExploreSearchDto;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.GlobalSearchEntity;
-import com.qomoi.entity.VerticalEntity;
 import com.qomoi.service.SearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +21,7 @@ public class SearchController {
 
     @GetMapping
     public ResponseEntity<GlobalSearchEntity> getAllQueryResults(@RequestParam(value = "query") String query) {
-       GlobalSearchEntity globalSearchEntity = searchService.getGlobalSearchResults(query);
+        GlobalSearchEntity globalSearchEntity = searchService.getGlobalSearchResults(query);
 
         return new ResponseEntity<>(globalSearchEntity, HttpStatus.OK);
     }
@@ -38,20 +36,14 @@ public class SearchController {
         }
     }
 
-    @PostMapping("/explore")
-    public ResponseEntity<ExploreSearchDto> exploreSearch(
-            @RequestParam(name = "verticals" , required = false) String verticals,
-            @RequestParam(name = "courseName" , required = false) String  courseName
-    ){
-        ExploreSearchDto exploreSearchDto = searchService.exploreSearch(verticals,courseName);
-        if(exploreSearchDto != null){
-            return new ResponseEntity<>(exploreSearchDto, HttpStatus.OK);
-        }
-        else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/explore")
+    public ResponseEntity<List<CoursesEntity>> getExploreCourses(
+            @RequestParam(name = "slug", required = false) String slug,
+            @RequestParam(name = "query", required = false) String query
+    ) {
+        List<CoursesEntity> coursesEntity  = searchService.getExploreCourses(slug, query);
+        return new ResponseEntity<>(coursesEntity, HttpStatus.OK);
     }
-
 
 
 }
