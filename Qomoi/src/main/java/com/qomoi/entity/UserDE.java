@@ -54,7 +54,7 @@ public class UserDE {
     private String state;
 
     @Column(name = "zipcode")
-    private Integer zipcode;
+    private String zipcode;
 
     @Column(name = "is_facebook")
     private Boolean isFacebook;
