@@ -3,6 +3,8 @@ package com.qomoi.service;
 import com.qomoi.dto.ExploreSearchDto;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.GlobalSearchEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -12,5 +14,7 @@ public interface SearchService {
 
     List<CoursesEntity> searchVerticals(String slug);
 
-    List<CoursesEntity> getExploreCourses(String slug, String query);
+    Page<CoursesEntity> getExploreCourses(String slug, String query, PageRequest pageRequest);
+
+    List<CoursesEntity> getVerticalCourses(String slug, String query);
 }

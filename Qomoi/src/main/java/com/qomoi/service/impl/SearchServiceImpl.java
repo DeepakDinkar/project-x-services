@@ -73,14 +73,28 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<CoursesEntity> getExploreCourses(String slug, String query) {
+    public Page<CoursesEntity> getExploreCourses(String slug, String query,PageRequest pageRequest) {
 
         if(StringUtils.hasText(slug) && StringUtils.hasText(query)) {
-            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(query, slug);
+            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(query, slug,pageRequest);
         } else if(StringUtils.hasText(slug)) {
-            return courseRepository.findCoursesEntitiesBySlug(slug);
+            return courseRepository.findCoursesEntitiesBySlug(slug,pageRequest);
         } else if(StringUtils.hasText(query)) {
-            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCase(query);
+            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCase(query,pageRequest);
+        }
+        return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
+    }
+
+    @Override
+    public List<CoursesEntity> getVerticalCourses(String slug, String query) {
+        if(StringUtils.hasText(slug) && StringUtils.hasText(query)){
+            return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(slug, query);
+        }
+        else if(StringUtils.hasText(slug)){
+            return courseRepository.findBySlugContainingIgnoreCase(slug);
+        }
+        else if(StringUtils.hasText(query)){
+            return courseRepository.findListByCampaignTemplateCourseNameContainingIgnoreCase(query);
         }
         return courseRepository.findAllByOrderByCampaignTemplateRatingDesc();
     }

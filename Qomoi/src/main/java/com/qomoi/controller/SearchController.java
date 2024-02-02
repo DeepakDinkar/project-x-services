@@ -3,6 +3,8 @@ package com.qomoi.controller;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.GlobalSearchEntity;
 import com.qomoi.service.SearchService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,14 +38,24 @@ public class SearchController {
         }
     }
 
-    @GetMapping("/explore")
-    public ResponseEntity<List<CoursesEntity>> getExploreCourses(
+    @GetMapping("/explore/{page}")
+    public ResponseEntity<Page<CoursesEntity>> getExploreCourses(
+            @PathVariable int page,
             @RequestParam(name = "slug", required = false) String slug,
             @RequestParam(name = "query", required = false) String query
     ) {
-        List<CoursesEntity> coursesEntity  = searchService.getExploreCourses(slug, query);
-        return new ResponseEntity<>(coursesEntity, HttpStatus.OK);
+        int pageSize = 25;
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+        Page<CoursesEntity> coursesPage = searchService.getExploreCourses(slug, query, pageRequest);
+        return new ResponseEntity<>(coursesPage, HttpStatus.OK);
     }
 
-
+    @GetMapping("/verticals/{slug}")
+    public ResponseEntity<List<CoursesEntity>> getVerticalCourses(
+            @PathVariable String slug,
+            @RequestParam(name = "query", required = false)String query
+    ){
+       List<CoursesEntity> verticalPage =  searchService.getVerticalCourses(slug, query);
+       return new ResponseEntity<>(verticalPage,HttpStatus.OK);
+    }
 }

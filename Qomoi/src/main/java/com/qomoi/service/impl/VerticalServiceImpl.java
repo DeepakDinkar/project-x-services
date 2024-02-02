@@ -43,7 +43,7 @@ public class VerticalServiceImpl implements VerticalService {
         VerticalEntity verticalEntity = verticalRepository.getVerticalEntityBySlug(slug);
 
         if(Objects.nonNull(verticalEntity)) {
-            List<CoursesEntity> courses = courseRepository.findCoursesEntitiesBySlug(slug);
+            List<CoursesEntity> courses = courseRepository.findCoursesBySlug(slug);
             verticalCoursesEntity.setSlug(verticalEntity.getSlug());
             verticalCoursesEntity.setTitle(verticalEntity.getTitle());
             verticalCoursesEntity.setImageUrl(verticalEntity.getImageUrl());
