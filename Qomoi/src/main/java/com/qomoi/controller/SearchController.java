@@ -39,23 +39,18 @@ public class SearchController {
     }
 
     @GetMapping("/explore/{page}")
-    public ResponseEntity<Page<CoursesEntity>> getExploreCourses(
-            @PathVariable int page,
-            @RequestParam(name = "slug", required = false) String slug,
-            @RequestParam(name = "query", required = false) String query
-    ) {
+    public ResponseEntity<Page<CoursesEntity>> getExploreCourses(@PathVariable int page, @RequestParam(name = "slug", required = false) String slug, @RequestParam(name = "query", required = false) String query) {
         int pageSize = 25;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         Page<CoursesEntity> coursesPage = searchService.getExploreCourses(slug, query, pageRequest);
         return new ResponseEntity<>(coursesPage, HttpStatus.OK);
     }
 
-    @GetMapping("/verticals/{slug}")
-    public ResponseEntity<List<CoursesEntity>> getVerticalCourses(
-            @PathVariable String slug,
-            @RequestParam(name = "query", required = false)String query
-    ){
-       List<CoursesEntity> verticalPage =  searchService.getVerticalCourses(slug, query);
-       return new ResponseEntity<>(verticalPage,HttpStatus.OK);
+    @GetMapping("/verticals/{slug}/{page}")
+    public ResponseEntity<Page<CoursesEntity>> getVerticalCourses(@PathVariable String slug, @PathVariable int page, @RequestParam(name = "query", required = false) String query) {
+        int pageSize = 25;
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+        Page<CoursesEntity> verticalPage = searchService.getVerticalCourses(slug, query, pageRequest);
+        return new ResponseEntity<>(verticalPage, HttpStatus.OK);
     }
 }

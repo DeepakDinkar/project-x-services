@@ -16,5 +16,5 @@ public interface SearchService {
 
     Page<CoursesEntity> getExploreCourses(String slug, String query, PageRequest pageRequest);
 
-    List<CoursesEntity> getVerticalCourses(String slug, String query);
+    Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest);
 }

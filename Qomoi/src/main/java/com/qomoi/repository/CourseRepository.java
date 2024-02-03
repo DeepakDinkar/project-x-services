@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
-
     List<CoursesEntity> findTop2BySlugOrderByCampaignTemplateRating(String slug);
 
     List<CoursesEntity> findCoursesBySlug(String slug);
@@ -27,13 +26,10 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     Page<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(String campaignTemplateCourseName, String slug, PageRequest pageRequest);
 
+    Page<CoursesEntity> findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(String slug, String name, PageRequest pageRequest);
 
-    List<CoursesEntity> findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(String slug, String name);
+    Page<CoursesEntity> findBySlugContainingIgnoreCase(String slug, PageRequest pageRequest);
 
-    List<CoursesEntity> findBySlugContainingIgnoreCase(String slug);
-
-    List<CoursesEntity> findListByCampaignTemplateCourseNameContainingIgnoreCase(String name);
-
-    List<CoursesEntity> findAllByOrderByCampaignTemplateRatingDesc();
+    Page<CoursesEntity> findListByCampaignTemplateCourseNameContainingIgnoreCase(String name, PageRequest pageRequest);
 
 }

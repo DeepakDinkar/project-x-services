@@ -86,16 +86,16 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<CoursesEntity> getVerticalCourses(String slug, String query) {
+    public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest) {
         if(StringUtils.hasText(slug) && StringUtils.hasText(query)){
-            return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(slug, query);
+            return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(slug, query, pageRequest);
         }
         else if(StringUtils.hasText(slug)){
-            return courseRepository.findBySlugContainingIgnoreCase(slug);
+            return courseRepository.findBySlugContainingIgnoreCase(slug, pageRequest);
         }
         else if(StringUtils.hasText(query)){
-            return courseRepository.findListByCampaignTemplateCourseNameContainingIgnoreCase(query);
+            return courseRepository.findListByCampaignTemplateCourseNameContainingIgnoreCase(query, pageRequest);
         }
-        return courseRepository.findAllByOrderByCampaignTemplateRatingDesc();
+        return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
     }
 }
