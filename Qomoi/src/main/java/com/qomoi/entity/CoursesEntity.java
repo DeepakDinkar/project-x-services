@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -37,5 +38,11 @@ public class CoursesEntity {
 
     @Column(name = "key_take_away",length = 500)
     private List<String> keyTakeAway;
+
+    @Column(name = "is_trending")
+    private Boolean isTrending;
+
+    @Column(name = "course_add_date")
+    private Date courseAddDate;
 
 }

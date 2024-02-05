@@ -78,6 +78,21 @@ public class UserController {
         }
     }
 
+    @PostMapping("/myProfile/{email}")
+    public ResponseEntity<UserProfileResponse> getMyProfile(@PathVariable String email){
+        return null;
+    }
+
+    @PostMapping("/myPurchase/{email}")
+    public ResponseEntity<PurchaseResponse> getPurchaseInfo(@PathVariable String email){
+        return null;
+    }
+
+    @PostMapping("/myCourses/{email}")
+    public ResponseEntity<CourseResponse> getMyCourses(@PathVariable String email){
+        return null;
+    }
+
 //    @PostMapping("/forgot_password")
 //    public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, HttpServletRequest request, Model model) throws MissingFieldException, NotFoundException, JsonProcessingException, NotFoundException {
 //

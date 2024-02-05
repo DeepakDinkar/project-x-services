@@ -26,6 +26,7 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     Page<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(String campaignTemplateCourseName, String slug, PageRequest pageRequest);
 
+
     Page<CoursesEntity> findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(String slug, String name, PageRequest pageRequest);
 
     Page<CoursesEntity> findBySlugContainingIgnoreCase(String slug, PageRequest pageRequest);

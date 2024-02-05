@@ -1,5 +1,6 @@
 package com.qomoi.controller;
 
+import com.qomoi.dto.CourseLocationResponse;
 import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
@@ -67,4 +68,13 @@ public class CourseController {
 
         return new ResponseEntity<>(pageCourse, HttpStatus.OK);
     }
+
+//    @GetMapping("/explore/{page}")
+//    public ResponseEntity<Page<CourseLocationResponse>> exploreCourse(@PathVariable int page) {
+//        int pageSize = 25;
+//        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+//        Page<CourseLocationResponse> pageCourse = courseService.getAllCourse(pageRequest);
+//
+//        return new ResponseEntity<>(pageCourse, HttpStatus.OK);
+//    }
 }

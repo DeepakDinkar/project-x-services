@@ -1,6 +1,7 @@
 package com.qomoi.service;
 
 
+import com.qomoi.dto.CourseLocationResponse;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.VerticalCoursesEntity;
@@ -13,6 +14,8 @@ import java.util.Optional;
 public interface CourseService {
 
     Page<CoursesEntity> getAllCourse(PageRequest pageRequest);
+//    Page<CourseLocationResponse> getAllCourse(PageRequest pageRequest);
+
     Optional<CourseResponse> getCourseId(Long id);
     void saveCourse(CoursesEntity coursesEntity);
     List<CoursesEntity> getAllCoursesByVerticalSlug(String slug);
