@@ -25,8 +25,8 @@ public class CourseController {
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<CourseResponse> getCourseDetails(@PathVariable Long courseId) {
-        Optional<CourseResponse> courseResponse = courseService.getCourseId(courseId);
+    public ResponseEntity<CourseLocationResponse> getCourseDetails(@PathVariable Long courseId) {
+        Optional<CourseLocationResponse> courseResponse = courseService.getCourseId(courseId);
         return courseResponse.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -61,10 +61,10 @@ public class CourseController {
     }
 
     @GetMapping("/explore/{page}")
-    public ResponseEntity<Page<CoursesEntity>> exploreCourse(@PathVariable int page) {
+    public ResponseEntity<List<CourseLocationResponse>> exploreCourse(@PathVariable int page) {
         int pageSize = 25;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        Page<CoursesEntity> pageCourse = courseService.getAllCourse(pageRequest);
+        List<CourseLocationResponse> pageCourse = courseService.getAllCourse(pageRequest);
 
         return new ResponseEntity<>(pageCourse, HttpStatus.OK);
     }

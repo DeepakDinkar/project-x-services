@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 public class CourseLocationResponse {
 
+    private Long id;
+
     private String slug;
 
     private String campaignTemplateCourseName;
@@ -26,10 +28,10 @@ public class CourseLocationResponse {
 
     private Boolean isTrending;
 
-    private Date courseAddDate;
+    private Date courseAddedDate;
 
-    private String locationName;
+    private List<LocationResponse>  location;
 
-    private Date date;
+    private List<TrainerResponse> trainer;
 
 }

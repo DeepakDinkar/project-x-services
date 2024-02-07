@@ -28,6 +28,7 @@ public class CourseResponse {
 
     private List<String> keyTakeAway;
 
+
     public CourseResponse(CoursesEntity coursesEntity) {
 
 

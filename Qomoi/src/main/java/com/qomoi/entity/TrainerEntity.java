@@ -21,6 +21,7 @@ public class TrainerEntity {
     @Column(name = "trainer_name")
     private String trainerName;
 
-    @Column(name = "slug")
-    private String slug;
+    @Column(name = "course_id")
+    private String courseId;
+
 }

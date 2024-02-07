@@ -13,10 +13,10 @@ import java.util.Optional;
 
 public interface CourseService {
 
-    Page<CoursesEntity> getAllCourse(PageRequest pageRequest);
-//    Page<CourseLocationResponse> getAllCourse(PageRequest pageRequest);
+//    Page<CoursesEntity> getAllCourse(PageRequest pageRequest);
+    List<CourseLocationResponse> getAllCourse(PageRequest pageRequest);
 
-    Optional<CourseResponse> getCourseId(Long id);
+    Optional<CourseLocationResponse> getCourseId(Long id);
     void saveCourse(CoursesEntity coursesEntity);
     List<CoursesEntity> getAllCoursesByVerticalSlug(String slug);
     List<VerticalCoursesEntity> getTrendingVerticalCourses();

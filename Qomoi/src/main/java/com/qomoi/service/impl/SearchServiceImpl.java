@@ -4,10 +4,16 @@ import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.GlobalSearchEntity;
 import com.qomoi.entity.VerticalEntity;
 import com.qomoi.repository.CourseRepository;
+import com.qomoi.repository.LocationRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.SearchService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.apache.http.client.utils.DateUtils;
+import org.hibernate.type.descriptor.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,20 +23,24 @@ import org.springframework.util.StringUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SearchServiceImpl implements SearchService {
 
     private final VerticalRepository verticalRepository;
     private final CourseRepository courseRepository;
+    private final LocationRepository locationRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public SearchServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository) {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public SearchServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository, LocationRepository locationRepository) {
         this.verticalRepository = verticalRepository;
         this.courseRepository = courseRepository;
+        this.locationRepository = locationRepository;
     }
 
     @Override
@@ -73,17 +83,47 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Page<CoursesEntity> getExploreCourses(String slug, String query,PageRequest pageRequest) {
+    public Page<CoursesEntity> getExploreCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, String location) {
 
         if(StringUtils.hasText(slug) && StringUtils.hasText(query)) {
-            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(query, slug,pageRequest);
+            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(query, slug, pageRequest);
         } else if(StringUtils.hasText(slug)) {
-            return courseRepository.findCoursesEntitiesBySlug(slug,pageRequest);
+            return courseRepository.findCoursesEntitiesBySlug(slug, pageRequest);
         } else if(StringUtils.hasText(query)) {
-            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCase(query,pageRequest);
+            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCase(query, pageRequest);
+        } else if(fromDate != null && toDate != null){
+            return courseRepository.findByCourseAddedDateBetweenOrderByIsTrendingDesc(fromDate, toDate, pageRequest);
+        } else if(StringUtils.hasText(location)){
+            StringBuilder sql = new StringBuilder(" Select l.location_name,c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date from location l FULL OUTER JOIN courses c ON c.id = l.course_id ");
+            sql.append(" where LOWER(location_name) = LOWER( ? ) order by is_trending desc ");
+
+            List<CoursesEntity> list = this.jdbcTemplate.query(sql.toString(), new Object[]{location}, new RowMapper<CoursesEntity>() {
+                @Override
+                public CoursesEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    CoursesEntity coursesEntity = new CoursesEntity();
+                    coursesEntity.setId(rs.getLong("id"));
+                    coursesEntity.setSlug(rs.getString("slug"));
+                    coursesEntity.setCampaignTemplateCourseName(rs.getString("campaign_template_course_name"));
+                    coursesEntity.setCourseContent(rs.getString("course_content"));
+                    coursesEntity.setCampaignTemplateRating(rs.getString("campaign_template_rating"));
+                    coursesEntity.setImageUrl(rs.getString("image_url"));
+                    coursesEntity.setKeyTakeAway(Collections.singletonList(rs.getString("key_take_away")));
+                    coursesEntity.setIsTrending(rs.getBoolean("is_trending"));
+                    coursesEntity.setCourseAddedDate(rs.getDate("course_added_date"));
+                    return coursesEntity;
+                }
+            });
+            // Calculate pagination
+            int start = (int) pageRequest.getOffset();
+            int end = Math.min((start + pageRequest.getPageSize()), list.size());
+            Page<CoursesEntity> coursesPage = new PageImpl<>(list.subList(start, end), pageRequest, list.size());
+
+            return coursesPage;
+
         }
         return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
     }
+
 
     @Override
     public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest) {
@@ -98,4 +138,5 @@ public class SearchServiceImpl implements SearchService {
         }
         return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
     }
+
 }

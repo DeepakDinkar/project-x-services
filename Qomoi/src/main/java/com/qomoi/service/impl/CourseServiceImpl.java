@@ -1,6 +1,8 @@
 package com.qomoi.service.impl;
 
 import com.qomoi.dto.CourseLocationResponse;
+import com.qomoi.dto.LocationResponse;
+import com.qomoi.dto.TrainerResponse;
 import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.CourseService;
@@ -13,16 +15,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 //import java.sql.ResultSet;
 //import java.sql.SQLException;
-import java.util.ArrayList;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 //import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,8 +35,8 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final VerticalRepository verticalRepository;
 //
-//    @Autowired
-//    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository) {
         this.courseRepository = courseRepository;
@@ -40,56 +45,98 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public Page<CoursesEntity> getAllCourse(PageRequest pageRequest) {
-        return courseRepository.findAll(pageRequest);
+    public List<CourseLocationResponse> getAllCourse(PageRequest pageRequest) {
+        StringBuilder sql = new StringBuilder("SELECT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, l.location_name, l.date FROM courses c JOIN location l ON c.id = l.course_id");
+
+        List<CourseLocationResponse> courseLocationResponses = new ArrayList<>();
+        Map<Long, CourseLocationResponse> courseMap = new HashMap<>();
+
+        this.jdbcTemplate.query(sql.toString(), new Object[]{}, new RowMapper<Void>() {
+            @Override
+            public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+                long courseId = rs.getLong("id");
+
+                // If the course is not in the map, create a new CourseLocationResponse
+                if (!courseMap.containsKey(courseId)) {
+                    CourseLocationResponse response = new CourseLocationResponse();
+                    response.setId(courseId);
+                    response.setSlug(rs.getString("slug"));
+                    response.setCampaignTemplateCourseName(rs.getString("campaign_template_course_name"));
+                    response.setCourseContent(rs.getString("course_content"));
+                    response.setCampaignTemplateRating(rs.getString("campaign_template_rating"));
+                    response.setImageUrl(rs.getString("image_url"));
+                    response.setKeyTakeAway(Collections.singletonList(rs.getString("key_take_away")));
+                    response.setIsTrending(rs.getBoolean("is_trending"));
+                    response.setCourseAddedDate(rs.getDate("course_added_date"));
+                    response.setLocation(new ArrayList<>());
+
+                    courseMap.put(courseId, response);
+                    courseLocationResponses.add(response);
+                }
+
+                // Create a LocationResponse and add it to the corresponding CourseLocationResponse
+                LocationResponse locationResponse = new LocationResponse();
+                locationResponse.setCourseId(courseId);
+                locationResponse.setLocationName(rs.getString("location_name"));
+                locationResponse.setDate(rs.getDate("date"));
+
+                courseMap.get(courseId).getLocation().add(locationResponse);
+
+                return null;
+            }
+        });
+
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), courseLocationResponses.size());
+
+        if (start >= courseLocationResponses.size()) {
+            return Collections.emptyList();
+        }
+        return courseLocationResponses.subList(start, end);
     }
 
-    //    @Override
-//    public Page<CourseLocationResponse> getAllCourse(PageRequest pageRequest) {
-//        StringBuilder sql = new StringBuilder("SELECT c.campaign_template_course_name, c.campaign_template_rating, c.course_add_date, ");
-//        sql.append("c.course_content, c.image_url, c.is_trending, c.key_take_away, c.slug, l.location_name, l.date FROM courses ");
-//        sql.append("c RIGHT JOIN location l ON c.id = l.course_id");
-//
-//        List<CourseLocationResponse> courseLocationResponses = this.jdbcTemplate.query(
-//                sql.toString(),
-//                new Object[]{},
-//                new RowMapper<CourseLocationResponse>() {
-//                    @Override
-//                    public CourseLocationResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-//                        CourseLocationResponse courseLocationResponse = new CourseLocationResponse();
-//                        courseLocationResponse.setCampaignTemplateCourseName(rs.getString("campaign_template_course_name"));
-//                        courseLocationResponse.setCampaignTemplateRating(rs.getString("campaign_template_rating"));
-//                        courseLocationResponse.setCourseAddDate(rs.getDate("course_add_date"));
-//                        courseLocationResponse.setCourseContent(rs.getString("course_content"));
-//                        courseLocationResponse.setImageUrl(rs.getString("image_url"));
-//                        courseLocationResponse.setIsTrending(rs.getBoolean("is_trending"));
-//                        courseLocationResponse.setKeyTakeAway(Collections.singletonList(rs.getString("key_take_away")));
-//                        courseLocationResponse.setSlug(rs.getString("slug"));
-//                        courseLocationResponse.setLocationName(rs.getString("location_name"));
-//                        courseLocationResponse.setDate(rs.getDate("date"));
-//                        return courseLocationResponse;
-//                    }
-//                }
-//        );
-//
-//        // Perform pagination manually
-//        int start = (int) pageRequest.getOffset();
-//        int end = Math.min((start + pageRequest.getPageSize()), courseLocationResponses.size());
-//        Page<CourseLocationResponse> page = new PageImpl<>(
-//                courseLocationResponses.subList(start, end),
-//                pageRequest,
-//                courseLocationResponses.size()
-//        );
-//
-//        return page;
-//    }
+
 
     @Override
-    public Optional<CourseResponse> getCourseId(Long id) {
+    public Optional<CourseLocationResponse> getCourseId(Long id) {
         Optional<CoursesEntity> courseRes = courseRepository.findById(id);
-        return courseRes.map(CourseResponse::new);
+        return courseRes.map(courseEntity -> {
+            CourseLocationResponse courseLocationResponse = new CourseLocationResponse();
+            courseLocationResponse.setId(courseEntity.getId());
+            courseLocationResponse.setSlug(courseEntity.getSlug());
+            courseLocationResponse.setCampaignTemplateCourseName(courseEntity.getCampaignTemplateCourseName());
+            courseLocationResponse.setCourseContent(courseEntity.getCourseContent());
+            courseLocationResponse.setCampaignTemplateRating(courseEntity.getCampaignTemplateRating());
+            courseLocationResponse.setImageUrl(courseEntity.getImageUrl());
+            courseLocationResponse.setKeyTakeAway(courseEntity.getKeyTakeAway());
+            courseLocationResponse.setIsTrending(courseEntity.getIsTrending());
+            courseLocationResponse.setCourseAddedDate(courseEntity.getCourseAddedDate());
 
+            StringBuilder sql = new StringBuilder("SELECT location_name, date FROM location WHERE course_id = ?");
+            List<LocationResponse> locationResponses = new ArrayList<>();
+            this.jdbcTemplate.query(sql.toString(), new Object[]{id}, (rs, rowNum) -> {
+                LocationResponse locationResponse = new LocationResponse();
+                locationResponse.setCourseId(id);
+                locationResponse.setLocationName(rs.getString("location_name"));
+                locationResponse.setDate(rs.getDate("date"));
+                locationResponses.add(locationResponse);
+                return null;
+            });
+
+            courseLocationResponse.setLocation(locationResponses);
+
+            StringBuilder sql1 = new StringBuilder("SELECT trainer_name FROM trainers WHERE course_id = ? ");
+            List<TrainerResponse> trainerResponses = new ArrayList<>();
+            this.jdbcTemplate.query(sql.toString(), new Object[]{id}, (rs, rowNum) -> {
+                TrainerResponse trainerResponse = new TrainerResponse();
+                trainerResponse.setTrainerName("trainer_name");
+                trainerResponses.add(trainerResponse);
+                return null;
+            });
+            return courseLocationResponse;
+        });
     }
+
 
     public void saveCourse(CoursesEntity coursesEntity) {
         courseRepository.save(coursesEntity);

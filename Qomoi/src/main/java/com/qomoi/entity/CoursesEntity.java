@@ -42,7 +42,8 @@ public class CoursesEntity {
     @Column(name = "is_trending")
     private Boolean isTrending;
 
-    @Column(name = "course_add_date")
-    private Date courseAddDate;
+    @Column(name = "course_added_date")
+    private Date courseAddedDate;
+
 
 }
