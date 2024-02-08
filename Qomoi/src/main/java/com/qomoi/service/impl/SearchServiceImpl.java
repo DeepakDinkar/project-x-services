@@ -142,12 +142,15 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Override
-    public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest) {
+    public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate ) {
         if(StringUtils.hasText(slug) && StringUtils.hasText(query)){
-            return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(slug, query, pageRequest);
+            return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(slug, query, pageRequest);
+        }
+        else if(fromDate!=null && toDate!=null && StringUtils.hasText(slug)){
+            return courseRepository.findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(fromDate, toDate, slug, pageRequest);
         }
         else if(StringUtils.hasText(slug)){
-            return courseRepository.findBySlugContainingIgnoreCase(slug, pageRequest);
+            return courseRepository.findBySlugContainingIgnoreCaseOrderByIsTrendingDesc(slug, pageRequest);
         }
         else if(StringUtils.hasText(query)){
             return courseRepository.findListByCampaignTemplateCourseNameContainingIgnoreCase(query, pageRequest);

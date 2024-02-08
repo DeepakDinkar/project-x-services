@@ -32,17 +32,16 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
     List<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEqualsOrderByIsTrendingDesc(String campaignTemplateCourseName, String slug);
 
 
-    Page<CoursesEntity> findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(String slug, String name, PageRequest pageRequest);
+    Page<CoursesEntity> findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(String slug, String name, PageRequest pageRequest);
 
-    Page<CoursesEntity> findBySlugContainingIgnoreCase(String slug, PageRequest pageRequest);
+    Page<CoursesEntity> findBySlugContainingIgnoreCaseOrderByIsTrendingDesc(String slug, PageRequest pageRequest);
 
     Page<CoursesEntity> findListByCampaignTemplateCourseNameContainingIgnoreCase(String name, PageRequest pageRequest);
 
     Page<CoursesEntity> findByCourseAddedDateBetweenOrderByIsTrendingDesc(Date startDate, Date endDate,PageRequest pageRequest);
 
+    Page<CoursesEntity> findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(Date startDate, Date endDate, String slug, PageRequest pageRequest);
 
-//    @Query(value = "SELECT * FROM courses WHERE id = :id ORDER BY is_trending DESC", nativeQuery = true)
-//    Optional<CoursesEntity> findByIdWithTrending(@Param("id") Long id);
 
 
 }

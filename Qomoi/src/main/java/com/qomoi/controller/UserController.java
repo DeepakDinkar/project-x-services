@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -67,6 +70,27 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/saveProfile/{email}")
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto, @PathVariable String email){
+        if(StringUtils.hasText(email)){
+          UserDE userDE = userService.updateProfile(profileDto,email);
+          return ResponseEntity.status(HttpStatus.CREATED)
+                  .body(new SavedRecordResponseDto(userDE,new ResponseDto(201, "Record saved successfully")));
+        }
+        throw new EntityNotFoundException("User with email " + email + " not found");
+    }
+
+    @GetMapping("/myProfile/{email}")
+    public ResponseEntity<?> getProfile(@PathVariable String email){
+        if(StringUtils.hasText(email)){
+            UserDE userDE = userService.getProfile(email);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new SavedRecordResponseDto(userDE,new ResponseDto(200, "User found")));
+        }
+        throw new EntityNotFoundException("User with email " + email + " not found");
+    }
+
+
     @PostMapping("/save-address/{id}")
     public ResponseEntity<String> saveAddress(@RequestBody AddressDto addressDto, @PathVariable Long id) {
         if (id != null && addressDto != null) {
@@ -78,10 +102,10 @@ public class UserController {
         }
     }
 
-    @PostMapping("/myProfile/{email}")
-    public ResponseEntity<UserProfileResponse> getMyProfile(@PathVariable String email){
-        return null;
-    }
+//    @PostMapping("/myProfile/{email}")
+//    public ResponseEntity<UserProfileResponse> getMyProfile(@PathVariable String email){
+//        return null;
+//    }
 
     @PostMapping("/myPurchase/{email}")
     public ResponseEntity<PurchaseResponse> getPurchaseInfo(@PathVariable String email){

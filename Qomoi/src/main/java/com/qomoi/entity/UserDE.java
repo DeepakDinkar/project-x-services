@@ -47,6 +47,9 @@ public class UserDE {
     @Column(name = "address2")
     private String address2;
 
+    @Column(name = "country")
+    private String country;
+
     @Column(name = "city")
     private String city;
 

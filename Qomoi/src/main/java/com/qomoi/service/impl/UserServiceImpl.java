@@ -1,6 +1,7 @@
 package com.qomoi.service.impl;
 
 
+import com.qomoi.dto.ProfileDto;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.utility.Decrypt;
@@ -9,12 +10,16 @@ import com.qomoi.dto.GoogleTokenResponse;
 import com.qomoi.dto.SignUpRequestDTO;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -131,6 +136,30 @@ public class UserServiceImpl {
         return userRepository.existsByMobile(mobile);
     }
 
+    public UserDE updateProfile(ProfileDto profileDto, String email){
+
+       UserDE user = userRepository.findByEmail(email);
+
+       if(Objects.nonNull(user)){
+           user.setFirstName(profileDto.getFirstName());
+           user.setLastName(profileDto.getLastName());
+           user.setAddress1(profileDto.getAddress1());
+           user.setAddress2(profileDto.getAddress2());
+           user.setCountry(profileDto.getCountry());
+           user.setCity(profileDto.getCity());
+           user.setZipcode(profileDto.getZipCode());
+           return userRepository.save(user);
+       }
+        throw new EntityNotFoundException("User with email " + email + " not found");
+    }
+
+    public UserDE getProfile(String email){
+        UserDE user = userRepository.findByEmail(email);
+            if(Objects.nonNull(user)){
+                return user;
+            }
+        throw new UsernameNotFoundException("User with email " + email + " not found");
+    }
 
     public String saveAddress(AddressDto addressDto, Long id) {
 
