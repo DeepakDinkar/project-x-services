@@ -19,17 +19,17 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     List<CoursesEntity> findTop2BySlugOrderByCampaignTemplateRating(String slug);
 
-    List<CoursesEntity> findCoursesBySlug(String slug);
+    Optional<List<CoursesEntity>> findCoursesBySlug(String slug);
 
-    Page<CoursesEntity> findCoursesEntitiesBySlug(String slug, PageRequest pageRequest);
+    List<CoursesEntity> findCoursesEntitiesBySlugOrderByIsTrendingDesc(String slug);
 
     List<CoursesEntity> findTop3BySlugContainingIgnoreCaseOrCampaignTemplateCourseNameContainingIgnoreCase(String slug, String name);
 
-    Page<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCase(String campaignTemplateCourseName, PageRequest pageRequest);
+    List<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(String campaignTemplateCourseName);
 
     Page<CoursesEntity> findAllByOrderByCampaignTemplateRatingDesc(PageRequest pageRequest);
 
-    Page<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(String campaignTemplateCourseName, String slug, PageRequest pageRequest);
+    List<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEqualsOrderByIsTrendingDesc(String campaignTemplateCourseName, String slug);
 
 
     Page<CoursesEntity> findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCase(String slug, String name, PageRequest pageRequest);
@@ -41,8 +41,8 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
     Page<CoursesEntity> findByCourseAddedDateBetweenOrderByIsTrendingDesc(Date startDate, Date endDate,PageRequest pageRequest);
 
 
-    @Query(value = "SELECT * FROM courses WHERE id = :id ORDER BY is_trending DESC", nativeQuery = true)
-    Optional<CoursesEntity> findByIdWithTrending(@Param("id") Long id);
+//    @Query(value = "SELECT * FROM courses WHERE id = :id ORDER BY is_trending DESC", nativeQuery = true)
+//    Optional<CoursesEntity> findByIdWithTrending(@Param("id") Long id);
 
 
 }

@@ -22,6 +22,6 @@ public class TrainerEntity {
     private String trainerName;
 
     @Column(name = "course_id")
-    private String courseId;
+    private Long courseId;
 
 }

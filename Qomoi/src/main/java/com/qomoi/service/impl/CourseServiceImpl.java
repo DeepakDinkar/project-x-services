@@ -3,6 +3,7 @@ package com.qomoi.service.impl;
 import com.qomoi.dto.CourseLocationResponse;
 import com.qomoi.dto.LocationResponse;
 import com.qomoi.dto.TrainerResponse;
+import com.qomoi.entity.CourseVerticalEntity;
 import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.CourseService;
@@ -56,7 +57,6 @@ public class CourseServiceImpl implements CourseService {
             public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
                 long courseId = rs.getLong("id");
 
-                // If the course is not in the map, create a new CourseLocationResponse
                 if (!courseMap.containsKey(courseId)) {
                     CourseLocationResponse response = new CourseLocationResponse();
                     response.setId(courseId);
@@ -74,7 +74,6 @@ public class CourseServiceImpl implements CourseService {
                     courseLocationResponses.add(response);
                 }
 
-                // Create a LocationResponse and add it to the corresponding CourseLocationResponse
                 LocationResponse locationResponse = new LocationResponse();
                 locationResponse.setCourseId(courseId);
                 locationResponse.setLocationName(rs.getString("location_name"));
@@ -125,14 +124,17 @@ public class CourseServiceImpl implements CourseService {
 
             courseLocationResponse.setLocation(locationResponses);
 
-            StringBuilder sql1 = new StringBuilder("SELECT trainer_name FROM trainers WHERE course_id = ? ");
+            StringBuilder sqlTrainer = new StringBuilder("SELECT trainer_name FROM trainers WHERE course_id = ?");
             List<TrainerResponse> trainerResponses = new ArrayList<>();
-            this.jdbcTemplate.query(sql.toString(), new Object[]{id}, (rs, rowNum) -> {
+            this.jdbcTemplate.query(sqlTrainer.toString(), new Object[]{id}, (rs, rowNum) -> {
                 TrainerResponse trainerResponse = new TrainerResponse();
-                trainerResponse.setTrainerName("trainer_name");
+                trainerResponse.setTrainerName(rs.getString("trainer_name"));
                 trainerResponses.add(trainerResponse);
                 return null;
             });
+
+            courseLocationResponse.setTrainer(trainerResponses);
+
             return courseLocationResponse;
         });
     }
@@ -148,20 +150,21 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public List<VerticalCoursesEntity> getTrendingVerticalCourses() {
-        List<VerticalCoursesEntity> trendingVerticalEntities = new ArrayList<>();
+    public List<CourseVerticalEntity> getTrendingVerticalCourses() {
+        List<CourseVerticalEntity> trendingVerticalEntities = new ArrayList<>();
         List<VerticalEntity> verticals = verticalRepository.findTop3ByOrderBySlugAsc();
 
         verticals.forEach(verticalEntity -> {
             List<CoursesEntity> courses = courseRepository.findTop2BySlugOrderByCampaignTemplateRating(verticalEntity.getSlug());
 
-            VerticalCoursesEntity verticalCoursesEntity = new VerticalCoursesEntity();
-            verticalCoursesEntity.setSlug(verticalEntity.getSlug());
-            verticalCoursesEntity.setTitle(verticalEntity.getTitle());
-            verticalCoursesEntity.setImageUrl(verticalEntity.getImageUrl());
-            verticalCoursesEntity.setCourses(courses);
+            CourseVerticalEntity courseVerticalEntity = new CourseVerticalEntity();
+            courseVerticalEntity.setSlug(verticalEntity.getSlug());
+            courseVerticalEntity.setTitle(verticalEntity.getTitle());
+            courseVerticalEntity.setImageUrl(verticalEntity.getImageUrl());
 
-            trendingVerticalEntities.add(verticalCoursesEntity);
+            courseVerticalEntity.setCourses(courses);
+
+            trendingVerticalEntities.add(courseVerticalEntity);
         });
         return trendingVerticalEntities;
     }

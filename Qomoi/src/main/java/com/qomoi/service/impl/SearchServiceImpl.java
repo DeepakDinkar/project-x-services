@@ -85,16 +85,33 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public Page<CoursesEntity> getExploreCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, String location) {
 
+        List<CoursesEntity> coursesEntityList = null;
+        int start = 0;
+        int end = 0;
         if(StringUtils.hasText(slug) && StringUtils.hasText(query)) {
-            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEquals(query, slug, pageRequest);
+            coursesEntityList = courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEqualsOrderByIsTrendingDesc(query, slug);
+            start = (int) pageRequest.getOffset();
+            end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
+            Page<CoursesEntity> coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
+            return coursesPage;
+
         } else if(StringUtils.hasText(slug)) {
-            return courseRepository.findCoursesEntitiesBySlug(slug, pageRequest);
+          coursesEntityList = courseRepository.findCoursesEntitiesBySlugOrderByIsTrendingDesc(slug);
+            start = (int) pageRequest.getOffset();
+            end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
+            Page<CoursesEntity> coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
+            return coursesPage;
+
         } else if(StringUtils.hasText(query)) {
-            return courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCase(query, pageRequest);
+            coursesEntityList = courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(query);
+            start = (int) pageRequest.getOffset();
+            end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
+            Page<CoursesEntity> coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
+            return coursesPage;
         } else if(fromDate != null && toDate != null){
             return courseRepository.findByCourseAddedDateBetweenOrderByIsTrendingDesc(fromDate, toDate, pageRequest);
         } else if(StringUtils.hasText(location)){
-            StringBuilder sql = new StringBuilder(" Select l.location_name,c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date from location l FULL OUTER JOIN courses c ON c.id = l.course_id ");
+            StringBuilder sql = new StringBuilder(" Select DISTINCT(c.id), c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, l.location_name from location l FULL OUTER JOIN courses c ON c.id = l.course_id ");
             sql.append(" where LOWER(location_name) = LOWER( ? ) order by is_trending desc ");
 
             List<CoursesEntity> list = this.jdbcTemplate.query(sql.toString(), new Object[]{location}, new RowMapper<CoursesEntity>() {
@@ -113,9 +130,8 @@ public class SearchServiceImpl implements SearchService {
                     return coursesEntity;
                 }
             });
-            // Calculate pagination
-            int start = (int) pageRequest.getOffset();
-            int end = Math.min((start + pageRequest.getPageSize()), list.size());
+             start = (int) pageRequest.getOffset();
+             end = Math.min((start + pageRequest.getPageSize()), list.size());
             Page<CoursesEntity> coursesPage = new PageImpl<>(list.subList(start, end), pageRequest, list.size());
 
             return coursesPage;

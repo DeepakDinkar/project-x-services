@@ -1,6 +1,7 @@
 package com.qomoi.controller;
 
 import com.qomoi.dto.CourseLocationResponse;
+import com.qomoi.entity.CourseVerticalEntity;
 import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
 import com.qomoi.entity.CoursesEntity;
@@ -55,8 +56,8 @@ public class CourseController {
     }
 
     @GetMapping("/trending")
-    public ResponseEntity<List<VerticalCoursesEntity>> getTrendingVerticalCourses() {
-        List<VerticalCoursesEntity> courseByTopic= courseService.getTrendingVerticalCourses();
+    public ResponseEntity<List<CourseVerticalEntity>> getTrendingVerticalCourses() {
+        List<CourseVerticalEntity> courseByTopic= courseService.getTrendingVerticalCourses();
         return new ResponseEntity<>(courseByTopic, HttpStatus.OK);
     }
 
