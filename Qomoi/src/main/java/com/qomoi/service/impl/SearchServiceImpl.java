@@ -12,10 +12,7 @@ import jakarta.persistence.PersistenceContext;
 import org.apache.http.client.utils.DateUtils;
 import org.hibernate.type.descriptor.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -142,12 +139,16 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Override
-    public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate ) {
+    public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, Boolean sortBy ) {
         if(StringUtils.hasText(slug) && StringUtils.hasText(query)){
             return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(slug, query, pageRequest);
         }
         else if(fromDate!=null && toDate!=null && StringUtils.hasText(slug)){
             return courseRepository.findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(fromDate, toDate, slug, pageRequest);
+        }
+        else if (sortBy != null && StringUtils.hasText(slug)) {
+            Sort sort = sortBy ? Sort.by(Sort.Direction.ASC, "campaignTemplateCourseName") : Sort.by(Sort.Direction.DESC, "campaignTemplateCourseName");
+            return courseRepository.findBySlugOrderByCampaignTemplateCourseName(slug, pageRequest.withSort(sort));
         }
         else if(StringUtils.hasText(slug)){
             return courseRepository.findBySlugContainingIgnoreCaseOrderByIsTrendingDesc(slug, pageRequest);
@@ -155,7 +156,7 @@ public class SearchServiceImpl implements SearchService {
         else if(StringUtils.hasText(query)){
             return courseRepository.findListByCampaignTemplateCourseNameContainingIgnoreCase(query, pageRequest);
         }
-        return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
+        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
     }
 
 }

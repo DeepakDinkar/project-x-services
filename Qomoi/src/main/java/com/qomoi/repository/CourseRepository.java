@@ -42,6 +42,12 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     Page<CoursesEntity> findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(Date startDate, Date endDate, String slug, PageRequest pageRequest);
 
+//    Page<CoursesEntity> findAllByOrderByCampaignTemplateCourseNameAsc(PageRequest pageRequest);
+//
+//    Page<CoursesEntity> findAllByOrderByCampaignTemplateCourseNameDsc(PageRequest pageRequest);
 
+    Page<CoursesEntity> findBySlugOrderByCampaignTemplateCourseName(String slug, Pageable pageable);
+
+    Page<CoursesEntity> findAllByOrderByIsTrendingDesc(PageRequest pageRequest);
 
 }
