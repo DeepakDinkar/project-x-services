@@ -4,23 +4,31 @@ package com.qomoi.service.impl;
 import com.qomoi.dto.ProfileDto;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
+import com.qomoi.utility.Constants;
 import com.qomoi.utility.Decrypt;
 import com.qomoi.dto.AddressDto;
 import com.qomoi.dto.GoogleTokenResponse;
 import com.qomoi.dto.SignUpRequestDTO;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -32,6 +40,11 @@ public class UserServiceImpl {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JavaMailSender mailSender;
+
+    private static final String CHARACTERS = "OIUMHUpokjh1645GTT55868RCRCIqwsdcfvTVYTITceztz183rfghjo";
+    private static final Random RANDOM = new SecureRandom();
 
     public UserDE saveUser(SignUpRequestDTO signUpRequestDTO) throws Exception {
         Decrypt cryptPass = new Decrypt();
@@ -44,14 +57,23 @@ public class UserServiceImpl {
         userDE.setMobile(signUpRequestDTO.getMobile());
         userDE.setEmailId(signUpRequestDTO.getEmailId());
         userDE.setUserType(signUpRequestDTO.getUserType());
+        String salt = getNextSalt(Constants.CHARACTER_LENGTH);
+        userDE.setSalt(salt);
         String rawPass = cryptPass.decrypt(signUpRequestDTO.getPassword());
-        userDE.setPassword(passwordEncoder.encode(rawPass));
+        userDE.setPassword(passwordEncoder.encode(salt+rawPass));
         userDE.setIsNormal(true);
         userregistered = userRepository.save(userDE);
 
         return userregistered;
     }
 
+    public static String getNextSalt(int length) {
+        StringBuilder salt = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            salt.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
+        }
+        return salt.toString();
+    }
     public UserDE getByEmailId(String emailId) {
         return userRepository.findByEmail(emailId);
     }
@@ -178,18 +200,28 @@ public class UserServiceImpl {
         }
     }
 
-//    public void sendEmail(String recipientEmail, String subject, String content)
-//            throws MessagingException, UnsupportedEncodingException {
-//        MimeMessage message = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//
-//        helper.setFrom("support@qomol.com", "Qomol Support");
-//        helper.setTo(recipientEmail);
-//        helper.setSubject(subject);
-//        helper.setText(content, true);
-//
-//        mailSender.send(message);
-//    }
+    public void sendEmail(String recipientEmail, String subject, String content)
+            throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
+        helper.setFrom("support@qomol.com", "Qomol Support");
+        helper.setTo(recipientEmail);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        mailSender.send(message);
+    }
+
+    public void updateResetPasswordToken(String token, String email) throws NotFoundException {
+        UserDE userDE = userRepository.findByEmail(email);
+        if (userDE != null) {
+            userDE.setUserId(userDE.getUserId());
+            userDE.setResetPasswordToken(token);
+            userRepository.save(userDE);
+        } else {
+            throw new NotFoundException("Email is not registered with PV: " + email);
+        }
+    }
 
 }

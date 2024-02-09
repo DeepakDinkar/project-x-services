@@ -31,5 +31,8 @@ public interface UserRepository extends JpaRepository<UserDE,Long> {
     @Query(value = "select * from users where user_type != '0' order by user_id desc",nativeQuery = true)
     List<UserDE> findAllAdmin();
 
+    @Query(value = "Select salt from qomoi_users where email_id =:email", nativeQuery = true)
+    String findSaltByEmailId(@Param("email") String email);
+
 }
 

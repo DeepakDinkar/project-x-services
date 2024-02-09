@@ -94,8 +94,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) throws Exception {
         Decrypt decryptPass = new Decrypt();
+
+        String salt = userRepository.findSaltByEmailId(loginRequestDTO.getEmailId());
+        String password = decryptPass.decrypt(loginRequestDTO.getPassword());
+
+        String saltPass = salt+password;
+
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmailId(), decryptPass.decrypt(loginRequestDTO.getPassword())));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmailId(), saltPass ));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

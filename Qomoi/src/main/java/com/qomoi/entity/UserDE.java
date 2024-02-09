@@ -68,4 +68,7 @@ public class UserDE {
     @Column(name = "is_normal")
     private Boolean isNormal;
 
+    @Column(name = "salt")
+    private String salt;
+
 }
