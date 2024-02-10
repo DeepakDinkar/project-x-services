@@ -3,14 +3,13 @@ package com.qomoi.service.impl;
 import com.qomoi.dto.CourseLocationResponse;
 import com.qomoi.dto.LocationResponse;
 import com.qomoi.dto.TrainerResponse;
-import com.qomoi.entity.CourseVerticalEntity;
+import com.qomoi.entity.*;
 import com.qomoi.repository.CourseRepository;
+import com.qomoi.repository.LocationRepository;
+import com.qomoi.repository.TrainersRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.CourseService;
 import com.qomoi.dto.CourseResponse;
-import com.qomoi.entity.CoursesEntity;
-import com.qomoi.entity.VerticalCoursesEntity;
-import com.qomoi.entity.VerticalEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,13 +34,18 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final VerticalRepository verticalRepository;
+    private final LocationRepository locationRepository;
+
+    private final TrainersRepository trainersRepository;
 //
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository,LocationRepository locationRepository, TrainersRepository trainersRepository) {
         this.courseRepository = courseRepository;
         this.verticalRepository = verticalRepository;
+        this.locationRepository = locationRepository;
+        this.trainersRepository = trainersRepository;
     }
 
 
@@ -167,5 +171,28 @@ public class CourseServiceImpl implements CourseService {
             trendingVerticalEntities.add(courseVerticalEntity);
         });
         return trendingVerticalEntities;
+    }
+
+    @Override
+    public List<String> getAllLocation() {
+
+       return locationRepository.findLocationNameDistinct();
+
+    }
+
+    @Override
+    public Page<TrainerResponse> getAllTrainers(PageRequest pageRequest) {
+
+        return trainersRepository.findAll(pageRequest)
+               .map(this::convertToTrainerResponse);
+    }
+
+    private TrainerResponse convertToTrainerResponse(TrainerEntity trainer) {
+        TrainerResponse trainerResponse = new TrainerResponse();
+        trainerResponse.setCourseId(trainer.getCourseId());
+        trainerResponse.setTrainerName(trainer.getTrainerName());
+        trainerResponse.setPhoneNumber(trainer.getPhoneNumber());
+        trainerResponse.setImageUrl(trainer.getImageUrl());
+        return trainerResponse;
     }
 }

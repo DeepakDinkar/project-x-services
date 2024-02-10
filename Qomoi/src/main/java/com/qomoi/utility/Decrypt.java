@@ -1,6 +1,6 @@
 package com.qomoi.utility;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -24,7 +24,10 @@ public class Decrypt {
     private String myEncryptionKey;
     private String myEncryptionScheme;
     SecretKey key;
-    private static final String SECRET_KEY = "randomsecretkey";
+
+
+    private static final String AES_ENCRYPTION_SCHEME = "AES";
+    private static final String SECRET_KEY = "WQhC69td3Fe7THz7O/X+iA==";
 
     public Decrypt() throws Exception {
         myEncryptionKey = "randomsecretkey";
@@ -42,7 +45,7 @@ public class Decrypt {
             cipher.init(ENCRYPT_MODE, key);
             byte[] plainText = unencryptedString.getBytes(UNICODE_FORMAT);
             byte[] encryptedText = cipher.doFinal(plainText);
-            encryptedString = new String(Base64.encodeBase64(encryptedText));
+            encryptedString = new String(Base64.getEncoder().encode(encryptedText));
         } catch (Exception e) {
             e.printStackTrace();
         }

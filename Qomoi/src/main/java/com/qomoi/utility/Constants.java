@@ -2,6 +2,7 @@ package com.qomoi.utility;
 
 public class Constants {
 
+    public static final String SECRET_KEY = "randomsecretkey";
     public static final int CHARACTER_LENGTH = 6;
     public static final String FIRSTNAME_MANDATORY = "FirstName is Missing";
     public static final String LASTNAME_MANDATORY = "LastName is Missing";

@@ -67,7 +67,7 @@ public class UserServiceImpl {
         return userregistered;
     }
 
-    public static String getNextSalt(int length) {
+    private static String getNextSalt(int length) {
         StringBuilder salt = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             salt.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));

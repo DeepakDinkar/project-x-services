@@ -21,7 +21,16 @@ public class TrainerEntity {
     @Column(name = "trainer_name")
     private String trainerName;
 
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phoneNumber")
+    private String phoneNumber;
+
     @Column(name = "course_id")
     private Long courseId;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 
 }

@@ -73,8 +73,13 @@ public class AuthController {
 
             if(userService.getByEmailIdAndMobileNumber(signUpRequestDTO.getEmailId(), signUpRequestDTO.getMobile())==null){
                 userRegistered = userService.saveUser(signUpRequestDTO);
+                SignupResponseDto signupResponseDto = new SignupResponseDto();
+                signupResponseDto.setFirstName(userRegistered.getFirstName());
+                signupResponseDto.setLastName(userRegistered.getLastName());
+                signupResponseDto.setEmail(userRegistered.getEmailId());
+                signupResponseDto.setMobile(userRegistered.getMobile());
                 return ResponseEntity.status(HttpStatus.CREATED)
-                        .body(new SavedRecordResponseDto(userRegistered, new ResponseDto(201, "Record saved successfully")));
+                        .body(new SavedResponseDto(signupResponseDto, new ResponseDto(201, "Record saved successfully")));
             }
             else{
                 throw new ExistingUserFoundException("User already exists");

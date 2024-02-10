@@ -12,4 +12,9 @@ public interface LocationRepository extends JpaRepository<LocationEntity, Long> 
 
     @Query(value = "SELECT course_id FROM location WHERE LOWER(location_name) = LOWER(:locationName)",nativeQuery = true)
     List<Long> findByLocationNameIgnoreCase(@Param("locationName") String locationName);
+
+    @Query(value = "SELECT DISTINCT(location_name) from LOCATION", nativeQuery = true)
+    List<String> findLocationNameDistinct();
+
+
 }

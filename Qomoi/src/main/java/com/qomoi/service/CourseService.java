@@ -3,6 +3,8 @@ package com.qomoi.service;
 
 import com.qomoi.dto.CourseLocationResponse;
 import com.qomoi.dto.CourseResponse;
+import com.qomoi.dto.LocationResponse;
+import com.qomoi.dto.TrainerResponse;
 import com.qomoi.entity.CourseVerticalEntity;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.VerticalCoursesEntity;
@@ -21,4 +23,8 @@ public interface CourseService {
     void saveCourse(CoursesEntity coursesEntity);
     List<CoursesEntity> getAllCoursesByVerticalSlug(String slug);
     List<CourseVerticalEntity> getTrendingVerticalCourses();
+
+    List<String> getAllLocation();
+
+    Page<TrainerResponse> getAllTrainers(PageRequest pageRequest);
 }

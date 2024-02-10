@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TrainerResponse {
+public class SavedResponseDto {
 
-    private Long courseId;
-    private String trainerName;
-    private String phoneNumber;
-    private String imageUrl;
+    private SignupResponseDto savedRecord;
 
+    private ResponseDto response;
 }
