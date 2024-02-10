@@ -6,8 +6,11 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+
+import static javax.crypto.Cipher.*;
 
 
 public class Decrypt {
@@ -21,6 +24,7 @@ public class Decrypt {
     private String myEncryptionKey;
     private String myEncryptionScheme;
     SecretKey key;
+    private static final String SECRET_KEY = "randomsecretkey";
 
     public Decrypt() throws Exception {
         myEncryptionKey = "randomsecretkey";
@@ -28,14 +32,14 @@ public class Decrypt {
         arrayBytes = Arrays.copyOf(myEncryptionKey.getBytes(UNICODE_FORMAT), 24);
         ks = new DESedeKeySpec(arrayBytes);
         skf = SecretKeyFactory.getInstance(myEncryptionScheme);
-        cipher = Cipher.getInstance(myEncryptionScheme);
+        cipher = getInstance(myEncryptionScheme);
         key = skf.generateSecret(ks);
     }
 
     public String encrypt(String unencryptedString) {
         String encryptedString = null;
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, key);
+            cipher.init(ENCRYPT_MODE, key);
             byte[] plainText = unencryptedString.getBytes(UNICODE_FORMAT);
             byte[] encryptedText = cipher.doFinal(plainText);
             encryptedString = new String(Base64.encodeBase64(encryptedText));
@@ -44,17 +48,32 @@ public class Decrypt {
         }
         return encryptedString;
     }
-    public String decrypt(String encryptedString) {
-        String decryptedText = null;
+    public String decrypt(String encryptedPassword) {
+//        String decryptedText = null;
+//        try {
+//            cipher.init(DECRYPT_MODE, key);
+//            byte[] encryptedText = Base64.decodeBase64(encryptedString);
+//            byte[] plainText = cipher.doFinal(encryptedText);
+//            decryptedText = new String(plainText, UNICODE_FORMAT);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return decryptedText;
+
         try {
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] encryptedText = Base64.decodeBase64(encryptedString);
-            byte[] plainText = cipher.doFinal(encryptedText);
-            decryptedText = new String(plainText, UNICODE_FORMAT);
+
+            byte[] decodedKey = java.util.Base64.getDecoder().decode(SECRET_KEY);
+            SecretKeySpec secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+
+            Cipher cipher = getInstance("AES");
+            cipher.init(DECRYPT_MODE, secretKey);
+
+            byte[] decryptedPasswordBytes = cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedPassword));
+            return new String(decryptedPasswordBytes);
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return decryptedText;
     }
 
 }
