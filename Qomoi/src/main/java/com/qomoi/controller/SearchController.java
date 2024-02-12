@@ -48,7 +48,7 @@ public class SearchController {
             @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "fromDate", required = false) Date fromDate,
             @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate,
             @RequestParam(name = "location", required = false) String location) {
-        int pageSize = 25;
+        int pageSize = 12;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
 
         Page<CoursesEntity> coursesPage = searchService.getExploreCourses(slug, query, pageRequest, fromDate, toDate, location);
@@ -62,7 +62,7 @@ public class SearchController {
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate,
                                                                   @RequestParam(name = "sortBy", required = false) Boolean sortBy,
                                                                   @RequestParam(name = "location" , required = false) String location) {
-        int pageSize = 25;
+        int pageSize = 12;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         Page<CoursesEntity> verticalPage = searchService.getVerticalCourses(slug, query, pageRequest, fromDate, toDate, sortBy,location);
         return new ResponseEntity<>(verticalPage, HttpStatus.OK);
