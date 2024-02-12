@@ -130,7 +130,7 @@ public class SearchServiceImpl implements SearchService {
             return coursesPage;
 
         }
-        return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
+        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
     }
 
     @Override
