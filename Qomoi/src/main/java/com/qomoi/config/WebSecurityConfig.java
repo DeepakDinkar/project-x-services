@@ -1,11 +1,9 @@
 package com.qomoi.config;
 
 
-
-
-import com.qomoi.service.impl.UserDetailsServiceImpl;
 import com.qomoi.jwt.AuthEntryPointJwt;
 import com.qomoi.jwt.AuthTokenFilter;
+import com.qomoi.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 

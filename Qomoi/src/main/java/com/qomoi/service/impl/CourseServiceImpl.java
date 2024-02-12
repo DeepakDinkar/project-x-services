@@ -175,9 +175,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<String> getAllLocation() {
-
-       return locationRepository.findLocationNameDistinct();
-
+        return locationRepository.findDistinctByLocationNameIsNotNull();
     }
 
     @Override

@@ -24,7 +24,7 @@ public interface CourseService {
     List<CoursesEntity> getAllCoursesByVerticalSlug(String slug);
     List<CourseVerticalEntity> getTrendingVerticalCourses();
 
-    List<String> getAllLocation();
+    List<?> getAllLocation();
 
     Page<TrainerResponse> getAllTrainers(PageRequest pageRequest);
 }

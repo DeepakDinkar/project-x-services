@@ -73,13 +73,10 @@ public class CourseController {
     }
 
     @GetMapping("/locations")
-    public ResponseEntity<Map<String, List<String>>> getAllLocation() {
-        List<String> locationList = courseService.getAllLocation();
-
-        Map<String, List<String>> response = new HashMap<>();
-        response.put("locations", locationList);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<List<?>> getAllLocation() {
+        List<?> locations = courseService.getAllLocation();
+        System.out.println(locations.toString());
+        return new ResponseEntity<>(locations, HttpStatus.OK);
     }
 
     @GetMapping("/trainers/{page}")
@@ -89,13 +86,4 @@ public class CourseController {
         Page<TrainerResponse> pageTrainer = courseService.getAllTrainers(pageRequest);
         return new ResponseEntity<>(pageTrainer, HttpStatus.OK);
     }
-
-//    @GetMapping("/explore/{page}")
-//    public ResponseEntity<Page<CourseLocationResponse>> exploreCourse(@PathVariable int page) {
-//        int pageSize = 25;
-//        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-//        Page<CourseLocationResponse> pageCourse = courseService.getAllCourse(pageRequest);
-//
-//        return new ResponseEntity<>(pageCourse, HttpStatus.OK);
-//    }
 }
