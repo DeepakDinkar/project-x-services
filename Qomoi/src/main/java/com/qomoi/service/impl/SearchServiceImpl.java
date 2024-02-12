@@ -9,11 +9,9 @@ import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.SearchService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -135,10 +133,48 @@ public class SearchServiceImpl implements SearchService {
         return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
     }
 
-
     @Override
-    public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, Boolean sortBy) {
-        if (StringUtils.hasText(slug) && StringUtils.hasText(query)) {
+    public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, Boolean sortBy, String location) {
+         if(StringUtils.hasText(slug) ) {
+
+             StringBuilder sql = new StringBuilder("SELECT DISTINCT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, ");
+             sql.append("l.location_name, l.date ");
+             sql.append(" FROM courses c JOIN location l ON c.id = l.course_id ");
+             sql.append(" WHERE c.slug = :slug ");
+             if(StringUtils.hasText(query)){
+                 sql.append(" AND  LOWER(c.campaign_template_course_name) LIKE LOWER(:query)");
+             }
+             if( fromDate != null && toDate != null ){
+                 sql.append(" AND c.course_added_date BETWEEN :fromDate AND :toDate ");
+             }
+             if( StringUtils.hasText(location)) {
+                 sql.append( "AND LOWER(l.location_name) =  :location ");
+             }
+             if(sortBy != null && sortBy.equals(Boolean.TRUE)){
+                 sql.append(" order by c.campaign_template_course_name ASC ");
+             }
+             if(sortBy != null && sortBy.equals(Boolean.FALSE)){
+                 sql.append(" order by c.campaign_template_course_name DESC ");
+             }
+             Query queryRes = entityManager.createNativeQuery(sql.toString(), CoursesEntity.class);
+             queryRes.setParameter("slug", slug);
+             if(StringUtils.hasText(query)){
+                 queryRes.setParameter("query", "%" + query + "%");
+             }
+             if(fromDate!=null){
+                 queryRes.setParameter("fromDate", fromDate);
+             }
+             if(toDate!=null){
+                 queryRes.setParameter("toDate", toDate);
+             }
+             if(StringUtils.hasText(location)){
+                 queryRes.setParameter("location", location);
+             }
+
+             List<CoursesEntity> resultList = queryRes.getResultList();
+             return paginateResultList(resultList, pageRequest);
+         }
+        else if (StringUtils.hasText(slug) && StringUtils.hasText(query)) {
             return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(slug, query, pageRequest);
         } else if (fromDate != null && toDate != null && StringUtils.hasText(slug)) {
             return courseRepository.findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(fromDate, toDate, slug, pageRequest);
@@ -151,6 +187,22 @@ public class SearchServiceImpl implements SearchService {
             return courseRepository.findListByCampaignTemplateCourseNameContainingIgnoreCase(query, pageRequest);
         }
         return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
+    }
+
+    private Page<CoursesEntity> paginateResultList(List<CoursesEntity> resultList, Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<CoursesEntity> pageList;
+
+        if (resultList.size() < startItem) {
+            pageList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, resultList.size());
+            pageList = resultList.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(pageList, PageRequest.of(currentPage, pageSize), resultList.size());
     }
 
 }
