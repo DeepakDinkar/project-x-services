@@ -148,7 +148,7 @@ public class SearchServiceImpl implements SearchService {
                  sql.append(" AND c.course_added_date BETWEEN :fromDate AND :toDate ");
              }
              if( StringUtils.hasText(location)) {
-                 sql.append( "AND LOWER(l.location_name) =  :location ");
+                 sql.append( "AND l.location_name =  :location ");
              }
              if(sortBy != null && sortBy.equals(Boolean.TRUE)){
                  sql.append(" order by c.campaign_template_course_name ASC ");
