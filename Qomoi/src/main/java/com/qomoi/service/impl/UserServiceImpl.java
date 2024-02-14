@@ -1,22 +1,28 @@
 package com.qomoi.service.impl;
 
 
-import com.qomoi.dto.ProfileDto;
+import com.qomoi.dto.*;
+import com.qomoi.entity.CoursesEntity;
+import com.qomoi.entity.PurchaseEntity;
+import com.qomoi.jwt.JwtUtils;
+import com.qomoi.repository.PurchaseRepository;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.utility.Constants;
 import com.qomoi.utility.Decrypt;
-import com.qomoi.dto.AddressDto;
-import com.qomoi.dto.GoogleTokenResponse;
-import com.qomoi.dto.SignUpRequestDTO;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,7 +49,15 @@ public class UserServiceImpl {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+    @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private static final String CHARACTERS = "OIUMHUpokjh1645GTT55868RCRCIqwsdcfvTVYTITceztz183rfghjo";
     private static final Random RANDOM = new SecureRandom();
@@ -205,7 +221,7 @@ public class UserServiceImpl {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        helper.setFrom("support@qomol.com", "Qomol Support");
+        helper.setFrom("support@rangachari.com", "Qomoi Support");
         helper.setTo(recipientEmail);
         helper.setSubject(subject);
         helper.setText(content, true);
@@ -216,7 +232,7 @@ public class UserServiceImpl {
     public void updateResetPasswordToken(String token, String email) throws NotFoundException {
         UserDE userDE = userRepository.findByEmail(email);
         if (userDE != null) {
-            userDE.setUserId(userDE.getUserId());
+//            userDE.setUserId(userDE.getUserId());
             userDE.setResetPasswordToken(token);
             userRepository.save(userDE);
         } else {
@@ -224,4 +240,46 @@ public class UserServiceImpl {
         }
     }
 
+    public String savePurchase(List<PurchaseDto> purchaseDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailId = authentication.getName();
+
+        for ( PurchaseDto purchase : purchaseDto) {
+
+            PurchaseEntity purchaseEntity = new PurchaseEntity();
+            purchaseEntity.setCourseId(purchase.getCourseId());
+            purchaseEntity.setCourseDate(purchase.getCourseDate());
+            purchaseEntity.setTransactionId(purchase.getTransactionId());
+            purchaseEntity.setEmail(emailId);
+            purchaseEntity.setLocation(purchase.getLocation());
+            purchaseEntity.setCourseAmt(purchase.getCourseAmt());
+            purchaseRepository.save(purchaseEntity);
+        }
+        return "success";
+    }
+
+    public List<PurchaseResponse> myPurchase () {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailId = authentication.getName();
+
+        StringBuilder sql = new StringBuilder("SELECT c.campaign_template_course_name, p.location, p.course_date, p.course_amt ");
+        sql.append("FROM purchase p ");
+        sql.append("JOIN courses c ON c.id = p.course_id ");
+        sql.append("WHERE email = ?");
+
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{emailId},
+                new RowMapper<PurchaseResponse>() {
+                    @Override
+                    public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        PurchaseResponse purchaseResponse = new PurchaseResponse();
+                        purchaseResponse.setCoursesName(rs.getString("campaign_template_course_name"));
+                        purchaseResponse.setCourseAmt(rs.getString("course_amt"));
+                        purchaseResponse.setLocation(rs.getString("location"));
+                        purchaseResponse.setCourseDate(rs.getDate("course_date"));
+                        return purchaseResponse;
+                    }
+                });
+        return list;
+    }
 }

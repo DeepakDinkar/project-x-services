@@ -1,11 +1,13 @@
 package com.qomoi.utility;
 
+import java.security.SecureRandom;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
@@ -27,7 +29,9 @@ public class Decrypt {
 
 
     private static final String AES_ENCRYPTION_SCHEME = "AES";
-    private static final String SECRET_KEY = "WQhC69td3Fe7THz7O/X+iA==";
+    private static final String SECRET_KEY = "WJdBBCe5VaoIDQ==";
+
+    private static final String INIT_VECTOR = "WJdBBCe5VaoIDQ==";
 
     public Decrypt() throws Exception {
         myEncryptionKey = "randomsecretkey";
@@ -64,15 +68,16 @@ public class Decrypt {
 //        return decryptedText;
 
         try {
-
-            byte[] decodedKey = java.util.Base64.getDecoder().decode(SECRET_KEY);
-            SecretKeySpec secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-
-            Cipher cipher = getInstance("AES");
-            cipher.init(DECRYPT_MODE, secretKey);
-
-            byte[] decryptedPasswordBytes = cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedPassword));
-            return new String(decryptedPasswordBytes);
+            byte[] decodedKey = Base64.getDecoder().decode(SECRET_KEY);
+            SecretKeySpec secretKey = new SecretKeySpec(decodedKey, "AES");
+            byte[] iv = Base64.getDecoder().decode(INIT_VECTOR);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+            byte[] encryptedBytes = Base64.getDecoder().decode(encryptedPassword);
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+            String decryptedPassword = new String(decryptedBytes).trim();
+            return decryptedPassword;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -55,7 +55,6 @@ public class SearchController {
         return new ResponseEntity<>(coursesPage, HttpStatus.OK);
     }
 
-
     @GetMapping("/verticals/{slug}/{page}")
     public ResponseEntity<Page<CoursesEntity>> getVerticalCourses(@PathVariable String slug, @PathVariable int page, @RequestParam(name = "query", required = false) String query,
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "fromDate", required = false) Date fromDate,

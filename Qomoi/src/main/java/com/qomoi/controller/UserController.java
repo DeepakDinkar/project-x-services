@@ -1,6 +1,7 @@
 package com.qomoi.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.service.impl.RefreshTokenServiceImpl;
 import com.qomoi.service.impl.UserDetailsImpl;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,30 +33,34 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @RestController
     @RequestMapping("/user")
 public class UserController {
 
     private final UserServiceImpl userService;
-//    private final AuthenticationManager authenticationManager;
+    //    private final AuthenticationManager authenticationManager;
 //    private final JwtUtils jwtUtils;
 //    private final RefreshTokenServiceImpl refreshTokenService;
     private final UserRepository userRepository;
-
 //    private final PasswordEncoder passwordEncoder;
 
     @Value("${front.end}")
     private String frontEndUrl;
 
-    public UserController(UserServiceImpl userService,  UserRepository userRepository) {
+    public UserController(UserServiceImpl userService, UserRepository userRepository) {
         this.userService = userService;
 //        this.authenticationManager = authenticationManager;
 //        this.jwtUtils = jwtUtils;
@@ -71,21 +77,21 @@ public class UserController {
     }
 
     @PostMapping("/saveProfile/{email}")
-    public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto, @PathVariable String email){
-        if(StringUtils.hasText(email)){
-          UserDE userDE = userService.updateProfile(profileDto,email);
-          return ResponseEntity.status(HttpStatus.CREATED)
-                  .body(new SavedRecordResponseDto(userDE,new ResponseDto(201, "Record saved successfully")));
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto, @PathVariable String email) {
+        if (StringUtils.hasText(email)) {
+            UserDE userDE = userService.updateProfile(profileDto, email);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new SavedRecordResponseDto(userDE, new ResponseDto(201, "Record saved successfully")));
         }
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
 
     @GetMapping("/myProfile/{email}")
-    public ResponseEntity<?> getProfile(@PathVariable String email){
-        if(StringUtils.hasText(email)){
+    public ResponseEntity<?> getProfile(@PathVariable String email) {
+        if (StringUtils.hasText(email)) {
             UserDE userDE = userService.getProfile(email);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new SavedRecordResponseDto(userDE,new ResponseDto(200, "User found")));
+                    .body(new SavedRecordResponseDto(userDE, new ResponseDto(200, "User found")));
         }
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
@@ -96,8 +102,7 @@ public class UserController {
         if (id != null && addressDto != null) {
             userService.saveAddress(addressDto, id);
             return ResponseEntity.ok("Address saved Successfully");
-        }
-        else{
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -107,42 +112,47 @@ public class UserController {
 //        return null;
 //    }
 
-    @PostMapping("/myPurchase/{email}")
-    public ResponseEntity<PurchaseResponse> getPurchaseInfo(@PathVariable String email){
-        return null;
+    @PostMapping("/savePurchase")
+    public ResponseEntity<?> savePurchase(@RequestBody List<PurchaseDto> purchaseDto){
+        String saveDetails = userService.savePurchase(purchaseDto);
+        if(StringUtils.hasText(saveDetails) && saveDetails.equals("success")){
+            return new ResponseEntity<>(new ResponseDto(201, "Record saved successfully"),HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ResponseDto(500, "Record not saved"),HttpStatus.OK);
+    }
+
+    @GetMapping("/myPurchase")
+    public ResponseEntity<?> getPurchaseInfo() {
+       List<PurchaseResponse> purchaseResponses = userService.myPurchase();
+       if(Objects.nonNull(purchaseResponses)){
+           return new ResponseEntity<>(purchaseResponses,HttpStatus.OK);
+       }
+       else{
+           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       }
     }
 
     @PostMapping("/myCourses/{email}")
-    public ResponseEntity<CourseResponse> getMyCourses(@PathVariable String email){
+    public ResponseEntity<CourseResponse> getMyCourses(@PathVariable String email) {
         return null;
     }
 
-//    @PostMapping("/forgot_password")
-//    public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, HttpServletRequest request, Model model) throws MissingFieldException, NotFoundException, JsonProcessingException, NotFoundException {
-//
-//        String email = forgetPasswordDto.getEmailId();
-//        String token = UUID.randomUUID().toString().replaceAll("-", "");
-//        if (!StringUtils.hasText(email)) {
-//            throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);
-//        }
-//        userService.updateResetPasswordToken(token, email);
-//
-//        try {
-//
-//            String resetPasswordLink = frontEndUrl + "/reset-password?token=" + token;
-//            String subject = "Here's the link to reset your password";
-//
-//            String content = "<p>Hello,</p>" + "<p>You have requested to reset your password.</p>"
-//                    + "<p>Click the link below to change your password:</p>" + "<p><a href=\"" + resetPasswordLink
+
+    @PostMapping("/sendMail/{email}")
+    public ResponseEntity<?> sendMail(@PathVariable String email, Model model) throws MessagingException, UnsupportedEncodingException {
+        if (StringUtils.hasText(email)) {
+            try {
+                String content = "<p>Hello,</p>" + "<p>You have purchased xxx course.</p>"
+                        + "<p> Happy learning </p>";
 //                    + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
 //                    + "or you have not made the request.</p>";
-//            userService.sendEmail(email, subject, content);
-//            model.addAttribute("message", "We have sent a reset password link to your email. Please check.");
-//        } catch (UnsupportedEncodingException | MessagingException e) {
-//            model.addAttribute("error", "Error while sending email");
-//        }
-//        return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
-//    }
-
-
+                String subject = "Course Purchased";
+                userService.sendEmail(email, subject, content);
+                model.addAttribute("message", "We have sent a purchase details to your email. Please check.");
+            } catch (MessagingException | UnsupportedEncodingException e) {
+                model.addAttribute("error", "Error while sending email");
+            }
+        }
+        return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
+    }
 }

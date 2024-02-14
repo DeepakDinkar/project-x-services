@@ -1,12 +1,14 @@
 package com.qomoi.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qomoi.dto.*;
 import com.qomoi.entity.RefreshToken;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.ExistingUserFoundException;
 import com.qomoi.exception.MissingFieldException;
+import com.qomoi.exception.NotFoundException;
 import com.qomoi.exception.TokenRefreshException;
 import com.qomoi.jwt.JwtUtils;
 import com.qomoi.repository.UserRepository;
@@ -19,6 +21,7 @@ import com.qomoi.validator.ValidateUserFields;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -27,6 +30,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,8 +39,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -49,6 +58,8 @@ public class AuthController {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${pv.app.jwtSecret}")
+    private String jwtSecret;
     @Value("${front.end}")
     private String frontEndUrl;
 
@@ -140,8 +151,8 @@ public class AuthController {
                 .body(new ResponseDto(200, Constants.SIGNOUT_SUCCESSFULLY));
     }
 
-    @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
+    @PostMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
 
         if ((refreshToken != null) && (refreshToken.length() > 0)) {
@@ -163,7 +174,7 @@ public class AuthController {
     }
 
     @PostMapping("/google-login")
-    public ResponseEntity<String> googleSignup( @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException {
+    public ResponseEntity<?> googleSignup( @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -182,16 +193,78 @@ public class AuthController {
 
         byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
         String jwtToken = Jwts.builder()
-                .setSubject(googleTokenResponse.getSub())
+                .setSubject(googleTokenResponse.getEmail())
                 .claim("name", googleTokenResponse.getName())
                 .claim("email", googleTokenResponse.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000)))
-                .signWith(SignatureAlgorithm.HS256, keyBytes)
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
-        String responseBody = response.getBody();
-        String extractedBody = responseBody.substring(responseBody.indexOf("{"), responseBody.lastIndexOf("}") + 1);
-        return new ResponseEntity<>(extractedBody + "\nJWT Token: " + jwtToken + "\n" + user, HttpStatus.OK);
+//        String responseBody = response.getBody();
+//        String extractedBody = responseBody.substring(responseBody.indexOf("{"), responseBody.lastIndexOf("}") + 1);
+
+        GoogleResponse googleResponse = new GoogleResponse();
+        googleResponse.setToken(jwtToken);
+        googleResponse.setUser(user);
+        googleResponse.setAdditionalInfo(response.getBody());
+
+        return new ResponseEntity<>(googleResponse, HttpStatus.OK);
+    }
+
+    private Key getSignKey() {
+        byte[] keyBytes = Base64.getDecoder().decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    @PostMapping("/forgot_password")
+    public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, HttpServletRequest request, Model model) throws MissingFieldException, NotFoundException, JsonProcessingException, NotFoundException {
+
+        String email = forgetPasswordDto.getEmailId();
+        String token = UUID.randomUUID().toString().replaceAll("-", "");
+        if (!StringUtils.hasText(email)) {
+            throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);
+        }
+        userService.updateResetPasswordToken(token, email);
+        try {
+            String resetPasswordLink = frontEndUrl + "/reset-password?token=" + token;
+            String subject = "Here's the link to reset your password";
+
+            String content = "<p>Hello,</p>" + "<p>You have requested to reset your password.</p>"
+                    + "<p>Click the link below to change your password:</p>" + "<p><a href=\"" + resetPasswordLink
+                    + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
+                    + "or you have not made the request.</p>";
+            userService.sendEmail(email, subject, content);
+            model.addAttribute("message", "We have sent a reset password link to your email. Please check.");
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            model.addAttribute("error", "Error while sending email");
+        }
+        return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
+    }
+
+    @PostMapping("/reset_password")
+    public ResponseEntity<?> processResetPassword( HttpServletRequest request, Model model) throws MissingFieldException, JsonProcessingException {
+
+        String token = request.getParameter("token");
+        String password = request.getParameter("password");
+        if (!StringUtils.hasText(token)) {
+            throw new MissingFieldException(Constants.TOKEN_MANDATORY);
+        }
+        if (!StringUtils.hasText(password)) {
+            throw new MissingFieldException(Constants.PASSWORD_MANDATORY);
+        }
+        UserDE customer = userService.getByResetPasswordToken(token);
+        model.addAttribute("title", "Reset your password");
+        if (customer == null) {
+            model.addAttribute("message", "Invalid Token");
+            return ResponseEntity
+                    .status(401)
+                    .body(new ResponseDto(5, Constants.UNAUTHORIZED));
+        } else {
+            userService.updatePassword(customer, password);
+            model.addAttribute("message", "You have successfully changed your password.");
+        }
+
+        return ResponseEntity.ok().body(new ResponseDto(200, Constants.PASSWORD_UPDATED_SUCCESSFULLY));
     }
 
 
