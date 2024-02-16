@@ -120,10 +120,13 @@ public class AuthController {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
         ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
+
+        UserDE userDE = userService.getByEmailId(loginRequestDTO.getEmailId());
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-                .body(new JwtResponse(jwtCookie.getValue()));
+                .body(new JwtResponse(jwtCookie.getValue(),userDE.getFirstName()));
     }
 
     @PostMapping("/signout")
