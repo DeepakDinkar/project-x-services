@@ -2,19 +2,14 @@ package com.qomoi.controller;
 
 import com.qomoi.dto.*;
 import com.qomoi.entity.CourseVerticalEntity;
-import com.qomoi.entity.TrainerEntity;
 import com.qomoi.service.CourseService;
 import com.qomoi.entity.CoursesEntity;
-import com.qomoi.entity.VerticalCoursesEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController

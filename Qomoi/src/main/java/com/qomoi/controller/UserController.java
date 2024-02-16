@@ -1,50 +1,24 @@
 package com.qomoi.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qomoi.repository.UserRepository;
-import com.qomoi.service.impl.RefreshTokenServiceImpl;
-import com.qomoi.service.impl.UserDetailsImpl;
 import com.qomoi.service.impl.UserServiceImpl;
 import com.qomoi.utility.Constants;
-import com.qomoi.utility.Decrypt;
 import com.qomoi.dto.*;
-import com.qomoi.entity.RefreshToken;
 import com.qomoi.entity.UserDE;
-import com.qomoi.exception.ExistingUserFoundException;
-import com.qomoi.exception.MissingFieldException;
 import com.qomoi.exception.NotFoundException;
-import com.qomoi.exception.TokenRefreshException;
-import com.qomoi.jwt.JwtUtils;
-import com.qomoi.validator.ValidateUserFields;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @RestController
     @RequestMapping("/user")
