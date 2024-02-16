@@ -51,22 +51,13 @@ import java.util.UUID;
 public class UserController {
 
     private final UserServiceImpl userService;
-    //    private final AuthenticationManager authenticationManager;
-//    private final JwtUtils jwtUtils;
-//    private final RefreshTokenServiceImpl refreshTokenService;
     private final UserRepository userRepository;
-//    private final PasswordEncoder passwordEncoder;
-
     @Value("${front.end}")
     private String frontEndUrl;
 
     public UserController(UserServiceImpl userService, UserRepository userRepository) {
         this.userService = userService;
-//        this.authenticationManager = authenticationManager;
-//        this.jwtUtils = jwtUtils;
-//        this.refreshTokenService = refreshTokenService;
         this.userRepository = userRepository;
-//        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -110,11 +101,6 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-//    @PostMapping("/myProfile/{email}")
-//    public ResponseEntity<UserProfileResponse> getMyProfile(@PathVariable String email){
-//        return null;
-//    }
 
     @PostMapping("/savePurchase")
     public ResponseEntity<?> savePurchase(@RequestBody List<PurchaseDto> purchaseDto){
@@ -160,8 +146,6 @@ public class UserController {
                             + "<p> Venue : "+purchase.getLocation()
                             + "<p> Date : "+purchase.getCourseDate()
                             + "<p> Happy learning !!! </p>";
-//                    + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
-//                    + "or you have not made the request.</p>";
                     String subject = "Course Purchased";
                     userService.sendEmail(email, subject, content);
                     model.addAttribute("message", "We have sent a purchase details to your email. Please check.");

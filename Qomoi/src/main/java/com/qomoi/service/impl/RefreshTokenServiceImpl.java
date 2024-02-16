@@ -44,7 +44,6 @@ public class RefreshTokenServiceImpl {
                 refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
                 return refreshTokenRepository.save(refreshToken);
             } else {
-                // Create a new refresh token
                 RefreshToken refreshToken = new RefreshToken();
                 refreshToken.setUser(user);
                 refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));

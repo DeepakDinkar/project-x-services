@@ -83,20 +83,21 @@ public class SearchServiceImpl implements SearchService {
     public Page<CoursesEntity> getExploreCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, String location) {
 
         List<CoursesEntity> coursesEntityList = null;
+        Page<CoursesEntity> coursesPage = null;
         int start = 0;
         int end = 0;
         if (StringUtils.hasText(slug) && StringUtils.hasText(query)) {
             coursesEntityList = courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEqualsOrderByIsTrendingDesc(query, slug);
             start = (int) pageRequest.getOffset();
             end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
-            Page<CoursesEntity> coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
+            coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
             return coursesPage;
 
         } else if (StringUtils.hasText(slug)) {
             coursesEntityList = courseRepository.findCoursesEntitiesBySlugOrderByIsTrendingDesc(slug);
             start = (int) pageRequest.getOffset();
             end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
-            Page<CoursesEntity> coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
+            coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
             return coursesPage;
 
         } else if (StringUtils.hasText(query)) {
@@ -125,7 +126,7 @@ public class SearchServiceImpl implements SearchService {
             });
             start = (int) pageRequest.getOffset();
             end = Math.min((start + pageRequest.getPageSize()), list.size());
-            Page<CoursesEntity> coursesPage = new PageImpl<>(list.subList(start, end), pageRequest, list.size());
+            coursesPage = new PageImpl<>(list.subList(start, end), pageRequest, list.size());
 
             return coursesPage;
 

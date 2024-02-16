@@ -24,21 +24,6 @@ public class ValidateUserFields {
 
         if (!StringUtils.hasText(signUpRequestDTO.getPassword()))
             throw new MissingFieldException(Constants.PASSWORD_MANDATORY);
-
-//        if (!StringUtils.hasText(signUpRequestDTO.getUserType()))
-//            throw new MissingFieldException(Constants.USER_TYPE_MANDATORY);
-
-//        if (!StringUtils.hasText(signUpRequestDTO.getStreet()))
-//            throw new MissingFieldException(Constants.STREET_MANDATORY);
-//
-//        if (!StringUtils.hasText(signUpRequestDTO.getCity()))
-//            throw new MissingFieldException(Constants.CITY_MANDATORY);
-//
-//        if (!StringUtils.hasText(signUpRequestDTO.getState()))
-//            throw new MissingFieldException(Constants.STATE_MANDATORY);
-//
-//        if (!StringUtils.hasText(signUpRequestDTO.getPincode()))
-//            throw new MissingFieldException(Constants.PINCODE_MANDATORY);
     }
 
     public void validateProfileUpdateFields(SignUpRequestDTO signUpRequestDTO) throws MissingFieldException {
@@ -57,18 +42,6 @@ public class ValidateUserFields {
 
         if (!StringUtils.hasText(signUpRequestDTO.getPassword()))
             throw new MissingFieldException("Password is Missing ");
-
-//        if (!StringUtils.hasText(signUpRequestDTO.getStreet()))
-//            throw new MissingFieldException("Street name is Missing ");
-//
-//        if (!StringUtils.hasText(signUpRequestDTO.getCity()))
-//            throw new MissingFieldException("City is Missing ");
-//
-//        if (!StringUtils.hasText(signUpRequestDTO.getState()))
-//            throw new MissingFieldException("State is Missing ");
-//
-//        if (!StringUtils.hasText(signUpRequestDTO.getPincode()))
-//            throw new MissingFieldException("Pin code is Missing ");
     }
 
     public void validateLoginFields(LoginRequestDTO loginRequestDTO) throws MissingFieldException {

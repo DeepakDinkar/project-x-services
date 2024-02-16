@@ -9,8 +9,6 @@ import com.qomoi.repository.MyCourseRepository;
 import com.qomoi.repository.PurchaseRepository;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
-import com.qomoi.utility.Constants;
-import com.qomoi.utility.Decrypt;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
@@ -31,7 +29,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
@@ -64,9 +61,6 @@ public class UserServiceImpl {
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    private static final String CHARACTERS = "OIUMHUpokjh1645GTT55868RCRCIqwsdcfvTVYTITceztz183rfghjo";
-    private static final Random RANDOM = new SecureRandom();
 
     public UserDE saveUser(SignUpRequestDTO signUpRequestDTO) throws Exception {
         UserDE existingUser = userRepository.findUserByEmailAndPhoneNumber(signUpRequestDTO.getEmailId().trim(),
@@ -225,7 +219,6 @@ public class UserServiceImpl {
                 purchaseEntity.setPurchaseDate(new Date());
                 purchaseRepository.save(purchaseEntity);
 
-                // Check if the email exists
                 boolean emailExists = myCourseRepository.existsByEmail(emailId);
                 if (!emailExists) {
                     MyCoursesEntity myCourses = new MyCoursesEntity();

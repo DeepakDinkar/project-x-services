@@ -9,25 +9,17 @@ import com.qomoi.repository.LocationRepository;
 import com.qomoi.repository.TrainersRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.CourseService;
-import com.qomoi.dto.CourseResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-
-//import java.sql.ResultSet;
-//import java.sql.SQLException;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-//import java.util.Collections;
-import java.util.stream.Collectors;
+
 
 @Service
 @Transactional
@@ -37,7 +29,6 @@ public class CourseServiceImpl implements CourseService {
     private final LocationRepository locationRepository;
 
     private final TrainersRepository trainersRepository;
-//
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
