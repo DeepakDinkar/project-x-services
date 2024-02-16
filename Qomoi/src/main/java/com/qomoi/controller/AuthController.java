@@ -16,7 +16,6 @@ import com.qomoi.service.impl.RefreshTokenServiceImpl;
 import com.qomoi.service.impl.UserDetailsImpl;
 import com.qomoi.service.impl.UserServiceImpl;
 import com.qomoi.utility.Constants;
-import com.qomoi.utility.Decrypt;
 import com.qomoi.validator.ValidateUserFields;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -109,15 +108,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) throws Exception {
-        Decrypt decryptPass = new Decrypt();
-
-        String salt = userRepository.findSaltByEmailId(loginRequestDTO.getEmailId());
-        String password = decryptPass.decrypt(loginRequestDTO.getPassword());
-
-        String saltPass = salt+password;
-
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmailId(), saltPass ));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmailId(), loginRequestDTO.getPassword() ));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

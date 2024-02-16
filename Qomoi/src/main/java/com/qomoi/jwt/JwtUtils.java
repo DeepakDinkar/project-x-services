@@ -30,7 +30,7 @@ public class JwtUtils {
     @Value("${pv.app.jwtCookieName}")
     private String jwtCookie;
 
-    @Value("${pv.app.jwtRefreshCookieName}")
+    @Value("${jwtRefreshCookieName}")
     private String jwtRefreshCookie;
 
 

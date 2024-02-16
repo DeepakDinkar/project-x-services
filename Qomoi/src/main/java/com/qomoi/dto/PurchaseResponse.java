@@ -16,5 +16,7 @@ public class PurchaseResponse {
     private String location;
     private Date courseDate;
     private String courseAmt;
+    private String transactionId;
+    private Date purchasedDate;
 
 }

@@ -2,7 +2,6 @@ package com.qomoi.service.impl;
 
 
 import com.qomoi.dto.*;
-import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.PurchaseEntity;
 import com.qomoi.jwt.JwtUtils;
 import com.qomoi.repository.PurchaseRepository;
@@ -15,7 +14,6 @@ import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -23,20 +21,17 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Transactional
@@ -63,7 +58,6 @@ public class UserServiceImpl {
     private static final Random RANDOM = new SecureRandom();
 
     public UserDE saveUser(SignUpRequestDTO signUpRequestDTO) throws Exception {
-        Decrypt cryptPass = new Decrypt();
         UserDE existingUser = userRepository.findUserByEmailAndPhoneNumber(signUpRequestDTO.getEmailId().trim(),
                 signUpRequestDTO.getMobile().trim());
         UserDE userregistered = null;
@@ -73,23 +67,13 @@ public class UserServiceImpl {
         userDE.setMobile(signUpRequestDTO.getMobile());
         userDE.setEmailId(signUpRequestDTO.getEmailId());
         userDE.setUserType(signUpRequestDTO.getUserType());
-        String salt = getNextSalt(Constants.CHARACTER_LENGTH);
-        userDE.setSalt(salt);
-        String rawPass = cryptPass.decrypt(signUpRequestDTO.getPassword());
-        userDE.setPassword(passwordEncoder.encode(salt+rawPass));
+        userDE.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         userDE.setIsNormal(true);
         userregistered = userRepository.save(userDE);
 
         return userregistered;
     }
 
-    private static String getNextSalt(int length) {
-        StringBuilder salt = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            salt.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
-        }
-        return salt.toString();
-    }
     public UserDE getByEmailId(String emailId) {
         return userRepository.findByEmail(emailId);
     }
@@ -97,18 +81,6 @@ public class UserServiceImpl {
     public UserDE getByEmailIdAndMobileNumber(String emailId, String mobile) {
         return userRepository.findUserByEmailAndPhoneNumber(emailId, mobile);
     }
-
-//    public void updateResetPasswordToken(String token, String email) throws NotFoundException {
-//        UserDE userDE = userRepository.findByEmail(email);
-//        if (userDE != null) {
-//            userDE.setUserId(userDE.getUserId());
-//            userDE.setResetPasswordToken(token);
-//            userRepository.save(userDE);
-//        } else {
-//            throw new NotFoundException("Email is not registered with PV: " + email);
-//        }
-//    }
-
 
     public String saveGoogleLogin(GoogleTokenResponse googleTokenResponse){
       if(userRepository.findByEmail(googleTokenResponse.getEmail()) == null) {
@@ -137,26 +109,8 @@ public class UserServiceImpl {
 
         userRepository.save(userDE);
     }
-    public Optional<UserDE> getEmailId(String emailId) {
-        return userRepository.findByEmailIds(emailId); }
 
-    public List<UserDE> getAllDetails() {
-        return userRepository.findAllDetails();
-    }
-    public List<UserDE> getAllDetail() {
-        List<UserDE>  userDE = userRepository.findAllAdmin();
-        return userDE;
-    }
 
-    public UserDE getUserId(Long id) throws NotFoundException {
-        Optional<UserDE> userId = userRepository.findById(id);
-        if (userId.isPresent()) {
-            UserDE userDE = userId.get();
-            return userDE;
-        } else {
-            throw new NotFoundException("User not found with id: " + id);
-        }
-    }
     public void deleteUser(Long id) throws NotFoundException {
         Optional<UserDE> userDE = userRepository.findById(id);
 
@@ -166,12 +120,6 @@ public class UserServiceImpl {
         } else {
             throw new NotFoundException("User not found with id: " + id);
         }
-    }
-    public boolean isEmailIdExists(String emailId) {
-        return userRepository.existsByEmailId(emailId);
-    }
-    public boolean isMobileExists(String mobile) {
-        return userRepository.existsByMobile(mobile);
     }
 
     public UserDE updateProfile(ProfileDto profileDto, String email){
@@ -232,7 +180,6 @@ public class UserServiceImpl {
     public void updateResetPasswordToken(String token, String email) throws NotFoundException {
         UserDE userDE = userRepository.findByEmail(email);
         if (userDE != null) {
-//            userDE.setUserId(userDE.getUserId());
             userDE.setResetPasswordToken(token);
             userRepository.save(userDE);
         } else {
@@ -244,29 +191,30 @@ public class UserServiceImpl {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String emailId = authentication.getName();
 
-        for ( PurchaseDto purchase : purchaseDto) {
+        if(StringUtils.hasText(emailId)) {
+            for (PurchaseDto purchase : purchaseDto) {
 
-            PurchaseEntity purchaseEntity = new PurchaseEntity();
-            purchaseEntity.setCourseId(purchase.getCourseId());
-            purchaseEntity.setCourseDate(purchase.getCourseDate());
-            purchaseEntity.setTransactionId(purchase.getTransactionId());
-            purchaseEntity.setEmail(emailId);
-            purchaseEntity.setLocation(purchase.getLocation());
-            purchaseEntity.setCourseAmt(purchase.getCourseAmt());
-            purchaseRepository.save(purchaseEntity);
+                PurchaseEntity purchaseEntity = new PurchaseEntity();
+                purchaseEntity.setCourseId(purchase.getCourseId());
+                purchaseEntity.setCourseDate(purchase.getCourseDate());
+                purchaseEntity.setTransactionId(purchase.getTransactionId());
+                purchaseEntity.setEmail(emailId);
+                purchaseEntity.setLocation(purchase.getLocation());
+                purchaseEntity.setCourseAmt(purchase.getCourseAmt());
+                purchaseEntity.setPurchaseDate(new Date());
+                purchaseRepository.save(purchaseEntity);
+            }
+            return "success";
         }
-        return "success";
+        return "fail";
     }
 
-    public List<PurchaseResponse> myPurchase () {
+    public List<PurchaseResponse> myPurchase (String emailId) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String emailId = authentication.getName();
-
-        StringBuilder sql = new StringBuilder("SELECT c.campaign_template_course_name, p.location, p.course_date, p.course_amt ");
-        sql.append("FROM purchase p ");
-        sql.append("JOIN courses c ON c.id = p.course_id ");
-        sql.append("WHERE email = ?");
+        StringBuilder sql = new StringBuilder("SELECT c.campaign_template_course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
+        sql.append(" FROM purchase p ");
+        sql.append(" JOIN courses c ON c.id = p.course_id ");
+        sql.append(" WHERE email = ? ");
 
         List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{emailId},
                 new RowMapper<PurchaseResponse>() {
@@ -277,9 +225,61 @@ public class UserServiceImpl {
                         purchaseResponse.setCourseAmt(rs.getString("course_amt"));
                         purchaseResponse.setLocation(rs.getString("location"));
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
+                        purchaseResponse.setTransactionId(rs.getString("transaction_id"));
+                        purchaseResponse.setPurchasedDate(rs.getDate("purchase_date"));
                         return purchaseResponse;
                     }
                 });
         return list;
     }
+
+    public List<PurchaseResponse> recentPurchase(String emailId){
+
+        StringBuilder sql = new StringBuilder("SELECT c.campaign_template_course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
+        sql.append(" FROM purchase p ");
+        sql.append(" JOIN courses c ON c.id = p.course_id ");
+        sql.append(" WHERE email = ?  AND DATE(p.purchase_date) = CURRENT_DATE ");
+
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{emailId},
+                new RowMapper<PurchaseResponse>() {
+                    @Override
+                    public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        PurchaseResponse purchaseResponse = new PurchaseResponse();
+                        purchaseResponse.setCoursesName(rs.getString("campaign_template_course_name"));
+                        purchaseResponse.setCourseAmt(rs.getString("course_amt"));
+                        purchaseResponse.setLocation(rs.getString("location"));
+                        purchaseResponse.setCourseDate(rs.getDate("course_date"));
+                        purchaseResponse.setTransactionId(rs.getString("transaction_id"));
+                        purchaseResponse.setPurchasedDate(rs.getDate("purchase_date"));
+                        return purchaseResponse;
+                    }
+                });
+        return list;
+
+    }
+
+    public List<PurchaseResponse> getReminder(){
+
+        StringBuilder sql = new StringBuilder(" SELECT c.campaign_template_course_name, p.email, p.course_date, p.location ");
+        sql.append(" FROM purchase p ");
+        sql.append(" JOIN courses c ON c.id = p.course_id ");
+        sql.append(" WHERE DATE(course_date) = CURRENT_DATE + INTERVAL '5 days' ");
+
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{},
+                new RowMapper<PurchaseResponse>() {
+                    @Override
+                    public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        PurchaseResponse purchaseResponse = new PurchaseResponse();
+                        purchaseResponse.setCoursesName(rs.getString("campaign_template_course_name"));
+                        purchaseResponse.setLocation(rs.getString("location"));
+                        purchaseResponse.setCourseDate(rs.getDate("course_date"));
+                        return purchaseResponse;
+                    }
+                });
+        return list;
+
+    }
+
+
+
 }

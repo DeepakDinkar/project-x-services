@@ -39,4 +39,7 @@ public class PurchaseEntity {
     @Column(name = "transaction_id")
     private String transactionId;
 
+    @Column (name = "purchase_date")
+    private Date purchaseDate;
+
 }

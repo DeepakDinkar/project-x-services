@@ -123,7 +123,9 @@ public class UserController {
 
     @GetMapping("/myPurchase")
     public ResponseEntity<?> getPurchaseInfo() {
-       List<PurchaseResponse> purchaseResponses = userService.myPurchase();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailId = authentication.getName();
+       List<PurchaseResponse> purchaseResponses = userService.myPurchase(emailId);
        if(Objects.nonNull(purchaseResponses)){
            return new ResponseEntity<>(purchaseResponses,HttpStatus.OK);
        }
@@ -138,21 +140,35 @@ public class UserController {
     }
 
 
-    @PostMapping("/sendMail/{email}")
-    public ResponseEntity<?> sendMail(@PathVariable String email, Model model) throws MessagingException, UnsupportedEncodingException {
-        if (StringUtils.hasText(email)) {
-            try {
-                String content = "<p>Hello,</p>" + "<p>You have purchased xxx course.</p>"
-                        + "<p> Happy learning </p>";
+    @PostMapping("/sendMail")
+    public ResponseEntity<?> sendMail( Model model) throws MessagingException, UnsupportedEncodingException {
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        List<PurchaseResponse> recentPurchase = userService.recentPurchase(email);
+
+        for (PurchaseResponse purchase : recentPurchase)
+        {
+            if (StringUtils.hasText(email)) {
+                try {
+                    String content = "<p>Hello,</p>" + "<p>You have purchased "+ purchase.getCoursesName() + " course.</p>"
+                            + "<p> Venue : "+purchase.getLocation()
+                            + "<p> Date : "+purchase.getCourseDate()
+                            + "<p> Happy learning !!! </p>";
 //                    + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
 //                    + "or you have not made the request.</p>";
-                String subject = "Course Purchased";
-                userService.sendEmail(email, subject, content);
-                model.addAttribute("message", "We have sent a purchase details to your email. Please check.");
-            } catch (MessagingException | UnsupportedEncodingException e) {
-                model.addAttribute("error", "Error while sending email");
+                    String subject = "Course Purchased";
+                    userService.sendEmail(email, subject, content);
+                    model.addAttribute("message", "We have sent a purchase details to your email. Please check.");
+                } catch (MessagingException | UnsupportedEncodingException e) {
+                    model.addAttribute("error", "Error while sending email");
+                }
             }
-        }
+    }
         return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
     }
+
+
+
 }

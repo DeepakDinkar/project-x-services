@@ -33,7 +33,7 @@ public class Constants {
     public static final String OTP_VALIDATION_MSG = "Entered Otp is NOT valid. Please Retry!";
     public static final String OTP_ERROR = "Error while sending the OTP";
 
-    public static final String MAIL_SENT_SUCCESSFULLY = "MailSent Successfully with Token:";
+    public static final String MAIL_SENT_SUCCESSFULLY = "MailSent Successfully ";
     public static final String PASSWORD_UPDATED_SUCCESSFULLY = "Password Updated Successfully";
     public static final String TOKEN_MANDATORY = "Token is Missing";
     public static final Object EMAIL_ID_NOT_VALID = "Email Id is not valid";

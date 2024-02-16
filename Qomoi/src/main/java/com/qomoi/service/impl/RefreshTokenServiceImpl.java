@@ -40,7 +40,6 @@ public class RefreshTokenServiceImpl {
             Optional<RefreshToken> existingToken = refreshTokenRepository.findByUser(user);
 
             if (existingToken.isPresent()) {
-                // Update the existing token or handle the situation accordingly
                 RefreshToken refreshToken = existingToken.get();
                 refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
                 return refreshTokenRepository.save(refreshToken);
