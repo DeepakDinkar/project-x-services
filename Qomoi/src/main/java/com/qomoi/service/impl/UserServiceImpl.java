@@ -2,8 +2,10 @@ package com.qomoi.service.impl;
 
 
 import com.qomoi.dto.*;
+import com.qomoi.entity.MyCoursesEntity;
 import com.qomoi.entity.PurchaseEntity;
 import com.qomoi.jwt.JwtUtils;
+import com.qomoi.repository.MyCourseRepository;
 import com.qomoi.repository.PurchaseRepository;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
@@ -13,7 +15,10 @@ import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -47,12 +52,18 @@ public class UserServiceImpl {
     private PurchaseRepository purchaseRepository;
 
     @Autowired
+    private MyCourseRepository myCourseRepository;
+
+    @Autowired
     private JwtUtils jwtUtils;
     @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private static final String CHARACTERS = "OIUMHUpokjh1645GTT55868RCRCIqwsdcfvTVYTITceztz183rfghjo";
     private static final Random RANDOM = new SecureRandom();
@@ -191,11 +202,21 @@ public class UserServiceImpl {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String emailId = authentication.getName();
 
-        if(StringUtils.hasText(emailId)) {
+        if (StringUtils.hasText(emailId)) {
             for (PurchaseDto purchase : purchaseDto) {
+
+                String sql = "SELECT c.campaign_template_course_name " +
+                        "FROM courses c " +
+                        "WHERE c.id = :courseId";
+
+                Query query = entityManager.createNativeQuery(sql);
+                query.setParameter("courseId", purchase.getCourseId());
+
+                String courseName = (String) query.getSingleResult();
 
                 PurchaseEntity purchaseEntity = new PurchaseEntity();
                 purchaseEntity.setCourseId(purchase.getCourseId());
+                purchaseEntity.setCourseName(courseName);
                 purchaseEntity.setCourseDate(purchase.getCourseDate());
                 purchaseEntity.setTransactionId(purchase.getTransactionId());
                 purchaseEntity.setEmail(emailId);
@@ -203,17 +224,36 @@ public class UserServiceImpl {
                 purchaseEntity.setCourseAmt(purchase.getCourseAmt());
                 purchaseEntity.setPurchaseDate(new Date());
                 purchaseRepository.save(purchaseEntity);
+
+                // Check if the email exists
+                boolean emailExists = myCourseRepository.existsByEmail(emailId);
+                if (!emailExists) {
+                    MyCoursesEntity myCourses = new MyCoursesEntity();
+                    myCourses.setEmail(emailId);
+                    List<String> courseNames = new LinkedList<>();
+                    courseNames.add(courseName);
+                    myCourses.setAllCourses(courseNames);
+                    myCourseRepository.save(myCourses);
+                } else {
+                    MyCoursesEntity myCourses = myCourseRepository.findByEmail(emailId);
+                    List<String> courseNames = myCourses.getAllCourses();
+                        courseNames.add(courseName);
+                        myCourses.setAllCourses(courseNames);
+                        myCourseRepository.save(myCourses);
+
+                }
             }
             return "success";
         }
         return "fail";
     }
 
+
+
     public List<PurchaseResponse> myPurchase (String emailId) {
 
-        StringBuilder sql = new StringBuilder("SELECT c.campaign_template_course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
+        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
         sql.append(" FROM purchase p ");
-        sql.append(" JOIN courses c ON c.id = p.course_id ");
         sql.append(" WHERE email = ? ");
 
         List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{emailId},
@@ -221,9 +261,14 @@ public class UserServiceImpl {
                     @Override
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
                         PurchaseResponse purchaseResponse = new PurchaseResponse();
-                        purchaseResponse.setCoursesName(rs.getString("campaign_template_course_name"));
+                        purchaseResponse.setCoursesName(rs.getString("course_name"));
                         purchaseResponse.setCourseAmt(rs.getString("course_amt"));
-                        purchaseResponse.setLocation(rs.getString("location"));
+                        String location = rs.getString("location");
+                        if(location.isEmpty()){
+                            purchaseResponse.setLocation(null);
+                        }else{
+                            purchaseResponse.setLocation(location);
+                        }
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
                         purchaseResponse.setTransactionId(rs.getString("transaction_id"));
                         purchaseResponse.setPurchasedDate(rs.getDate("purchase_date"));

@@ -23,9 +23,11 @@ public class PurchaseEntity {
     @Column(name = "course_id")
     private Long courseId;
 
+    @Column(name = "course_name")
+    private String courseName;
+
     @Column(name = "email")
     private String email;
-
 
     @Column(name = "location")
     private String location;

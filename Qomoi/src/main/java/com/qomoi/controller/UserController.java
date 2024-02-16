@@ -77,7 +77,9 @@ public class UserController {
     }
 
     @PostMapping("/saveProfile/{email}")
-    public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto, @PathVariable String email) {
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         if (StringUtils.hasText(email)) {
             UserDE userDE = userService.updateProfile(profileDto, email);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -86,8 +88,10 @@ public class UserController {
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
 
-    @GetMapping("/myProfile/{email}")
-    public ResponseEntity<?> getProfile(@PathVariable String email) {
+    @GetMapping("/myProfile")
+    public ResponseEntity<?> getProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         if (StringUtils.hasText(email)) {
             UserDE userDE = userService.getProfile(email);
             return ResponseEntity.status(HttpStatus.OK)
