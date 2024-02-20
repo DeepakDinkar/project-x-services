@@ -59,7 +59,7 @@ public class AuthController {
 
     @Value("${pv.app.jwtSecret}")
     private String jwtSecret;
-    @Value("${front.end}")
+    @Value("${app.filter.cors-filter.allowed-origins}")
     private String frontEndUrl;
 
     public AuthController(UserServiceImpl userService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, RefreshTokenServiceImpl refreshTokenService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -237,10 +237,10 @@ public class AuthController {
     }
 
     @PostMapping("/reset_password")
-    public ResponseEntity<?> processResetPassword( HttpServletRequest request, Model model) throws MissingFieldException, JsonProcessingException {
+    public ResponseEntity<?> processResetPassword( @RequestBody ResetPasswordDto resetPasswordDto , Model model) throws MissingFieldException, JsonProcessingException {
 
-        String token = request.getParameter("token");
-        String password = request.getParameter("password");
+        String token = resetPasswordDto.getToken();
+        String password = resetPasswordDto.getNewPassword();
         if (!StringUtils.hasText(token)) {
             throw new MissingFieldException(Constants.TOKEN_MANDATORY);
         }

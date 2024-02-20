@@ -188,7 +188,7 @@ public class UserServiceImpl {
             userDE.setResetPasswordToken(token);
             userRepository.save(userDE);
         } else {
-            throw new NotFoundException("Email is not registered with PV: " + email);
+            throw new NotFoundException("Email is not registered with Qomoi: " + email);
         }
     }
 
