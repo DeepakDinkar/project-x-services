@@ -11,7 +11,7 @@ public class SignUpRequestDTO {
 
     private String lastName;
     private String firstName;
-    private String emailId;
+    private String email;
     private String mobile;
     private String street;
     private String city;

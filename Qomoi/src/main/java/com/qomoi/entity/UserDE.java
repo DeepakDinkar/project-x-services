@@ -71,4 +71,7 @@ public class UserDE {
     @Column(name = "salt")
     private String salt;
 
+    @Column(name = "profile_image")
+    private String profileImage;
+
 }

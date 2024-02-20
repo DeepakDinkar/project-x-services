@@ -41,14 +41,23 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/saveProfile/{email}")
+    @PostMapping("/saveProfile")
     public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         if (StringUtils.hasText(email)) {
             UserDE userDE = userService.updateProfile(profileDto, email);
+            profileDto.setFirstName(userDE.getFirstName());
+            profileDto.setLastName(userDE.getLastName());
+            profileDto.setEmail(userDE.getEmailId());
+            profileDto.setImageUrl(userDE.getProfileImage());
+            profileDto.setAddress1(userDE.getAddress1());
+            profileDto.setAddress2(userDE.getAddress2());
+            profileDto.setPhoneNo(userDE.getMobile());
+            profileDto.setCity(userDE.getCity());
+            profileDto.setCountry(userDE.getCountry());
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new SavedRecordResponseDto(userDE, new ResponseDto(201, "Record saved successfully")));
+                    .body(profileDto);
         }
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
@@ -59,26 +68,38 @@ public class UserController {
         String email = authentication.getName();
         if (StringUtils.hasText(email)) {
             UserDE userDE = userService.getProfile(email);
+
+            ProfileDto profileDto = new ProfileDto();
+            profileDto.setFirstName(userDE.getFirstName());
+            profileDto.setLastName(userDE.getLastName());
+            profileDto.setEmail(userDE.getEmailId());
+            profileDto.setImageUrl(userDE.getProfileImage());
+            profileDto.setAddress1(userDE.getAddress1());
+            profileDto.setAddress2(userDE.getAddress2());
+            profileDto.setPhoneNo(userDE.getMobile());
+            profileDto.setCity(userDE.getCity());
+            profileDto.setCountry(userDE.getCountry());
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new SavedRecordResponseDto(userDE, new ResponseDto(200, "User found")));
+                    .body(profileDto);
         }
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
 
-
-    @PostMapping("/save-address/{id}")
-    public ResponseEntity<String> saveAddress(@RequestBody AddressDto addressDto, @PathVariable Long id) {
-        if (id != null && addressDto != null) {
-            userService.saveAddress(addressDto, id);
-            return ResponseEntity.ok("Address saved Successfully");
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+//    @PostMapping("/save-address/{id}")
+//    public ResponseEntity<String> saveAddress(@RequestBody AddressDto addressDto, @PathVariable Long id) {
+//        if (id != null && addressDto != null) {
+//            userService.saveAddress(addressDto, id);
+//            return ResponseEntity.ok("Address saved Successfully");
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
 
     @PostMapping("/savePurchase")
     public ResponseEntity<?> savePurchase(@RequestBody List<PurchaseDto> purchaseDto){
-        String saveDetails = userService.savePurchase(purchaseDto);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        String saveDetails = userService.savePurchase(purchaseDto,email);
         if(StringUtils.hasText(saveDetails) && saveDetails.equals("success")){
             return new ResponseEntity<>(new ResponseDto(201, "Record saved successfully"),HttpStatus.OK);
         }
@@ -98,9 +119,17 @@ public class UserController {
        }
     }
 
-    @PostMapping("/myCourses/{email}")
-    public ResponseEntity<CourseResponse> getMyCourses(@PathVariable String email) {
-        return null;
+    @GetMapping("/myCourses")
+    public ResponseEntity<?> getMyCourses() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailId = authentication.getName();
+        List<PurchaseResponse> purchaseResponses = userService.myCourses(emailId);
+        if(Objects.nonNull(purchaseResponses)){
+            return new ResponseEntity<>(purchaseResponses,HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 

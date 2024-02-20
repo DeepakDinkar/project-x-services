@@ -12,6 +12,8 @@ public class ProfileDto {
     private String firstName;
     private String lastName;
     private String phoneNo;
+    private String email;
+    private String imageUrl;
     private String address1;
     private String address2;
     private String country;

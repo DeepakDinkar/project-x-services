@@ -81,13 +81,15 @@ public class AuthController {
             validateUserFields.validateSignUpFields(signUpRequestDTO);
             UserDE userRegistered = null;
 
-            if(userService.getByEmailIdAndMobileNumber(signUpRequestDTO.getEmailId(), signUpRequestDTO.getMobile())==null){
+            if(userService.getByEmailIdAndMobileNumber(signUpRequestDTO.getEmail(), signUpRequestDTO.getMobile())==null){
                 userRegistered = userService.saveUser(signUpRequestDTO);
                 SignupResponseDto signupResponseDto = new SignupResponseDto();
                 signupResponseDto.setFirstName(userRegistered.getFirstName());
                 signupResponseDto.setLastName(userRegistered.getLastName());
                 signupResponseDto.setEmail(userRegistered.getEmailId());
                 signupResponseDto.setMobile(userRegistered.getMobile());
+                signupResponseDto.setIsNormal(userRegistered.getIsNormal());
+
                 return ResponseEntity.status(HttpStatus.CREATED)
                         .body(new SavedResponseDto(signupResponseDto, new ResponseDto(201, "Record saved successfully")));
             }
@@ -109,7 +111,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) throws Exception {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmailId(), loginRequestDTO.getPassword() ));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword() ));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -121,7 +123,7 @@ public class AuthController {
 
         ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
-        UserDE userDE = userService.getByEmailId(loginRequestDTO.getEmailId());
+        UserDE userDE = userService.getByEmailId(loginRequestDTO.getEmail());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
@@ -212,9 +214,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgot_password")
-    public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, HttpServletRequest request, Model model) throws MissingFieldException, NotFoundException, JsonProcessingException, NotFoundException {
+    public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, Model model) throws MissingFieldException, NotFoundException, JsonProcessingException, NotFoundException {
 
-        String email = forgetPasswordDto.getEmailId();
+        String email = forgetPasswordDto.getEmail();
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         if (!StringUtils.hasText(email)) {
             throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);

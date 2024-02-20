@@ -63,14 +63,14 @@ public class UserServiceImpl {
     private EntityManager entityManager;
 
     public UserDE saveUser(SignUpRequestDTO signUpRequestDTO) throws Exception {
-        UserDE existingUser = userRepository.findUserByEmailAndPhoneNumber(signUpRequestDTO.getEmailId().trim(),
+        UserDE existingUser = userRepository.findUserByEmailAndPhoneNumber(signUpRequestDTO.getEmail().trim(),
                 signUpRequestDTO.getMobile().trim());
         UserDE userregistered = null;
         UserDE userDE = new UserDE();
         userDE.setLastName(signUpRequestDTO.getLastName());
         userDE.setFirstName(signUpRequestDTO.getFirstName());
         userDE.setMobile(signUpRequestDTO.getMobile());
-        userDE.setEmailId(signUpRequestDTO.getEmailId());
+        userDE.setEmailId(signUpRequestDTO.getEmail());
         userDE.setUserType(signUpRequestDTO.getUserType());
         userDE.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         userDE.setIsNormal(true);
@@ -139,6 +139,7 @@ public class UserServiceImpl {
            user.setCountry(profileDto.getCountry());
            user.setCity(profileDto.getCity());
            user.setZipcode(profileDto.getZipCode());
+           user.setProfileImage(profileDto.getImageUrl());
            return userRepository.save(user);
        }
         throw new EntityNotFoundException("User with email " + email + " not found");
@@ -192,11 +193,10 @@ public class UserServiceImpl {
         }
     }
 
-    public String savePurchase(List<PurchaseDto> purchaseDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String emailId = authentication.getName();
+    public String savePurchase(List<PurchaseDto> purchaseDto, String email) {
 
-        if (StringUtils.hasText(emailId)) {
+
+        if (StringUtils.hasText(email)) {
             for (PurchaseDto purchase : purchaseDto) {
 
                 String sql = "SELECT c.campaign_template_course_name " +
@@ -213,22 +213,22 @@ public class UserServiceImpl {
                 purchaseEntity.setCourseName(courseName);
                 purchaseEntity.setCourseDate(purchase.getCourseDate());
                 purchaseEntity.setTransactionId(purchase.getTransactionId());
-                purchaseEntity.setEmail(emailId);
+                purchaseEntity.setEmail(email);
                 purchaseEntity.setLocation(purchase.getLocation());
                 purchaseEntity.setCourseAmt(purchase.getCourseAmt());
                 purchaseEntity.setPurchaseDate(new Date());
                 purchaseRepository.save(purchaseEntity);
 
-                boolean emailExists = myCourseRepository.existsByEmail(emailId);
+                boolean emailExists = myCourseRepository.existsByEmail(email);
                 if (!emailExists) {
                     MyCoursesEntity myCourses = new MyCoursesEntity();
-                    myCourses.setEmail(emailId);
+                    myCourses.setEmail(email);
                     List<String> courseNames = new LinkedList<>();
                     courseNames.add(courseName);
                     myCourses.setAllCourses(courseNames);
                     myCourseRepository.save(myCourses);
                 } else {
-                    MyCoursesEntity myCourses = myCourseRepository.findByEmail(emailId);
+                    MyCoursesEntity myCourses = myCourseRepository.findByEmail(email);
                     List<String> courseNames = myCourses.getAllCourses();
                         courseNames.add(courseName);
                         myCourses.setAllCourses(courseNames);
@@ -243,13 +243,13 @@ public class UserServiceImpl {
 
 
 
-    public List<PurchaseResponse> myPurchase (String emailId) {
+    public List<PurchaseResponse> myPurchase (String email) {
 
         StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
         sql.append(" FROM purchase p ");
         sql.append(" WHERE email = ? ");
 
-        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{emailId},
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{email},
                 new RowMapper<PurchaseResponse>() {
                     @Override
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -270,6 +270,36 @@ public class UserServiceImpl {
                 });
         return list;
     }
+
+    public List<PurchaseResponse> myCourses (String email) {
+
+        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
+        sql.append(" FROM purchase p ");
+        sql.append(" WHERE email = ?  and course_date < current_date ");
+        sql.append(" ORDER BY course_date DESC ");
+
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{email},
+                new RowMapper<PurchaseResponse>() {
+                    @Override
+                    public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        PurchaseResponse purchaseResponse = new PurchaseResponse();
+                        purchaseResponse.setCoursesName(rs.getString("course_name"));
+                        purchaseResponse.setCourseAmt(rs.getString("course_amt"));
+                        String location = rs.getString("location");
+                        if(location.isEmpty()){
+                            purchaseResponse.setLocation(null);
+                        }else{
+                            purchaseResponse.setLocation(location);
+                        }
+                        purchaseResponse.setCourseDate(rs.getDate("course_date"));
+                        purchaseResponse.setTransactionId(rs.getString("transaction_id"));
+                        purchaseResponse.setPurchasedDate(rs.getDate("purchase_date"));
+                        return purchaseResponse;
+                    }
+                });
+        return list;
+    }
+
 
     public List<PurchaseResponse> recentPurchase(String emailId){
 

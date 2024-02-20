@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(staticName = "build")
 @NoArgsConstructor
 public class ForgetPasswordDto {
-    private String emailId;
+    private String email;
 }

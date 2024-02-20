@@ -19,7 +19,7 @@ public class ValidateUserFields {
         if (!StringUtils.hasText(signUpRequestDTO.getMobile()))
             throw new MissingFieldException(Constants.PHONE_NUMBER_MANDATORY);
 
-        if (!StringUtils.hasText(signUpRequestDTO.getEmailId()))
+        if (!StringUtils.hasText(signUpRequestDTO.getEmail()))
             throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);
 
         if (!StringUtils.hasText(signUpRequestDTO.getPassword()))
@@ -37,7 +37,7 @@ public class ValidateUserFields {
         if (!StringUtils.hasText(signUpRequestDTO.getMobile()))
             throw new MissingFieldException("PhoneNumber is Missing ");
 
-        if (!StringUtils.hasText(signUpRequestDTO.getEmailId()))
+        if (!StringUtils.hasText(signUpRequestDTO.getEmail()))
             throw new MissingFieldException("EmailId is Missing ");
 
         if (!StringUtils.hasText(signUpRequestDTO.getPassword()))
@@ -46,7 +46,7 @@ public class ValidateUserFields {
 
     public void validateLoginFields(LoginRequestDTO loginRequestDTO) throws MissingFieldException {
 
-        if (!StringUtils.hasText(loginRequestDTO.getEmailId()))
+        if (!StringUtils.hasText(loginRequestDTO.getEmail()))
             throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);
 
         if (!StringUtils.hasText(loginRequestDTO.getPassword()))
