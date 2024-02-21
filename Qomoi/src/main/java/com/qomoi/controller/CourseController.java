@@ -52,10 +52,28 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/trending")
-    public ResponseEntity<List<CourseVerticalEntity>> getTrendingVerticalCourses() {
-        List<CourseVerticalEntity> courseByTopic= courseService.getTrendingVerticalCourses();
-        return new ResponseEntity<>(courseByTopic, HttpStatus.OK);
+    @GetMapping("/trending/{page}")
+    public ResponseEntity<Page<CoursesEntity>> getTrendingCourses(@PathVariable int page) {
+        int pageSize = 25;
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+        Page<CoursesEntity> trendingCourse = courseService.getTrendingVerticalCourses(pageRequest);
+        return new ResponseEntity<>(trendingCourse, HttpStatus.OK);
+    }
+
+    @GetMapping("/recommended/{page}")
+    public ResponseEntity<Page<CoursesEntity>> getRecommendedCourses(@PathVariable int page){
+        int pageSize = 25;
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+        Page<CoursesEntity> recommendedCourses = courseService.getRecommendedCourses(pageRequest);
+        return new ResponseEntity<>(recommendedCourses, HttpStatus.OK);
+    }
+
+    @GetMapping("/similar/{slug}/{page}")
+    public ResponseEntity<Page<CoursesEntity>> getSimilarCourses(@PathVariable int page,@PathVariable String slug ){
+        int pageSize = 25;
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+        Page<CoursesEntity> similarCourses = courseService.getSimilarCourses(pageRequest,slug);
+        return new ResponseEntity<>(similarCourses, HttpStatus.OK);
     }
 
     @GetMapping("/explore/{page}")

@@ -145,29 +145,45 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public List<CourseVerticalEntity> getTrendingVerticalCourses() {
-        List<CourseVerticalEntity> trendingVerticalEntities = new ArrayList<>();
-        List<VerticalEntity> verticals = verticalRepository.findTop3ByOrderBySlugAsc();
+    public Page<CoursesEntity> getTrendingVerticalCourses(PageRequest pageRequest) {
+//        List<CourseVerticalEntity> trendingVerticalEntities = new ArrayList<>();
+//        List<VerticalEntity> verticals = verticalRepository.findTop3ByOrderBySlugAsc();
+//
+//        verticals.forEach(verticalEntity -> {
+//            List<CoursesEntity> courses = courseRepository.findTop2BySlugOrderByCampaignTemplateRating(verticalEntity.getSlug());
+//
+//            CourseVerticalEntity courseVerticalEntity = new CourseVerticalEntity();
+//            courseVerticalEntity.setSlug(verticalEntity.getSlug());
+//            courseVerticalEntity.setTitle(verticalEntity.getTitle());
+//            courseVerticalEntity.setImageUrl(verticalEntity.getImageUrl());
+//
+//            courseVerticalEntity.setCourses(courses);
+//
+//            trendingVerticalEntities.add(courseVerticalEntity);
+//        });
+//        return trendingVerticalEntities;
 
-        verticals.forEach(verticalEntity -> {
-            List<CoursesEntity> courses = courseRepository.findTop2BySlugOrderByCampaignTemplateRating(verticalEntity.getSlug());
+        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
 
-            CourseVerticalEntity courseVerticalEntity = new CourseVerticalEntity();
-            courseVerticalEntity.setSlug(verticalEntity.getSlug());
-            courseVerticalEntity.setTitle(verticalEntity.getTitle());
-            courseVerticalEntity.setImageUrl(verticalEntity.getImageUrl());
-
-            courseVerticalEntity.setCourses(courses);
-
-            trendingVerticalEntities.add(courseVerticalEntity);
-        });
-        return trendingVerticalEntities;
     }
+
+    @Override
+    public Page<CoursesEntity> getRecommendedCourses(PageRequest pageRequest) {
+        return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
+    }
+
+    @Override
+    public Page<CoursesEntity> getSimilarCourses(PageRequest pageRequest, String slug) {
+        return courseRepository.findBySlugOrderByIsTrendingDesc(pageRequest, slug);
+    }
+
 
     @Override
     public List<String> getAllLocation() {
         return locationRepository.findDistinctByLocationNameIsNotNull();
     }
+
+
 
     @Override
     public Page<TrainerResponse> getAllTrainers(PageRequest pageRequest) {

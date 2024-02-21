@@ -27,8 +27,6 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     Page<CoursesEntity> findAllByOrderByCampaignTemplateRatingDesc(PageRequest pageRequest);
 
-
-
     List<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEqualsOrderByIsTrendingDesc(String campaignTemplateCourseName, String slug);
 
 
@@ -49,5 +47,8 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
     Page<CoursesEntity> findBySlugOrderByCampaignTemplateCourseName(String slug, Pageable pageable);
 
     Page<CoursesEntity> findAllByOrderByIsTrendingDesc(PageRequest pageRequest);
+
+    Page<CoursesEntity> findBySlugOrderByIsTrendingDesc(PageRequest pageRequest, String slug);
+
 
 }
