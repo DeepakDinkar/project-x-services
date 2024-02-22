@@ -20,6 +20,5 @@ public class QomoiApplication implements CommandLineRunner {
 	@Scheduled(cron = "5 5 0 * * *", zone = "GST")
 	public void runEngTasks() {
 //        System.out.println("Scheduled EngTasks task running");
-
 	}
 }

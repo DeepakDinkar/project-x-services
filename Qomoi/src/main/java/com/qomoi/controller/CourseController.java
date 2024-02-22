@@ -61,7 +61,7 @@ public class CourseController {
     }
 
     @GetMapping("/recommended/{page}")
-    public ResponseEntity<Page<CoursesEntity>> getRecommendedCourses(@PathVariable int page){
+    public ResponseEntity<Page<CoursesEntity>> getRecommendedCourses(@PathVariable int page) {
         int pageSize = 25;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         Page<CoursesEntity> recommendedCourses = courseService.getRecommendedCourses(pageRequest);
@@ -69,10 +69,10 @@ public class CourseController {
     }
 
     @GetMapping("/similar/{slug}/{page}")
-    public ResponseEntity<Page<CoursesEntity>> getSimilarCourses(@PathVariable int page,@PathVariable String slug ){
+    public ResponseEntity<Page<CoursesEntity>> getSimilarCourses(@PathVariable int page, @PathVariable String slug) {
         int pageSize = 25;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        Page<CoursesEntity> similarCourses = courseService.getSimilarCourses(pageRequest,slug);
+        Page<CoursesEntity> similarCourses = courseService.getSimilarCourses(pageRequest, slug);
         return new ResponseEntity<>(similarCourses, HttpStatus.OK);
     }
 
@@ -88,12 +88,11 @@ public class CourseController {
     @GetMapping("/locations")
     public ResponseEntity<List<?>> getAllLocation() {
         List<?> locations = courseService.getAllLocation();
-        System.out.println(locations.toString());
         return new ResponseEntity<>(locations, HttpStatus.OK);
     }
 
     @GetMapping("/trainers/{page}")
-    public ResponseEntity<Page<TrainerResponse>> getTrainers(@PathVariable int page){
+    public ResponseEntity<Page<TrainerResponse>> getTrainers(@PathVariable int page) {
         int pageSize = 25;
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         Page<TrainerResponse> pageTrainer = courseService.getAllTrainers(pageRequest);
