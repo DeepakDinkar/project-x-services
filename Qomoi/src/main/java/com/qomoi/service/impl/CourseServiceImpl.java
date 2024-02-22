@@ -145,25 +145,25 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public Page<CoursesEntity> getTrendingVerticalCourses(PageRequest pageRequest) {
-//        List<CourseVerticalEntity> trendingVerticalEntities = new ArrayList<>();
-//        List<VerticalEntity> verticals = verticalRepository.findTop3ByOrderBySlugAsc();
-//
-//        verticals.forEach(verticalEntity -> {
-//            List<CoursesEntity> courses = courseRepository.findTop2BySlugOrderByCampaignTemplateRating(verticalEntity.getSlug());
-//
-//            CourseVerticalEntity courseVerticalEntity = new CourseVerticalEntity();
-//            courseVerticalEntity.setSlug(verticalEntity.getSlug());
-//            courseVerticalEntity.setTitle(verticalEntity.getTitle());
-//            courseVerticalEntity.setImageUrl(verticalEntity.getImageUrl());
-//
-//            courseVerticalEntity.setCourses(courses);
-//
-//            trendingVerticalEntities.add(courseVerticalEntity);
-//        });
-//        return trendingVerticalEntities;
+    public List<CourseVerticalEntity> getTrendingVerticalCourses() {
+        List<CourseVerticalEntity> trendingVerticalEntities = new ArrayList<>();
+        List<VerticalEntity> verticals = verticalRepository.findTop3ByOrderBySlugAsc();
 
-        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
+        verticals.forEach(verticalEntity -> {
+            List<CoursesEntity> courses = courseRepository.findTop2BySlugOrderByCampaignTemplateRating(verticalEntity.getSlug());
+
+            CourseVerticalEntity courseVerticalEntity = new CourseVerticalEntity();
+            courseVerticalEntity.setSlug(verticalEntity.getSlug());
+            courseVerticalEntity.setTitle(verticalEntity.getTitle());
+            courseVerticalEntity.setImageUrl(verticalEntity.getImageUrl());
+
+            courseVerticalEntity.setCourses(courses);
+
+            trendingVerticalEntities.add(courseVerticalEntity);
+        });
+        return trendingVerticalEntities;
+
+//        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
 
     }
 

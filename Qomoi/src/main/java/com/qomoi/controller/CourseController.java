@@ -52,11 +52,11 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/trending/{page}")
-    public ResponseEntity<Page<CoursesEntity>> getTrendingCourses(@PathVariable int page) {
-        int pageSize = 25;
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        Page<CoursesEntity> trendingCourse = courseService.getTrendingVerticalCourses(pageRequest);
+    @GetMapping("/trending")
+    public ResponseEntity<List<CourseVerticalEntity>> getTrendingCourses() {
+//        int pageSize = 25;
+//        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+        List<CourseVerticalEntity> trendingCourse = courseService.getTrendingVerticalCourses();
         return new ResponseEntity<>(trendingCourse, HttpStatus.OK);
     }
 

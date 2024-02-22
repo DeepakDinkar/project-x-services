@@ -22,7 +22,7 @@ public interface CourseService {
     Optional<CourseLocationResponse> getCourseId(Long id);
     void saveCourse(CoursesEntity coursesEntity);
     List<CoursesEntity> getAllCoursesByVerticalSlug(String slug);
-    Page<CoursesEntity> getTrendingVerticalCourses(PageRequest pageRequest);
+    List<CourseVerticalEntity> getTrendingVerticalCourses();
     Page<CoursesEntity> getRecommendedCourses(PageRequest pageRequest);
     Page<CoursesEntity> getSimilarCourses(PageRequest pageRequest, String slug);
     List<?> getAllLocation();
