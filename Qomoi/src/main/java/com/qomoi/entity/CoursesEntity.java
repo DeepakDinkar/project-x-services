@@ -45,5 +45,7 @@ public class CoursesEntity {
     @Column(name = "course_added_date")
     private Date courseAddedDate;
 
+    @Column(name = "trainer_id")
+    private List<Long> trainerId;
 
 }

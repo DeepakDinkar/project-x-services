@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "trainers")
 @Data
@@ -28,7 +30,7 @@ public class TrainerEntity {
     private String phoneNumber;
 
     @Column(name = "course_id")
-    private Long courseId;
+    private List<Long> courseId;
 
     @Column(name = "image_url")
     private String imageUrl;
