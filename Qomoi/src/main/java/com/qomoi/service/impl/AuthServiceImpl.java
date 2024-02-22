@@ -37,6 +37,7 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -138,24 +139,40 @@ public class AuthServiceImpl {
 
     }
 
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+    public ResponseEntity<?> refreshToken(RefreshTokenDto refreshTokenDto) {
+//        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+//
+//        if ((refreshToken != null) && (refreshToken.length() > 0)) {
+//            return refreshTokenService.findByToken(refreshToken)
+//                    .map(refreshTokenService::verifyExpiration)
+//                    .map(RefreshToken::getUser)
+//                    .map(user -> {
+//                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
+//
+//                        return ResponseEntity.ok()
+//                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+//                                .body(new ResponseDto(200, Constants.TOKEN_REFRESHED_SUCCESSFULLY));
+//                    })
+//                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
+//                            Constants.TOKEN_REFRESHED_NOT_AVAILABLE));
+//        }
+//
+//        return ResponseEntity.badRequest().body(new ResponseDto(4, Constants.TOKEN_EMPTY));
 
-        if ((refreshToken != null) && (refreshToken.length() > 0)) {
-            return refreshTokenService.findByToken(refreshToken)
-                    .map(refreshTokenService::verifyExpiration)
-                    .map(RefreshToken::getUser)
-                    .map(user -> {
-                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
-
-                        return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                .body(new ResponseDto(200, Constants.TOKEN_REFRESHED_SUCCESSFULLY));
-                    })
-                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
-                            Constants.TOKEN_REFRESHED_NOT_AVAILABLE));
+        String expiredToken = refreshTokenDto.getToken();
+        if (expiredToken != null && expiredToken.length() > 0) {
+            String username = jwtUtils.getUserNameFromJwtToken(expiredToken);
+            UserDE user =  userService.getByEmailId(username);
+            if(Objects.nonNull(user)){
+                String newToken = jwtUtils.generateTokenFromUsername(username);
+                ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                        .body(new JwtResponse(newToken, username));
+            }else {
+                throw new TokenRefreshException(expiredToken, Constants.TOKEN_REFRESHED_NOT_AVAILABLE);
+            }
         }
-
         return ResponseEntity.badRequest().body(new ResponseDto(4, Constants.TOKEN_EMPTY));
     }
 

@@ -91,8 +91,8 @@ public class AuthController {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-        return authService.refreshToken(request);
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenDto refreshTokenDto) {
+        return authService.refreshToken(refreshTokenDto);
     }
 
     @PostMapping("/google-login")
