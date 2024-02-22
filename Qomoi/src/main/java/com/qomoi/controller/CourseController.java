@@ -52,10 +52,8 @@ public class CourseController {
         }
     }
 
-    @GetMapping("/trending")
+    @GetMapping("/banner")
     public ResponseEntity<List<CourseVerticalEntity>> getTrendingCourses() {
-//        int pageSize = 25;
-//        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         List<CourseVerticalEntity> trendingCourse = courseService.getTrendingVerticalCourses();
         return new ResponseEntity<>(trendingCourse, HttpStatus.OK);
     }
