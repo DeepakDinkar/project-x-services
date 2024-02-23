@@ -29,7 +29,6 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     List<CoursesEntity> findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEqualsOrderByIsTrendingDesc(String campaignTemplateCourseName, String slug);
 
-
     Page<CoursesEntity> findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(String slug, String name, PageRequest pageRequest);
 
     Page<CoursesEntity> findBySlugContainingIgnoreCaseOrderByIsTrendingDesc(String slug, PageRequest pageRequest);
@@ -39,10 +38,6 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
     Page<CoursesEntity> findByCourseAddedDateBetweenOrderByIsTrendingDesc(Date startDate, Date endDate,PageRequest pageRequest);
 
     Page<CoursesEntity> findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(Date startDate, Date endDate, String slug, PageRequest pageRequest);
-
-//    Page<CoursesEntity> findAllByOrderByCampaignTemplateCourseNameAsc(PageRequest pageRequest);
-//
-//    Page<CoursesEntity> findAllByOrderByCampaignTemplateCourseNameDsc(PageRequest pageRequest);
 
     Page<CoursesEntity> findBySlugOrderByCampaignTemplateCourseName(String slug, Pageable pageable);
 

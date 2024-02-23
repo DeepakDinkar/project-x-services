@@ -21,10 +21,8 @@ public class VerticalServiceImpl implements VerticalService {
 
     private final VerticalRepository verticalRepository;
     private final CourseRepository courseRepository;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     public VerticalServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository) {
 
         this.verticalRepository = verticalRepository;

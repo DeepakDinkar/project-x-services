@@ -12,6 +12,7 @@ import com.qomoi.service.CourseService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -183,21 +184,28 @@ public class CourseServiceImpl implements CourseService {
         return locationRepository.findDistinctByLocationNameIsNotNull();
     }
 
-
-
     @Override
     public Page<TrainerResponse> getAllTrainers(PageRequest pageRequest) {
+        StringBuilder sql = new StringBuilder("SELECT string_agg(c.campaign_template_course_name, ', ') AS course_names, t.trainer_name, t.phone_number, t.image_url  ");
+        sql.append(" FROM trainers t LEFT JOIN courses c ON c.id = ANY(t.course_id) ");
+        sql.append(" GROUP BY t.trainer_name, t.phone_number, t.image_url ");
 
-        return trainersRepository.findAll(pageRequest)
-               .map(this::convertToTrainerResponse);
+        List<TrainerResponse> trainerResponses = this.jdbcTemplate.query(sql.toString(), new Object[]{}, new RowMapper<TrainerResponse>() {
+            @Override
+            public TrainerResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+                TrainerResponse trainerResponse = new TrainerResponse();
+                trainerResponse.setCourseName(Collections.singletonList(rs.getString("course_names")));
+                trainerResponse.setTrainerName(rs.getString("trainer_name"));
+                trainerResponse.setImageUrl(rs.getString("image_url"));
+                trainerResponse.setPhoneNumber(rs.getString("phone_number"));
+                return trainerResponse;
+            }
+        });
+
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), trainerResponses.size());
+
+        return new PageImpl<>(trainerResponses.subList(start, end), pageRequest, trainerResponses.size());
     }
 
-    private TrainerResponse convertToTrainerResponse(TrainerEntity trainer) {
-        TrainerResponse trainerResponse = new TrainerResponse();
-        trainerResponse.setCourseId(trainer.getCourseId());
-        trainerResponse.setTrainerName(trainer.getTrainerName());
-        trainerResponse.setPhoneNumber(trainer.getPhoneNumber());
-        trainerResponse.setImageUrl(trainer.getImageUrl());
-        return trainerResponse;
-    }
 }

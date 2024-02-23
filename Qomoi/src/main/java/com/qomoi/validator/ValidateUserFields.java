@@ -26,32 +26,5 @@ public class ValidateUserFields {
             throw new MissingFieldException(Constants.PASSWORD_MANDATORY);
     }
 
-    public void validateProfileUpdateFields(SignUpRequestDTO signUpRequestDTO) throws MissingFieldException {
-
-        if (!StringUtils.hasText(signUpRequestDTO.getFirstName()))
-            throw new MissingFieldException("FirstName is Missing ");
-
-        if (!StringUtils.hasText(signUpRequestDTO.getLastName()))
-            throw new MissingFieldException("LastName is Missing ");
-
-        if (!StringUtils.hasText(signUpRequestDTO.getMobile()))
-            throw new MissingFieldException("PhoneNumber is Missing ");
-
-        if (!StringUtils.hasText(signUpRequestDTO.getEmail()))
-            throw new MissingFieldException("EmailId is Missing ");
-
-        if (!StringUtils.hasText(signUpRequestDTO.getPassword()))
-            throw new MissingFieldException("Password is Missing ");
-    }
-
-    public void validateLoginFields(LoginRequestDTO loginRequestDTO) throws MissingFieldException {
-
-        if (!StringUtils.hasText(loginRequestDTO.getEmail()))
-            throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);
-
-        if (!StringUtils.hasText(loginRequestDTO.getPassword()))
-            throw new MissingFieldException(Constants.PASSWORD_MANDATORY);
-    }
-
 }
 

@@ -16,7 +16,6 @@ import java.util.Optional;
 
 public interface CourseService {
 
-//    Page<CoursesEntity> getAllCourse(PageRequest pageRequest);
     List<CourseLocationResponse> getAllCourse(PageRequest pageRequest);
 
     Optional<CourseLocationResponse> getCourseId(Long id);

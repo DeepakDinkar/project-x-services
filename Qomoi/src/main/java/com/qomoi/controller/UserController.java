@@ -85,16 +85,6 @@ public class UserController {
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
 
-//    @PostMapping("/save-address/{id}")
-//    public ResponseEntity<String> saveAddress(@RequestBody AddressDto addressDto, @PathVariable Long id) {
-//        if (id != null && addressDto != null) {
-//            userService.saveAddress(addressDto, id);
-//            return ResponseEntity.ok("Address saved Successfully");
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
-
     @PostMapping("/savePurchase")
     public ResponseEntity<?> savePurchase(@RequestBody List<PurchaseDto> purchaseDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
