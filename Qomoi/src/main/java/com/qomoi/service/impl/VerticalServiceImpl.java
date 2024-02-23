@@ -10,7 +10,6 @@ import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.VerticalService;
 import com.qomoi.entity.VerticalEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +20,12 @@ public class VerticalServiceImpl implements VerticalService {
 
     private final VerticalRepository verticalRepository;
     private final CourseRepository courseRepository;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    public VerticalServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository) {
+    private final JdbcTemplate jdbcTemplate;
+    public VerticalServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository, JdbcTemplate jdbcTemplate) {
 
         this.verticalRepository = verticalRepository;
         this.courseRepository = courseRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override

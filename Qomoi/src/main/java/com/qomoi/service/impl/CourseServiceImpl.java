@@ -6,11 +6,9 @@ import com.qomoi.dto.TrainerResponse;
 import com.qomoi.entity.*;
 import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.LocationRepository;
-import com.qomoi.repository.TrainersRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.CourseService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -29,15 +27,13 @@ public class CourseServiceImpl implements CourseService {
     private final VerticalRepository verticalRepository;
     private final LocationRepository locationRepository;
 
-    private final TrainersRepository trainersRepository;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository,LocationRepository locationRepository, TrainersRepository trainersRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository,LocationRepository locationRepository,JdbcTemplate jdbcTemplate) {
         this.courseRepository = courseRepository;
         this.verticalRepository = verticalRepository;
         this.locationRepository = locationRepository;
-        this.trainersRepository = trainersRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
 

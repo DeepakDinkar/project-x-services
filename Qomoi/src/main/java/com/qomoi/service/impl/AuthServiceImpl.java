@@ -17,7 +17,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -124,7 +123,7 @@ public class AuthServiceImpl {
 
     public ResponseEntity<?> logoutUser() {
         Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principle.toString() != "anonymousUser") {
+        if (principle.toString().equals("anonymousUser")) {
             Long userId = ((UserDetailsImpl) principle).getId();
             refreshTokenService.deleteByUserId(userId);
         }
@@ -162,7 +161,7 @@ public class AuthServiceImpl {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + googleSigninRequest.getToken());
-        HttpEntity entity = new HttpEntity<>(headers);
+        HttpEntity<Object> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 "https://www.googleapis.com/oauth2/v3/userinfo",
                 HttpMethod.GET,
@@ -174,7 +173,6 @@ public class AuthServiceImpl {
 
         String user = userService.saveGoogleLogin(googleTokenResponse);
 
-        byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
         String jwtToken = Jwts.builder()
                 .setSubject(googleTokenResponse.getEmail())
                 .claim("name", googleTokenResponse.getName())
@@ -183,8 +181,7 @@ public class AuthServiceImpl {
                 .setExpiration(new Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000)))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
-//        String responseBody = response.getBody();
-//        String extractedBody = responseBody.substring(responseBody.indexOf("{"), responseBody.lastIndexOf("}") + 1);
+
 
         GoogleResponse googleResponse = new GoogleResponse();
         googleResponse.setToken(jwtToken);

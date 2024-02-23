@@ -10,7 +10,6 @@ import com.qomoi.service.SearchService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -29,16 +28,17 @@ public class SearchServiceImpl implements SearchService {
     private final VerticalRepository verticalRepository;
     private final CourseRepository courseRepository;
     private final LocationRepository locationRepository;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public SearchServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository, LocationRepository locationRepository) {
+    public SearchServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository, LocationRepository locationRepository, JdbcTemplate jdbcTemplate, EntityManager entityManager) {
         this.verticalRepository = verticalRepository;
         this.courseRepository = courseRepository;
         this.locationRepository = locationRepository;
+        this.jdbcTemplate = jdbcTemplate;
+        this.entityManager = entityManager;
     }
 
     @Override

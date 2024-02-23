@@ -4,7 +4,6 @@ package com.qomoi.service.impl;
 import com.qomoi.dto.*;
 import com.qomoi.entity.MyCoursesEntity;
 import com.qomoi.entity.PurchaseEntity;
-import com.qomoi.jwt.JwtUtils;
 import com.qomoi.repository.MyCourseRepository;
 import com.qomoi.repository.PurchaseRepository;
 import com.qomoi.repository.RefreshTokenRepository;
@@ -17,20 +16,16 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -38,29 +33,31 @@ import java.util.*;
 @Service
 @Transactional
 public class UserServiceImpl {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PurchaseRepository purchaseRepository;
+    private final PurchaseRepository purchaseRepository;
 
-    @Autowired
-    private MyCourseRepository myCourseRepository;
+    private final MyCourseRepository myCourseRepository;
 
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    public UserServiceImpl(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository, PasswordEncoder passwordEncoder, PurchaseRepository purchaseRepository, MyCourseRepository myCourseRepository, JavaMailSender mailSender, JdbcTemplate jdbcTemplate, EntityManager entityManager) {
+        this.userRepository = userRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.purchaseRepository = purchaseRepository;
+        this.myCourseRepository = myCourseRepository;
+        this.mailSender = mailSender;
+        this.jdbcTemplate = jdbcTemplate;
+        this.entityManager = entityManager;
+    }
 
     public UserDE saveUser(SignUpRequestDTO signUpRequestDTO) throws Exception {
         UserDE existingUser = userRepository.findUserByEmailAndPhoneNumber(signUpRequestDTO.getEmail().trim(),
@@ -151,23 +148,6 @@ public class UserServiceImpl {
                 return user;
             }
         throw new UsernameNotFoundException("User with email " + email + " not found");
-    }
-
-    public String saveAddress(AddressDto addressDto, Long id) {
-
-        Optional<UserDE> userVal = userRepository.findById(id);
-        if(userVal.isPresent()){
-            userVal.get().setAddress1(addressDto.getAddress1());
-            userVal.get().setAddress2(addressDto.getAddress2());
-            userVal.get().setCity(addressDto.getCity());
-            userVal.get().setState(addressDto.getState());
-            userVal.get().setZipcode(addressDto.getZipcode());
-            userRepository.save(userVal.get());
-            return "Address saved successfully";
-        }
-        else{
-            return "User not found";
-        }
     }
 
     public void sendEmail(String recipientEmail, String subject, String content)
@@ -347,7 +327,4 @@ public class UserServiceImpl {
         return list;
 
     }
-
-
-
 }
