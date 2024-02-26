@@ -123,11 +123,10 @@ public class AuthServiceImpl {
 
     public ResponseEntity<?> logoutUser() {
         Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principle.toString().equals("anonymousUser")) {
+        if (principle.toString() != "anonymousUser") {
             Long userId = ((UserDetailsImpl) principle).getId();
             refreshTokenService.deleteByUserId(userId);
         }
-
         ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
         ResponseCookie jwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
 
@@ -135,7 +134,6 @@ public class AuthServiceImpl {
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                 .body(new ResponseDto(200, Constants.SIGNOUT_SUCCESSFULLY));
-
     }
 
     public ResponseEntity<?> refreshToken(RefreshTokenDto refreshTokenDto) {
