@@ -56,6 +56,7 @@ public class UserController {
             profileDto.setPhoneNo(userDE.getMobile());
             profileDto.setCity(userDE.getCity());
             profileDto.setCountry(userDE.getCountry());
+            profileDto.setZipCode(userDE.getZipcode());
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(profileDto);
         }
@@ -79,6 +80,7 @@ public class UserController {
             profileDto.setPhoneNo(userDE.getMobile());
             profileDto.setCity(userDE.getCity());
             profileDto.setCountry(userDE.getCountry());
+            profileDto.setZipCode(userDE.getZipcode());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(profileDto);
         }
