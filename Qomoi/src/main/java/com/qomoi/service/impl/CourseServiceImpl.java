@@ -116,11 +116,14 @@ public class CourseServiceImpl implements CourseService {
 
             courseLocationResponse.setLocation(locationResponses);
 
-            StringBuilder sqlTrainer = new StringBuilder("SELECT trainer_name FROM trainers WHERE course_id = ?");
+            StringBuilder sqlTrainer = new StringBuilder("SELECT trainer_name,email,image_url,phone_number FROM trainers WHERE ? = ANY(course_id)");
             List<TrainerResponse> trainerResponses = new ArrayList<>();
             this.jdbcTemplate.query(sqlTrainer.toString(), new Object[]{id}, (rs, rowNum) -> {
                 TrainerResponse trainerResponse = new TrainerResponse();
                 trainerResponse.setTrainerName(rs.getString("trainer_name"));
+                trainerResponse.setEmail(rs.getString("email"));
+                trainerResponse.setPhoneNumber(rs.getString("phone_number"));
+                trainerResponse.setImageUrl(rs.getString("image_url"));
                 trainerResponses.add(trainerResponse);
                 return null;
             });
@@ -160,7 +163,6 @@ public class CourseServiceImpl implements CourseService {
         });
         return trendingVerticalEntities;
 
-//        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
 
     }
 

@@ -11,10 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 public class TrainerResponse {
 
-    private List<Long> courseId;
+//    private List<Long> courseId;
     private List<String> courseName;
     private String trainerName;
     private String phoneNumber;
     private String imageUrl;
+    private String email;
 
 }
