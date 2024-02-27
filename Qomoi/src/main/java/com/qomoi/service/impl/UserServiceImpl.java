@@ -196,6 +196,7 @@ public class UserServiceImpl {
                 purchaseEntity.setEmail(email);
                 purchaseEntity.setLocation(purchase.getLocation());
                 purchaseEntity.setCourseAmt(purchase.getCourseAmt());
+                purchaseEntity.setSlug(purchase.getSlug());
                 purchaseEntity.setPurchaseDate(new Date());
                 purchaseRepository.save(purchaseEntity);
 
@@ -225,7 +226,7 @@ public class UserServiceImpl {
 
     public List<PurchaseResponse> myPurchase (String email) {
 
-        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
+        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date,p.slug");
         sql.append(" FROM purchase p ");
         sql.append(" WHERE email = ? ");
 
@@ -235,12 +236,13 @@ public class UserServiceImpl {
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
                         PurchaseResponse purchaseResponse = new PurchaseResponse();
                         purchaseResponse.setCoursesName(rs.getString("course_name"));
-                        purchaseResponse.setCourseAmt(rs.getString("course_amt"));
+                        purchaseResponse.setSlug(rs.getString("slug"));
+                        purchaseResponse.setCourseAmt(rs.getFloat("course_amt"));
                         String location = rs.getString("location");
-                        if(location.isEmpty()){
-                            purchaseResponse.setLocation(null);
-                        }else{
+                        if(StringUtils.hasText(location)){
                             purchaseResponse.setLocation(location);
+                        }else{
+                            purchaseResponse.setLocation(null);
                         }
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
                         purchaseResponse.setTransactionId(rs.getString("transaction_id"));
@@ -253,7 +255,7 @@ public class UserServiceImpl {
 
     public List<PurchaseResponse> myCourses (String email) {
 
-        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
+        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date,p.slug");
         sql.append(" FROM purchase p ");
         sql.append(" WHERE email = ?  and course_date < current_date ");
         sql.append(" ORDER BY course_date DESC ");
@@ -264,12 +266,13 @@ public class UserServiceImpl {
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
                         PurchaseResponse purchaseResponse = new PurchaseResponse();
                         purchaseResponse.setCoursesName(rs.getString("course_name"));
-                        purchaseResponse.setCourseAmt(rs.getString("course_amt"));
+                        purchaseResponse.setSlug(rs.getString("slug"));
+                        purchaseResponse.setCourseAmt(rs.getFloat("course_amt"));
                         String location = rs.getString("location");
-                        if(location.isEmpty()){
-                            purchaseResponse.setLocation(null);
-                        }else{
+                        if(StringUtils.hasText(location)){
                             purchaseResponse.setLocation(location);
+                        }else{
+                            purchaseResponse.setLocation(null);
                         }
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
                         purchaseResponse.setTransactionId(rs.getString("transaction_id"));
@@ -294,7 +297,7 @@ public class UserServiceImpl {
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
                         PurchaseResponse purchaseResponse = new PurchaseResponse();
                         purchaseResponse.setCoursesName(rs.getString("campaign_template_course_name"));
-                        purchaseResponse.setCourseAmt(rs.getString("course_amt"));
+                        purchaseResponse.setCourseAmt(rs.getFloat("course_amt"));
                         purchaseResponse.setLocation(rs.getString("location"));
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
                         purchaseResponse.setTransactionId(rs.getString("transaction_id"));

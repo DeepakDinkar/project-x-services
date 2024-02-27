@@ -1,12 +1,10 @@
 package com.qomoi.dto;
 
-import com.qomoi.entity.CoursesEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +17,10 @@ public class PurchaseDto {
 
     private Date courseDate;
 
-    private String courseAmt;
+    private float courseAmt;
 
     private String transactionId;
+
+    private String slug;
 
 }

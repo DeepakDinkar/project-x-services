@@ -59,6 +59,7 @@ public class VerticalServiceImpl implements VerticalService {
                     CourseLocationResponse courseLocationResponse = new CourseLocationResponse();
                     courseLocationResponse.setId(coursesEntity.getId());
                     courseLocationResponse.setSlug(coursesEntity.getSlug());
+                    courseLocationResponse.setCourseAmt(coursesEntity.getCourseAmt());
                     courseLocationResponse.setCampaignTemplateCourseName(coursesEntity.getCampaignTemplateCourseName());
                     courseLocationResponse.setCourseContent(coursesEntity.getCourseContent());
                     courseLocationResponse.setCampaignTemplateRating(coursesEntity.getCampaignTemplateRating());

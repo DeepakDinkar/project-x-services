@@ -48,4 +48,7 @@ public class CoursesEntity {
     @Column(name = "trainer_id")
     private List<Long> trainerId;
 
+    @Column(name = "course_amt")
+    private float courseAmt;
+
 }
