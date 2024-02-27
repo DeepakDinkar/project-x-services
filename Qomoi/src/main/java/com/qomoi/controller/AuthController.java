@@ -1,50 +1,33 @@
 package com.qomoi.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.qomoi.dto.*;
-import com.qomoi.entity.RefreshToken;
-import com.qomoi.entity.UserDE;
-import com.qomoi.exception.ExistingUserFoundException;
-import com.qomoi.exception.MissingFieldException;
-import com.qomoi.exception.NotFoundException;
-import com.qomoi.exception.TokenRefreshException;
-import com.qomoi.jwt.JwtUtils;
-import com.qomoi.repository.UserRepository;
-import com.qomoi.service.impl.AuthServiceImpl;
-import com.qomoi.service.impl.RefreshTokenServiceImpl;
-import com.qomoi.service.impl.UserDetailsImpl;
-import com.qomoi.service.impl.UserServiceImpl;
-import com.qomoi.utility.Constants;
-import com.qomoi.validator.ValidateUserFields;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
-import java.util.UUID;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.qomoi.dto.ForgetPasswordDto;
+import com.qomoi.dto.GoogleSigninRequest;
+import com.qomoi.dto.LoginRequestDTO;
+import com.qomoi.dto.RefreshTokenDto;
+import com.qomoi.dto.ResetPasswordDto;
+import com.qomoi.dto.SignUpRequestDTO;
+import com.qomoi.exception.ExistingUserFoundException;
+import com.qomoi.exception.MissingFieldException;
+import com.qomoi.exception.NotFoundException;
+import com.qomoi.jwt.JwtUtils;
+import com.qomoi.repository.UserRepository;
+import com.qomoi.service.impl.AuthServiceImpl;
+import com.qomoi.service.impl.RefreshTokenServiceImpl;
+import com.qomoi.service.impl.UserServiceImpl;
 
 @RestController
 @RequestMapping("/auth")
