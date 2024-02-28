@@ -25,18 +25,27 @@ public class SearchController {
 
     @GetMapping
     public ResponseEntity<GlobalSearchEntity> getAllQueryResults(@RequestParam(value = "query") String query) {
-        GlobalSearchEntity globalSearchEntity = searchService.getGlobalSearchResults(query);
-
-        return new ResponseEntity<>(globalSearchEntity, HttpStatus.OK);
+        try {
+            GlobalSearchEntity globalSearchEntity = searchService.getGlobalSearchResults(query);
+            return new ResponseEntity<>(globalSearchEntity, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{slug}")
     public ResponseEntity<List<CoursesEntity>> searchVerticals(@PathVariable String slug) {
-        if (slug != null) {
-            List<CoursesEntity> response = searchService.searchVerticals(slug);
-            return ResponseEntity.ok(response);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            if (slug != null) {
+                List<CoursesEntity> response = searchService.searchVerticals(slug);
+                return ResponseEntity.ok(response);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -48,11 +57,15 @@ public class SearchController {
             @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "fromDate", required = false) Date fromDate,
             @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate,
             @RequestParam(name = "location", required = false) String location) {
-        int pageSize = 12;
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-
-        Page<CoursesEntity> coursesPage = searchService.getExploreCourses(slug, query, pageRequest, fromDate, toDate, location);
-        return new ResponseEntity<>(coursesPage, HttpStatus.OK);
+        try {
+            int pageSize = 12;
+            PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+            Page<CoursesEntity> coursesPage = searchService.getExploreCourses(slug, query, pageRequest, fromDate, toDate, location);
+            return new ResponseEntity<>(coursesPage, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/verticals/{slug}/{page}")
@@ -61,9 +74,14 @@ public class SearchController {
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate,
                                                                   @RequestParam(name = "sortBy", required = false) Boolean sortBy,
                                                                   @RequestParam(name = "location" , required = false) String location) {
-        int pageSize = 12;
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        Page<CoursesEntity> verticalPage = searchService.getVerticalCourses(slug, query, pageRequest, fromDate, toDate, sortBy,location);
-        return new ResponseEntity<>(verticalPage, HttpStatus.OK);
+        try {
+            int pageSize = 12;
+            PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+            Page<CoursesEntity> verticalPage = searchService.getVerticalCourses(slug, query, pageRequest, fromDate, toDate, sortBy, location);
+            return new ResponseEntity<>(verticalPage, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

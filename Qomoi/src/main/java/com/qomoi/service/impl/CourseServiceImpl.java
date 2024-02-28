@@ -184,9 +184,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<TrainerResponse> getAllTrainers(PageRequest pageRequest) {
-        StringBuilder sql = new StringBuilder("SELECT string_agg(c.campaign_template_course_name, ', ') AS course_names, t.trainer_name, t.phone_number, t.image_url  ");
+        StringBuilder sql = new StringBuilder("SELECT string_agg(c.campaign_template_course_name, ', ') AS course_names, t.trainer_name, t.phone_number, t.image_url, t.email  ");
         sql.append(" FROM trainers t LEFT JOIN courses c ON c.id = ANY(t.course_id) ");
-        sql.append(" GROUP BY t.trainer_name, t.phone_number, t.image_url ");
+        sql.append(" GROUP BY t.trainer_name, t.phone_number, t.image_url,t.email");
 
         List<TrainerResponse> trainerResponses = this.jdbcTemplate.query(sql.toString(), new Object[]{}, new RowMapper<TrainerResponse>() {
             @Override
@@ -196,6 +196,7 @@ public class CourseServiceImpl implements CourseService {
                 trainerResponse.setTrainerName(rs.getString("trainer_name"));
                 trainerResponse.setImageUrl(rs.getString("image_url"));
                 trainerResponse.setPhoneNumber(rs.getString("phone_number"));
+                trainerResponse.setEmail(rs.getString("email"));
                 return trainerResponse;
             }
         });

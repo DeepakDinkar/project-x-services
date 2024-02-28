@@ -22,26 +22,37 @@ public class VerticalController {
 
     @GetMapping
     public ResponseEntity<List<VerticalEntity>> getAllTopics() {
-        List<VerticalEntity> allTopics = verticalService.getVerticals();
-        return ResponseEntity.ok(allTopics);
+        try {
+            List<VerticalEntity> allTopics = verticalService.getVerticals();
+            return ResponseEntity.ok(allTopics);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/save-vertical")
     public ResponseEntity<String> saveTopic(@RequestBody VerticalEntity verticalEntity) {
-        if (verticalEntity != null) {
-            verticalService.saveTopic(verticalEntity);
-            return ResponseEntity.ok("Course saved successfully");
+        try {
+            if (verticalEntity != null) {
+                verticalService.saveTopic(verticalEntity);
+                return ResponseEntity.ok("Course saved successfully");
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
-
 
     @GetMapping("/{slug}")
     public ResponseEntity<VerticalCoursesEntity> getVerticalCoursesBySlug(@PathVariable String slug) {
-
-        VerticalCoursesEntity verticalCoursesEntity = verticalService.getVerticalCoursesBySlug(slug);
-        return new ResponseEntity<>(verticalCoursesEntity, HttpStatus.OK);
+        try {
+            VerticalCoursesEntity verticalCoursesEntity = verticalService.getVerticalCoursesBySlug(slug);
+            return ResponseEntity.ok(verticalCoursesEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
 }

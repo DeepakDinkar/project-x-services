@@ -1,5 +1,6 @@
 package com.qomoi.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +12,7 @@ public class QomoiController {
 
     @PostMapping("/callback")
     public ResponseEntity<?> callBack(){
-        return null;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

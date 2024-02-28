@@ -24,76 +24,118 @@ public class CourseController {
 
     @GetMapping("/{courseId}")
     public ResponseEntity<CourseLocationResponse> getCourseDetails(@PathVariable Long courseId) {
-        Optional<CourseLocationResponse> courseResponse = courseService.getCourseId(courseId);
-        return courseResponse.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            Optional<CourseLocationResponse> courseResponse = courseService.getCourseId(courseId);
+            return courseResponse.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/save-course")
     public ResponseEntity<String> saveCourses(@RequestBody CoursesEntity coursesEntity) {
-        if (coursesEntity != null) {
-            courseService.saveCourse(coursesEntity);
-            return new ResponseEntity<>("Course saved successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            if (coursesEntity != null) {
+                courseService.saveCourse(coursesEntity);
+                return new ResponseEntity<>("Course saved successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/verticals/{slug}")
     public ResponseEntity<List<CoursesEntity>> getCourseByTopic(@PathVariable String slug) {
-        if (slug != null) {
-            List<CoursesEntity> response = courseService.getAllCoursesByVerticalSlug(slug);
-            if (!response.isEmpty()) {
-                return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            if (slug != null) {
+                List<CoursesEntity> response = courseService.getAllCoursesByVerticalSlug(slug);
+                if (!response.isEmpty()) {
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
     @GetMapping("/banner")
     public ResponseEntity<List<CourseVerticalEntity>> getTrendingCourses() {
-        List<CourseVerticalEntity> trendingCourse = courseService.getTrendingVerticalCourses();
-        return new ResponseEntity<>(trendingCourse, HttpStatus.OK);
+        try {
+            List<CourseVerticalEntity> trendingCourse = courseService.getTrendingVerticalCourses();
+            return new ResponseEntity<>(trendingCourse, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/recommended/{page}")
     public ResponseEntity<Page<CoursesEntity>> getRecommendedCourses(@PathVariable int page) {
-        int pageSize = 25;
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        Page<CoursesEntity> recommendedCourses = courseService.getRecommendedCourses(pageRequest);
-        return new ResponseEntity<>(recommendedCourses, HttpStatus.OK);
+        try {
+            int pageSize = 25;
+            PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+            Page<CoursesEntity> recommendedCourses = courseService.getRecommendedCourses(pageRequest);
+            return new ResponseEntity<>(recommendedCourses, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
     @GetMapping("/similar/{slug}/{page}")
     public ResponseEntity<Page<CoursesEntity>> getSimilarCourses(@PathVariable int page, @PathVariable String slug) {
-        int pageSize = 25;
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        Page<CoursesEntity> similarCourses = courseService.getSimilarCourses(pageRequest, slug);
-        return new ResponseEntity<>(similarCourses, HttpStatus.OK);
+        try {
+            int pageSize = 25;
+            PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+            Page<CoursesEntity> similarCourses = courseService.getSimilarCourses(pageRequest, slug);
+            return new ResponseEntity<>(similarCourses, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/explore/{page}")
     public ResponseEntity<List<CourseLocationResponse>> exploreCourse(@PathVariable int page) {
-        int pageSize = 25;
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        List<CourseLocationResponse> pageCourse = courseService.getAllCourse(pageRequest);
-
-        return new ResponseEntity<>(pageCourse, HttpStatus.OK);
+        try {
+            int pageSize = 25;
+            PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+            List<CourseLocationResponse> pageCourse = courseService.getAllCourse(pageRequest);
+            return new ResponseEntity<>(pageCourse, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/locations")
     public ResponseEntity<List<?>> getAllLocation() {
-        List<?> locations = courseService.getAllLocation();
-        return new ResponseEntity<>(locations, HttpStatus.OK);
+        try {
+            List<?> locations = courseService.getAllLocation();
+            return new ResponseEntity<>(locations, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/trainers/{page}")
     public ResponseEntity<Page<TrainerResponse>> getTrainers(@PathVariable int page) {
-        int pageSize = 25;
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
-        Page<TrainerResponse> pageTrainer = courseService.getAllTrainers(pageRequest);
-        return new ResponseEntity<>(pageTrainer, HttpStatus.OK);
+        try {
+            int pageSize = 25;
+            PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+            Page<TrainerResponse> pageTrainer = courseService.getAllTrainers(pageRequest);
+            return new ResponseEntity<>(pageTrainer, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
