@@ -184,7 +184,7 @@ public class AuthServiceImpl {
         GoogleResponse googleResponse = new GoogleResponse();
         googleResponse.setToken(jwtToken);
         googleResponse.setUser(user);
-        googleResponse.setAdditionalInfo(response.getBody());
+        googleResponse.setFirstName(googleTokenResponse.getGiven_name());
 
         return new ResponseEntity<>(googleResponse, HttpStatus.OK);
     }

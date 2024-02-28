@@ -36,7 +36,7 @@ public class PurchaseEntity {
     private Date courseDate;
 
     @Column(name = "course_amt")
-    private float courseAmt;
+    private double courseAmt;
 
     @Column(name = "transaction_id")
     private String transactionId;

@@ -138,8 +138,8 @@ public class SearchServiceImpl implements SearchService {
     public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, Boolean sortBy, String location) {
          if(StringUtils.hasText(slug) ) {
 
-             StringBuilder sql = new StringBuilder("SELECT DISTINCT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, c.trainer_id, ");
-             sql.append("l.location_name, l.date ");
+             StringBuilder sql = new StringBuilder("SELECT DISTINCT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, c.trainer_id, c.course_amt, ");
+             sql.append(" l.location_name, l.date ");
              sql.append(" FROM courses c JOIN location l ON c.id = l.course_id ");
              sql.append(" WHERE c.slug = :slug ");
              if(StringUtils.hasText(query)){

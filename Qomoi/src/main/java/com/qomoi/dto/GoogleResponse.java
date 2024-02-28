@@ -11,6 +11,6 @@ public class GoogleResponse {
 
     private String token;
     private String user;
-    private String additionalInfo;
+    private String firstName;
 
 }
