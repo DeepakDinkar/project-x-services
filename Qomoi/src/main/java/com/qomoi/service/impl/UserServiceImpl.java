@@ -237,7 +237,7 @@ public class UserServiceImpl {
                         PurchaseResponse purchaseResponse = new PurchaseResponse();
                         purchaseResponse.setCoursesName(rs.getString("course_name"));
                         purchaseResponse.setSlug(rs.getString("slug"));
-                        purchaseResponse.setCourseAmt(rs.getFloat("course_amt"));
+                        purchaseResponse.setCourseAmt(rs.getDouble("course_amt"));
                         String location = rs.getString("location");
                         if(StringUtils.hasText(location)){
                             purchaseResponse.setLocation(location);
@@ -267,7 +267,7 @@ public class UserServiceImpl {
                         PurchaseResponse purchaseResponse = new PurchaseResponse();
                         purchaseResponse.setCoursesName(rs.getString("course_name"));
                         purchaseResponse.setSlug(rs.getString("slug"));
-                        purchaseResponse.setCourseAmt(rs.getFloat("course_amt"));
+                        purchaseResponse.setCourseAmt(rs.getDouble("course_amt"));
                         String location = rs.getString("location");
                         if(StringUtils.hasText(location)){
                             purchaseResponse.setLocation(location);
@@ -297,7 +297,7 @@ public class UserServiceImpl {
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
                         PurchaseResponse purchaseResponse = new PurchaseResponse();
                         purchaseResponse.setCoursesName(rs.getString("campaign_template_course_name"));
-                        purchaseResponse.setCourseAmt(rs.getFloat("course_amt"));
+                        purchaseResponse.setCourseAmt(rs.getDouble("course_amt"));
                         purchaseResponse.setLocation(rs.getString("location"));
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
                         purchaseResponse.setTransactionId(rs.getString("transaction_id"));

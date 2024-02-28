@@ -34,6 +34,6 @@ public class CourseLocationResponse {
 
     private List<TrainerResponse> trainer;
 
-    private double courseAmt;
+    private Double courseAmt;
 
 }

@@ -17,7 +17,7 @@ public class PurchaseDto {
 
     private Date courseDate;
 
-    private double courseAmt;
+    private Double courseAmt;
 
     private String transactionId;
 

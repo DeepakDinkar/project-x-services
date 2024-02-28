@@ -49,6 +49,6 @@ public class CoursesEntity {
     private List<Long> trainerId;
 
     @Column(name = "course_amt")
-    private double courseAmt;
+    private Double courseAmt;
 
 }
