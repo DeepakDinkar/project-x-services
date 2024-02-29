@@ -330,4 +330,12 @@ public class UserServiceImpl {
         return list;
 
     }
+
+    public PurchaseEntity findDetails(Long id){
+        return purchaseRepository.findById(id).orElse(null);
+    }
+
+    public PurchaseEntity savePayment(PurchaseEntity purchaseEntity) {
+        return purchaseRepository.save(purchaseEntity);
+    }
 }

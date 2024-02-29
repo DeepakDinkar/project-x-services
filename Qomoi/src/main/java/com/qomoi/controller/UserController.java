@@ -1,6 +1,7 @@
 package com.qomoi.controller;
 
 
+import com.qomoi.entity.PurchaseEntity;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.service.impl.UserServiceImpl;
 import com.qomoi.utility.Constants;
@@ -9,6 +10,7 @@ import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -174,6 +176,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/addPayment/{id}")
+    public PurchaseEntity addPayment(@PathVariable Long id){
+        PurchaseEntity purchaseEntity = userService.findDetails(id);
+        purchaseEntity.setStatus("S");
+        return userService.savePayment(purchaseEntity);
+    }
+
+
 
 
 }

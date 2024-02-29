@@ -47,4 +47,7 @@ public class PurchaseEntity {
     @Column(name = "slug")
     private String slug;
 
+    @Column(name = "status")
+    private String status = "P";
+
 }

@@ -2,16 +2,22 @@ package com.qomoi.controller;
 
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 
+import ch.qos.logback.core.util.SystemInfo;
+import com.qomoi.entity.AddToCart;
+import com.qomoi.modal.KeyList;
+import com.qomoi.repository.AddToCartRepository;
+import com.qomoi.service.EncryptDecryptKey;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qomoi.dto.ForgetPasswordDto;
@@ -41,6 +47,12 @@ public class AuthController {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AddToCartRepository addToCartRepository;
+
+    @Autowired
+    private EncryptDecryptKey encryptDecryptKey;
 
 
 
@@ -93,6 +105,24 @@ public class AuthController {
         return authService.processResetPassword(resetPasswordDto, model);
     }
 
+    @GetMapping("/get_key")
+    public String getSecretKey() throws Exception {
+        Long seqId = addToCartRepository.findSequence();
+        KeyList keyList = new KeyList();
+        keyList.setTokenKey("key"+seqId);
+        keyList.setTempName("TEMP"+seqId);
+        return encryptDecryptKey.encryptKey(keyList);
+    }
 
+    @PostMapping("/store_data")
+    public AddToCart storeData(@RequestBody AddToCart addToCart){
+        System.out.println(addToCart);
+        return addToCartRepository.save(addToCart);
+    }
+
+    @GetMapping("/get_stored_data/{key}")
+    public AddToCart getStoredData(@PathVariable String key) {
+        return addToCartRepository.findBySecretKey(key);
+    }
 
 }
