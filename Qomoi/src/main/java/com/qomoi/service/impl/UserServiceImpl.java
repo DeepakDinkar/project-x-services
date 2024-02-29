@@ -257,7 +257,7 @@ public class UserServiceImpl {
 
         StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date,p.slug");
         sql.append(" FROM purchase p ");
-        sql.append(" WHERE email = ?  and course_date < current_date ");
+        sql.append(" WHERE email = ? ");
         sql.append(" ORDER BY course_date DESC ");
 
         List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{email},
