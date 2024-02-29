@@ -23,4 +23,6 @@ public class PurchaseDto {
 
     private String slug;
 
+    private String imageUrl;
+
 }
