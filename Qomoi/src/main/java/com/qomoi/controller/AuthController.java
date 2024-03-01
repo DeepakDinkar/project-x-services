@@ -83,12 +83,12 @@ public class AuthController {
         return authService.googleSignup(googleSigninRequest);
     }
 
-    @PostMapping("/forgot_password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, Model model) throws MissingFieldException, NotFoundException, JsonProcessingException, NotFoundException {
         return authService.processForgotPassword(forgetPasswordDto, model);
     }
 
-    @PostMapping("/reset_password")
+    @PostMapping("/reset-password")
     public ResponseEntity<?> processResetPassword( @RequestBody ResetPasswordDto resetPasswordDto , Model model) throws MissingFieldException, JsonProcessingException {
         return authService.processResetPassword(resetPasswordDto, model);
     }
