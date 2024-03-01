@@ -13,6 +13,7 @@ import com.qomoi.repository.AddToCartRepository;
 import com.qomoi.service.EncryptDecryptKey;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -115,9 +116,14 @@ public class AuthController {
     }
 
     @PostMapping("/store_data")
-    public AddToCart storeData(@RequestBody AddToCart addToCart){
-        System.out.println(addToCart);
-        return addToCartRepository.save(addToCart);
+    public  ResponseEntity<?> storeData(@RequestBody AddToCart addToCart){
+        try{
+            AddToCart response = addToCartRepository.save(addToCart);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Stored successfully!");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong!");
+        }
+
     }
 
     @GetMapping("/get_stored_data/{key}")
