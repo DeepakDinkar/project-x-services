@@ -20,13 +20,13 @@ public class AddToCart {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "json")
+    @Column(name = "json", columnDefinition = "text")
     private String json;
 
     @Column(name = "secret_key")
     private String secretKey;
 
-    @Column(name = "created_date", columnDefinition = "text")
+    @Column(name = "created_date")
     private LocalDate createdDate;
 
     @PrePersist
