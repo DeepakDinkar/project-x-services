@@ -118,9 +118,14 @@ public class AuthController {
     @PostMapping("/store_data")
     public  ResponseEntity<?> storeData(@RequestBody AddToCart addToCart){
         try{
+            AddToCart res = addToCartRepository.findBySecretKey(addToCart.getSecretKey());
+            if(res != null){
+                addToCartRepository.deleteSecretKey(addToCart.getSecretKey());
+            }
             AddToCart response = addToCartRepository.save(addToCart);
             return ResponseEntity.status(HttpStatus.CREATED).body("Stored successfully!");
         }catch (Exception e){
+            System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong!");
         }
 

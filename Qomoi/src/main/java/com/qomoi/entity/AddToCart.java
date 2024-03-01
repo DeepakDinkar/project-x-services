@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "add_to_cart")
+@Table(name = "cart_data")
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddToCart {
