@@ -102,6 +102,7 @@ public class CourseServiceImpl implements CourseService {
             courseLocationResponse.setKeyTakeAway(courseEntity.getKeyTakeAway());
             courseLocationResponse.setIsTrending(courseEntity.getIsTrending());
             courseLocationResponse.setCourseAddedDate(courseEntity.getCourseAddedDate());
+            courseLocationResponse.setCourseAmt(courseEntity.getCourseAmt());
 
             StringBuilder sql = new StringBuilder("SELECT location_name, date FROM location WHERE course_id = ?");
             List<LocationResponse> locationResponses = new ArrayList<>();

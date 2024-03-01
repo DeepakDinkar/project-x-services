@@ -50,4 +50,7 @@ public class PurchaseEntity {
     @Column(name = "status")
     private String status = "P";
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
 }
