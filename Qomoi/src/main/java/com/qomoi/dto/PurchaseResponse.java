@@ -19,5 +19,6 @@ public class PurchaseResponse {
     private String transactionId;
     private Date purchasedDate;
     private String slug;
+    private String imageUrl;
 
 }

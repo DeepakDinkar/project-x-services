@@ -1,6 +1,7 @@
 package com.qomoi.controller;
 
 
+import com.qomoi.entity.PurchaseEntity;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.service.impl.UserServiceImpl;
 import com.qomoi.utility.Constants;
@@ -9,6 +10,7 @@ import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -49,6 +51,9 @@ public class UserController {
     @PostMapping("/saveProfile")
     public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto) {
         try {
+            if ( profileDto == null ) {
+                return ResponseEntity.badRequest().build();
+            }
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             if (StringUtils.hasText(email)) {
@@ -104,15 +109,27 @@ public class UserController {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
-            String saveDetails = userService.savePurchase(purchaseDto,email);
-            if(StringUtils.hasText(saveDetails) && saveDetails.equals("success")){
-                return new ResponseEntity<>(new ResponseDto(201, "Record saved successfully"),HttpStatus.OK);
+            boolean allDetailsAvailable = true;
+
+            for (PurchaseDto dto : purchaseDto) {
+                if (dto.getCourseAmt() == null || dto.getCourseId() == null || dto.getSlug() == null
+                        || dto.getImageUrl() == null || dto.getCourseDate() == null || dto.getTransactionId() == null) {
+                    allDetailsAvailable = false;
+                    break;
+                }
             }
-            return new ResponseEntity<>(new ResponseDto(500, "Record not saved"),HttpStatus.OK);
+
+            if (allDetailsAvailable) {
+                String saveDetails = userService.savePurchase(purchaseDto, email);
+                return new ResponseEntity<>(new ResponseDto(201, "Record saved successfully"), HttpStatus.OK);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(400, "Incomplete details in request"));
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @GetMapping("/myPurchase")
     public ResponseEntity<?> getPurchaseInfo() {
@@ -174,6 +191,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/addPayment/{id}")
+    public PurchaseEntity addPayment(@PathVariable Long id){
+        PurchaseEntity purchaseEntity = userService.findDetails(id);
+        purchaseEntity.setStatus("S");
+        return userService.savePayment(purchaseEntity);
+    }
+
+
 
 
 }

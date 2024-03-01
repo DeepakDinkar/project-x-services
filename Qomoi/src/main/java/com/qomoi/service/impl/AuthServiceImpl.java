@@ -11,6 +11,7 @@ import com.qomoi.exception.MissingFieldException;
 import com.qomoi.exception.NotFoundException;
 import com.qomoi.exception.TokenRefreshException;
 import com.qomoi.jwt.JwtUtils;
+import com.qomoi.repository.UserRepository;
 import com.qomoi.utility.Constants;
 import com.qomoi.validator.ValidateUserFields;
 import io.jsonwebtoken.Jwts;
@@ -54,12 +55,15 @@ public class AuthServiceImpl {
     private final JwtUtils jwtUtils;
     private final RefreshTokenServiceImpl refreshTokenService;
 
+    private final UserRepository userRepository;
+
     public AuthServiceImpl(UserServiceImpl userService, AuthenticationManager authenticationManager,JwtUtils jwtUtils,
-                           RefreshTokenServiceImpl refreshTokenService){
+                           RefreshTokenServiceImpl refreshTokenService,UserRepository userRepository){
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.refreshTokenService = refreshTokenService;
+        this.userRepository = userRepository;
     }
 
     public ResponseEntity<?> saveUser(@RequestBody SignUpRequestDTO signUpRequestDTO)
@@ -154,7 +158,7 @@ public class AuthServiceImpl {
         return ResponseEntity.badRequest().body(new ResponseDto(4, Constants.TOKEN_EMPTY));
     }
 
-    public ResponseEntity<?> googleSignup( @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException {
+    public ResponseEntity<?> googleSignup( @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException, ExistingUserFoundException {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -181,12 +185,18 @@ public class AuthServiceImpl {
                 .compact();
 
 
-        GoogleResponse googleResponse = new GoogleResponse();
-        googleResponse.setToken(jwtToken);
-        googleResponse.setUser(user);
-        googleResponse.setFirstName(googleTokenResponse.getGiven_name());
+        if(userRepository.existsByEmailId(googleTokenResponse.getEmail())){
+            throw new ExistingUserFoundException("User already exists");
+        }
+        else{
 
-        return new ResponseEntity<>(googleResponse, HttpStatus.OK);
+            GoogleResponse googleResponse = new GoogleResponse();
+            googleResponse.setToken(jwtToken);
+            googleResponse.setUser(user);
+            googleResponse.setFirstName(googleTokenResponse.getGiven_name());
+
+            return new ResponseEntity<>(googleResponse, HttpStatus.OK);
+        }
     }
 
     private Key getSignKey() {

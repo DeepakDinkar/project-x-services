@@ -80,6 +80,8 @@ public class UserServiceImpl {
         return userRepository.findByEmail(emailId);
     }
 
+
+
     public UserDE getByEmailIdAndMobileNumber(String emailId, String mobile) {
         return userRepository.findUserByEmailAndPhoneNumber(emailId, mobile);
     }
@@ -196,6 +198,7 @@ public class UserServiceImpl {
                 purchaseEntity.setEmail(email);
                 purchaseEntity.setLocation(purchase.getLocation());
                 purchaseEntity.setCourseAmt(purchase.getCourseAmt());
+                purchaseEntity.setImageUrl(purchase.getImageUrl());
                 purchaseEntity.setSlug(purchase.getSlug());
                 purchaseEntity.setPurchaseDate(new Date());
                 purchaseRepository.save(purchaseEntity);
@@ -226,7 +229,7 @@ public class UserServiceImpl {
 
     public List<PurchaseResponse> myPurchase (String email) {
 
-        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date,p.slug");
+        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date, p.slug, p.image_url ");
         sql.append(" FROM purchase p ");
         sql.append(" WHERE email = ? ");
 
@@ -238,6 +241,7 @@ public class UserServiceImpl {
                         purchaseResponse.setCoursesName(rs.getString("course_name"));
                         purchaseResponse.setSlug(rs.getString("slug"));
                         purchaseResponse.setCourseAmt(rs.getDouble("course_amt"));
+                        purchaseResponse.setImageUrl(rs.getString("image_url"));
                         String location = rs.getString("location");
                         if(StringUtils.hasText(location)){
                             purchaseResponse.setLocation(location);
@@ -255,9 +259,9 @@ public class UserServiceImpl {
 
     public List<PurchaseResponse> myCourses (String email) {
 
-        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date,p.slug");
+        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date, p.slug, p.image_url");
         sql.append(" FROM purchase p ");
-        sql.append(" WHERE email = ?  and course_date < current_date ");
+        sql.append(" WHERE email = ? ");
         sql.append(" ORDER BY course_date DESC ");
 
         List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{email},
@@ -268,6 +272,7 @@ public class UserServiceImpl {
                         purchaseResponse.setCoursesName(rs.getString("course_name"));
                         purchaseResponse.setSlug(rs.getString("slug"));
                         purchaseResponse.setCourseAmt(rs.getDouble("course_amt"));
+                        purchaseResponse.setImageUrl(rs.getString("image_url"));
                         String location = rs.getString("location");
                         if(StringUtils.hasText(location)){
                             purchaseResponse.setLocation(location);
@@ -329,5 +334,13 @@ public class UserServiceImpl {
                 });
         return list;
 
+    }
+
+    public PurchaseEntity findDetails(Long id){
+        return purchaseRepository.findById(id).orElse(null);
+    }
+
+    public PurchaseEntity savePayment(PurchaseEntity purchaseEntity) {
+        return purchaseRepository.save(purchaseEntity);
     }
 }

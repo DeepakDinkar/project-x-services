@@ -21,5 +21,7 @@ public interface UserRepository extends JpaRepository<UserDE,Long> {
 
     public UserDE findByResetPasswordToken(String token);
 
+    public boolean existsByEmailId(String email);
+
 }
 
