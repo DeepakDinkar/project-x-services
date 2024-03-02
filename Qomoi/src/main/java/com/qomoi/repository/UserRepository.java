@@ -13,15 +13,17 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserDE,Long> {
 
-    @Query(value = "SELECT users from UserDE users where users.emailId =?1 or users.mobile = ?2 ")
-    public UserDE findUserByEmailAndPhoneNumber(String emailId, String phoneNumber);
+    @Query(value = "SELECT u from UserDE u where u.emailId = :emailId or u.mobile = :phoneNumber")
+    public UserDE findUserByEmailAndPhoneNumber(@Param("emailId") String emailId, @Param("phoneNumber") String phoneNumber);
+
+    boolean existsByEmailIdOrMobile(String email, String mobile);
 
     @Query("SELECT u FROM UserDE u WHERE u.emailId = ?1")
     public UserDE findByEmail(String email);
 
     public UserDE findByResetPasswordToken(String token);
 
-    public boolean existsByEmailId(String email);
+    public boolean existsByEmailIdAndIsNormal(String email, Boolean normal);
 
 }
 

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class GoogleResponse {
 
     private String token;
-    private String user;
     private String firstName;
+    private Boolean isGoogle;
 
 }

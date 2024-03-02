@@ -74,7 +74,7 @@ public class AuthServiceImpl {
             validateUserFields.validateSignUpFields(signUpRequestDTO);
             UserDE userRegistered = null;
 
-            if(userService.getByEmailIdAndMobileNumber(signUpRequestDTO.getEmail(), signUpRequestDTO.getMobile())==null){
+            if(userRepository.existsByEmailIdOrMobile(signUpRequestDTO.getEmail(), signUpRequestDTO.getMobile()) == false ){
                 userRegistered = userService.saveUser(signUpRequestDTO);
                 SignupResponseDto signupResponseDto = new SignupResponseDto();
                 signupResponseDto.setFirstName(userRegistered.getFirstName());
@@ -185,16 +185,14 @@ public class AuthServiceImpl {
                 .compact();
 
 
-        if(userRepository.existsByEmailId(googleTokenResponse.getEmail())){
+        if(userRepository.existsByEmailIdAndIsNormal(googleTokenResponse.getEmail(),true)){
             throw new ExistingUserFoundException("User already exists");
         }
         else{
-
             GoogleResponse googleResponse = new GoogleResponse();
             googleResponse.setToken(jwtToken);
-            googleResponse.setUser(user);
             googleResponse.setFirstName(googleTokenResponse.getGiven_name());
-
+            googleResponse.setIsGoogle(true);
             return new ResponseEntity<>(googleResponse, HttpStatus.OK);
         }
     }
