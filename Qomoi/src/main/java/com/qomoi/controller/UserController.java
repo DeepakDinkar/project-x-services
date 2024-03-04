@@ -123,8 +123,8 @@ public class UserController {
             }
 
             if (allDetailsAvailable) {
-                String saveDetails = userService.savePurchase(purchaseDtoList,addressInfo,saveAddress, email);
-                return new ResponseEntity<>(new ResponseDto(201, "Record saved successfully"), HttpStatus.OK);
+                List<PurchaseEntity>  saveDetails = userService.savePurchase(purchaseDtoList,addressInfo,saveAddress, email);
+                return new ResponseEntity<>( saveDetails, HttpStatus.OK);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(400, "Incomplete details in request"));
             }
@@ -197,13 +197,35 @@ public class UserController {
     }
 
     @PostMapping("/addPayment/{id}")
-    public PurchaseEntity addPayment(@PathVariable Long id){
+    public PurchaseEntity addPayment(@PathVariable Long id, Model model) {
         PurchaseEntity purchaseEntity = userService.findDetails(id);
         purchaseEntity.setStatus("S");
-        return userService.savePayment(purchaseEntity);
+        PurchaseEntity savedPurchaseEntity = userService.savePayment(purchaseEntity);
+
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+            List<PurchaseResponse> recentPurchase = userService.recentPurchase(email);
+
+            for (PurchaseResponse purchase : recentPurchase) {
+                if (StringUtils.hasText(email)) {
+                    String content = "<p>Hello,</p>" + "<p>You have purchased "+ purchase.getCoursesName() + " course.</p>"
+                            + "<p> Venue : "+purchase.getLocation()
+                            + "<p> Date : "+purchase.getCourseDate()
+                            + "<p> Happy learning !!! </p>";
+                    String subject = "Course Purchased";
+
+                    // Send email
+                    userService.sendEmail(email, subject, content);
+
+                    model.addAttribute("message", "We have sent a purchase details to your email. Please check.");
+                }
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Error while sending email: " + e.getMessage());
+        }
+
+        return savedPurchaseEntity;
     }
-
-
-
 
 }

@@ -176,31 +176,30 @@ public class UserServiceImpl {
         }
     }
 
-    public String savePurchase(List<PurchaseDto> purchaseDto, AddressDto addressDto, Boolean saveAddress, String email) {
-
+    public List<PurchaseEntity> savePurchase(List<PurchaseDto> purchaseDtoList, AddressDto addressDto, Boolean saveAddress, String email) {
+        List<PurchaseEntity> savedPurchaseList = new ArrayList<>();
 
         if (StringUtils.hasText(email)) {
-            for (PurchaseDto purchase : purchaseDto) {
-
+            for (PurchaseDto purchaseDto : purchaseDtoList) {
                 String sql = "SELECT c.campaign_template_course_name " +
                         "FROM courses c " +
                         "WHERE c.id = :courseId";
 
                 Query query = entityManager.createNativeQuery(sql);
-                query.setParameter("courseId", purchase.getCourseId());
+                query.setParameter("courseId", purchaseDto.getCourseId());
 
                 String courseName = (String) query.getSingleResult();
 
                 PurchaseEntity purchaseEntity = new PurchaseEntity();
-                purchaseEntity.setCourseId(purchase.getCourseId());
+                purchaseEntity.setCourseId(purchaseDto.getCourseId());
                 purchaseEntity.setCourseName(courseName);
-                purchaseEntity.setCourseDate(purchase.getCourseDate());
-                purchaseEntity.setTransactionId(purchase.getTransactionId());
+                purchaseEntity.setCourseDate(purchaseDto.getCourseDate());
+                purchaseEntity.setTransactionId(purchaseDto.getTransactionId());
                 purchaseEntity.setEmail(email);
-                purchaseEntity.setLocation(purchase.getLocation());
-                purchaseEntity.setCourseAmt(purchase.getCourseAmt());
-                purchaseEntity.setImageUrl(purchase.getImageUrl());
-                purchaseEntity.setSlug(purchase.getSlug());
+                purchaseEntity.setLocation(purchaseDto.getLocation());
+                purchaseEntity.setCourseAmt(purchaseDto.getCourseAmt());
+                purchaseEntity.setImageUrl(purchaseDto.getImageUrl());
+                purchaseEntity.setSlug(purchaseDto.getSlug());
                 purchaseEntity.setPurchaseDate(new Date());
                 purchaseEntity.setCountry(addressDto.getCountry());
                 purchaseEntity.setCity(addressDto.getCity());
@@ -210,7 +209,7 @@ public class UserServiceImpl {
                 purchaseEntity.setZipcode(addressDto.getZipcode());
                 purchaseEntity.setIsFutureUse(saveAddress);
 
-                if(saveAddress == true){
+                if (saveAddress == true) {
                     UserDE user = userRepository.findByEmail(email);
                     user.setCountry(addressDto.getCountry());
                     user.setCity(addressDto.getCity());
@@ -220,7 +219,9 @@ public class UserServiceImpl {
                     user.setZipcode(addressDto.getZipcode());
                     userRepository.save(user);
                 }
-                purchaseRepository.save(purchaseEntity);
+
+                PurchaseEntity savedPurchase = purchaseRepository.save(purchaseEntity);
+                savedPurchaseList.add(savedPurchase);
 
                 boolean emailExists = myCourseRepository.existsByEmail(email);
                 if (!emailExists) {
@@ -233,15 +234,13 @@ public class UserServiceImpl {
                 } else {
                     MyCoursesEntity myCourses = myCourseRepository.findByEmail(email);
                     List<String> courseNames = myCourses.getAllCourses();
-                        courseNames.add(courseName);
-                        myCourses.setAllCourses(courseNames);
-                        myCourseRepository.save(myCourses);
-
+                    courseNames.add(courseName);
+                    myCourses.setAllCourses(courseNames);
+                    myCourseRepository.save(myCourses);
                 }
             }
-            return "success";
         }
-        return "fail";
+        return savedPurchaseList;
     }
 
 
