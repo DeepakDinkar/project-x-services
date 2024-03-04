@@ -47,7 +47,7 @@ public class AuthServiceImpl {
     @Value("${pv.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${app.filter.cors-filter.allowed-origins}")
+    @Value("${app.ui.hostUrl}")
     private String frontEndUrl;
 
     private final UserServiceImpl userService;
