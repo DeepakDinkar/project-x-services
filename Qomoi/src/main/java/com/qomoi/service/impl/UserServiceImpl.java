@@ -71,6 +71,7 @@ public class UserServiceImpl {
         userDE.setUserType(signUpRequestDTO.getUserType());
         userDE.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         userDE.setIsNormal(true);
+        userDE.setCountry(signUpRequestDTO.getCountry());
         userregistered = userRepository.save(userDE);
 
         return userregistered;
@@ -175,7 +176,7 @@ public class UserServiceImpl {
         }
     }
 
-    public String savePurchase(List<PurchaseDto> purchaseDto, String email) {
+    public String savePurchase(List<PurchaseDto> purchaseDto, AddressDto addressDto, Boolean saveAddress, String email) {
 
 
         if (StringUtils.hasText(email)) {
@@ -201,6 +202,24 @@ public class UserServiceImpl {
                 purchaseEntity.setImageUrl(purchase.getImageUrl());
                 purchaseEntity.setSlug(purchase.getSlug());
                 purchaseEntity.setPurchaseDate(new Date());
+                purchaseEntity.setCountry(addressDto.getCountry());
+                purchaseEntity.setCity(addressDto.getCity());
+                purchaseEntity.setAddress1(addressDto.getAddress1());
+                purchaseEntity.setAddress2(addressDto.getAddress2());
+                purchaseEntity.setState(addressDto.getState());
+                purchaseEntity.setZipcode(addressDto.getZipcode());
+                purchaseEntity.setIsFutureUse(saveAddress);
+
+                if(saveAddress == true){
+                    UserDE user = userRepository.findByEmail(email);
+                    user.setCountry(addressDto.getCountry());
+                    user.setCity(addressDto.getCity());
+                    user.setAddress1(addressDto.getAddress1());
+                    user.setAddress2(addressDto.getAddress2());
+                    user.setState(addressDto.getState());
+                    user.setZipcode(addressDto.getZipcode());
+                    userRepository.save(user);
+                }
                 purchaseRepository.save(purchaseEntity);
 
                 boolean emailExists = myCourseRepository.existsByEmail(email);

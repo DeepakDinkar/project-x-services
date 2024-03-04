@@ -13,6 +13,7 @@ public class SignUpRequestDTO {
     private String firstName;
     private String email;
     private String mobile;
+    private String country;
     private String street;
     private String city;
     private String state;

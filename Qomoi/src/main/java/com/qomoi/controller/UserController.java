@@ -105,13 +105,16 @@ public class UserController {
     }
 
     @PostMapping("/savePurchase")
-    public ResponseEntity<?> savePurchase(@RequestBody List<PurchaseDto> purchaseDto) {
+    public ResponseEntity<?> savePurchase(@RequestBody PurchaseInfo purchaseInfo) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             boolean allDetailsAvailable = true;
+            List<PurchaseDto> purchaseDtoList = purchaseInfo.getCourses();
+            AddressDto addressInfo = purchaseInfo.getAddress();
+            Boolean saveAddress = purchaseInfo.getSaveAddress();
 
-            for (PurchaseDto dto : purchaseDto) {
+            for (PurchaseDto dto : purchaseDtoList) {
                 if (dto.getCourseAmt() == null || dto.getCourseId() == null || dto.getSlug() == null
                         || dto.getImageUrl() == null || dto.getCourseDate() == null || dto.getTransactionId() == null) {
                     allDetailsAvailable = false;
@@ -120,12 +123,13 @@ public class UserController {
             }
 
             if (allDetailsAvailable) {
-                String saveDetails = userService.savePurchase(purchaseDto, email);
+                String saveDetails = userService.savePurchase(purchaseDtoList,addressInfo,saveAddress, email);
                 return new ResponseEntity<>(new ResponseDto(201, "Record saved successfully"), HttpStatus.OK);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(400, "Incomplete details in request"));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -53,4 +53,25 @@ public class PurchaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "address1")
+    private String address1;
+
+    @Column(name = "address2")
+    private String address2;
+
+    @Column(name = "country")
+    private String country;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "zipcode")
+    private String zipcode;
+
+    @Column(name = "is_future_use")
+    private Boolean isFutureUse;
+
 }
