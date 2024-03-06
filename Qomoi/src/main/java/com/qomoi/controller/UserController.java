@@ -11,6 +11,7 @@ import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -105,7 +106,7 @@ public class UserController {
     }
 
     @PostMapping("/savePurchase")
-    public ResponseEntity<?> savePurchase(@RequestBody PurchaseInfo purchaseInfo) {
+    public ResponseEntity<?> savePurchase(@Valid @RequestBody PurchaseInfo purchaseInfo) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
