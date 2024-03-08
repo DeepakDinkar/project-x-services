@@ -79,6 +79,23 @@ public class CourseController {
         }
     }
 
+    @GetMapping("/trending/{page}")
+    public ResponseEntity<Page<CoursesEntity>> getTrending(@PathVariable int page) {
+        try {
+            if (page <= 0) {
+                return ResponseEntity.badRequest().build();
+            }
+            int pageSize = 25;
+            PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+            Page<CoursesEntity> trendingCourse = courseService.getAllTrending(pageRequest);
+            return new ResponseEntity<>(trendingCourse, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
     @GetMapping("/recommended/{page}")
     public ResponseEntity<Page<CoursesEntity>> getRecommendedCourses(@PathVariable int page) {
         try {

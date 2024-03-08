@@ -168,6 +168,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Page<CoursesEntity> getAllTrending(PageRequest pageRequest) {
+        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
+
+    }
+
+
+    @Override
     public Page<CoursesEntity> getRecommendedCourses(PageRequest pageRequest) {
         return courseRepository.findAllByOrderByCampaignTemplateRatingDesc(pageRequest);
     }

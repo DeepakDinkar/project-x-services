@@ -46,4 +46,5 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
     Page<CoursesEntity> findBySlugOrderByIsTrendingDesc(PageRequest pageRequest, String slug);
 
 
+
 }

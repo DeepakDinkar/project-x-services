@@ -22,6 +22,9 @@ public interface CourseService {
     void saveCourse(CoursesEntity coursesEntity);
     List<CoursesEntity> getAllCoursesByVerticalSlug(String slug);
     List<CourseVerticalEntity> getTrendingVerticalCourses();
+
+    Page<CoursesEntity> getAllTrending(PageRequest pageRequest);
+
     Page<CoursesEntity> getRecommendedCourses(PageRequest pageRequest);
     Page<CoursesEntity> getSimilarCourses(PageRequest pageRequest, String slug);
     List<?> getAllLocation();

@@ -10,7 +10,6 @@ import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-    @RequestMapping("/user")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserServiceImpl userService;
