@@ -2,16 +2,14 @@ package com.qomoi.controller;
 
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 
-import ch.qos.logback.core.util.SystemInfo;
+
 import com.qomoi.entity.AddToCart;
 import com.qomoi.modal.KeyList;
 import com.qomoi.repository.AddToCartRepository;
 import com.qomoi.service.EncryptDecryptKey;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +69,7 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> saveUser(@RequestBody SignUpRequestDTO signUpRequestDTO)
+    public ResponseEntity<?> saveUser(@Valid @RequestBody SignUpRequestDTO signUpRequestDTO)
             throws MissingFieldException, ExistingUserFoundException {
         return authService.saveUser(signUpRequestDTO);
     }
@@ -92,7 +90,7 @@ public class AuthController {
     }
 
     @PostMapping("/google-login")
-    public ResponseEntity<?> googleSignup( @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException, ExistingUserFoundException {
+    public ResponseEntity<?> googleSignup(@Valid @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException, ExistingUserFoundException {
         return authService.googleSignup(googleSigninRequest);
     }
 

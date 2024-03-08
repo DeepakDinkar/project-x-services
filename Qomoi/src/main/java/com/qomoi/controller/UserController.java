@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @PostMapping("/saveProfile")
-    public ResponseEntity<?> updateProfile(@RequestBody ProfileDto profileDto) {
+    public ResponseEntity<?> updateProfile( @Valid @RequestBody ProfileDto profileDto) {
         try {
             if ( profileDto == null ) {
                 return ResponseEntity.badRequest().build();

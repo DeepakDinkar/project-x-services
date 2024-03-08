@@ -1,6 +1,7 @@
 package com.qomoi.controller;
 
 import com.qomoi.dto.CallBackDto;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +15,7 @@ public class QomoiController {
 
     @PostMapping("/callback")
     public ResponseEntity<?> callBack(
-            @RequestBody CallBackDto callBackDto
+            @RequestBody @Valid CallBackDto callBackDto
             ) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
