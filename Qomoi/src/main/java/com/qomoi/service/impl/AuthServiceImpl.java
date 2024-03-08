@@ -25,6 +25,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -209,21 +210,27 @@ public class AuthServiceImpl {
         if (!StringUtils.hasText(email)) {
             throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);
         }
-        userService.updateResetPasswordToken(token, email);
-        try {
-            String resetPasswordLink = frontEndUrl + "/reset-password?token=" + token;
-            String subject = "Here's the link to reset your password";
+       UserDE user = userRepository.findByEmail(email);
+        if(Objects.nonNull(user)){
+            userService.updateResetPasswordToken(token, email);
+            try {
+                String resetPasswordLink = frontEndUrl + "/reset-password?token=" + token;
+                String subject = "Here's the link to reset your password";
 
-            String content = "<p>Hello,</p>" + "<p>You have requested to reset your password.</p>"
-                    + "<p>Click the link below to change your password:</p>" + "<p><a href=\"" + resetPasswordLink
-                    + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
-                    + "or you have not made the request.</p>";
-            userService.sendEmail(email, subject, content);
-            model.addAttribute("message", "We have sent a reset password link to your email. Please check.");
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            model.addAttribute("error", "Error while sending email");
+                String content = "<p>Hello,</p>" + "<p>You have requested to reset your password.</p>"
+                        + "<p>Click the link below to change your password:</p>" + "<p><a href=\"" + resetPasswordLink
+                        + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
+                        + "or you have not made the request.</p>";
+                userService.sendEmail(email, subject, content);
+                model.addAttribute("message", "We have sent a reset password link to your email. Please check.");
+            } catch (MessagingException | UnsupportedEncodingException e) {
+                model.addAttribute("error", "Error while sending email");
+            }
+            return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
         }
-        return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
+        else{
+            return ResponseEntity.badRequest().body(new ResponseDto(404, Constants.ENTER_REGISTERED_EMAIL));
+        }
     }
 
     public ResponseEntity<?> processResetPassword( @RequestBody ResetPasswordDto resetPasswordDto , Model model) throws MissingFieldException, JsonProcessingException {

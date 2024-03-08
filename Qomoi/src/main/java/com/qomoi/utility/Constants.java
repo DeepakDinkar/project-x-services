@@ -6,6 +6,8 @@ public class Constants {
     public static final String LASTNAME_MANDATORY = "LastName is Missing";
     public static final String PHONE_NUMBER_MANDATORY = "PhoneNumber is Missing";
     public static final String EMAIL_ID_MANDATORY = "EmailId is Missing";
+
+    public static final String ENTER_REGISTERED_EMAIL = "Enter Registered email";
     public static final String EMAIL_ID_EXISTS = "EmailId already taken";
     public static final String INPUT_FIELD_MISSING = "Fields missing";
     public static final String PASSWORD_MANDATORY = "Password is Missing";
