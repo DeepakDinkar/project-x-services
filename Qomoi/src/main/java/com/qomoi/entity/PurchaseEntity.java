@@ -56,7 +56,7 @@ public class PurchaseEntity {
     @Column(name = "address1")
     private String address1;
 
-    @Column(name = "address2")
+    @Column(name = "address2", nullable = true)
     private String address2;
 
     @Column(name = "country")
