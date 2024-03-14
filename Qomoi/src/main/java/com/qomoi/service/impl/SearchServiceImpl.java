@@ -84,31 +84,18 @@ public class SearchServiceImpl implements SearchService {
 
         List<CoursesEntity> coursesEntityList = null;
         Page<CoursesEntity> coursesPage = null;
-        int start = 0;
-        int end = 0;
+        int start;
+        int end;
+
         if (StringUtils.hasText(slug) && StringUtils.hasText(query)) {
             coursesEntityList = courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseAndSlugEqualsOrderByIsTrendingDesc(query, slug);
-            start = (int) pageRequest.getOffset();
-            end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
-            coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
-            return coursesPage;
-
         } else if (StringUtils.hasText(slug)) {
             coursesEntityList = courseRepository.findCoursesEntitiesBySlugOrderByIsTrendingDesc(slug);
-            start = (int) pageRequest.getOffset();
-            end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
-            coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
-            return coursesPage;
-
         } else if (StringUtils.hasText(query)) {
             coursesEntityList = courseRepository.findByCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(query);
-            start = (int) pageRequest.getOffset();
-            end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
-            return new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
         } else if (fromDate != null && toDate != null) {
-            return courseRepository.findByCourseAddedDateBetweenOrderByIsTrendingDesc(fromDate, toDate, pageRequest);
-        } else if (StringUtils.hasText(location)) {
-            List<CoursesEntity> list = this.jdbcTemplate.query(" Select DISTINCT(c.id), c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, l.location_name from location l FULL OUTER JOIN courses c ON c.id = l.course_id " + " where LOWER(location_name) = LOWER( ? ) order by is_trending desc ", new Object[]{location}, new RowMapper<CoursesEntity>() {
+            String sql = "SELECT DISTINCT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, l.location_name FROM courses c FULL OUTER JOIN location l ON c.id = l.course_id WHERE l.date BETWEEN ? AND ? ORDER BY is_trending DESC";
+            coursesEntityList = this.jdbcTemplate.query(sql, new Object[]{fromDate, toDate}, new RowMapper<CoursesEntity>() {
                 @Override
                 public CoursesEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
                     CoursesEntity coursesEntity = new CoursesEntity();
@@ -124,15 +111,33 @@ public class SearchServiceImpl implements SearchService {
                     return coursesEntity;
                 }
             });
-            start = (int) pageRequest.getOffset();
-            end = Math.min((start + pageRequest.getPageSize()), list.size());
-            coursesPage = new PageImpl<>(list.subList(start, end), pageRequest, list.size());
-
-            return coursesPage;
-
+        } else if (StringUtils.hasText(location)) {
+            String sql = "SELECT DISTINCT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, l.location_name FROM courses c FULL OUTER JOIN location l ON c.id = l.course_id WHERE LOWER(l.location_name) = LOWER(?) ORDER BY is_trending DESC";
+            coursesEntityList = this.jdbcTemplate.query(sql, new Object[]{location}, new RowMapper<CoursesEntity>() {
+                @Override
+                public CoursesEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    CoursesEntity coursesEntity = new CoursesEntity();
+                    coursesEntity.setId(rs.getLong("id"));
+                    coursesEntity.setSlug(rs.getString("slug"));
+                    coursesEntity.setCampaignTemplateCourseName(rs.getString("campaign_template_course_name"));
+                    coursesEntity.setCourseContent(rs.getString("course_content"));
+                    coursesEntity.setCampaignTemplateRating(rs.getString("campaign_template_rating"));
+                    coursesEntity.setImageUrl(rs.getString("image_url"));
+                    coursesEntity.setKeyTakeAway(Collections.singletonList(rs.getString("key_take_away")));
+                    coursesEntity.setIsTrending(rs.getBoolean("is_trending"));
+                    coursesEntity.setCourseAddedDate(rs.getDate("course_added_date"));
+                    return coursesEntity;
+                }
+            });
         }
-        return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
+
+        start = (int) pageRequest.getOffset();
+        end = Math.min((start + pageRequest.getPageSize()), coursesEntityList.size());
+        coursesPage = new PageImpl<>(coursesEntityList.subList(start, end), pageRequest, coursesEntityList.size());
+
+        return coursesPage;
     }
+
 
     @Override
     public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, Boolean sortBy, String location) {
@@ -146,7 +151,7 @@ public class SearchServiceImpl implements SearchService {
                  sql.append(" AND  LOWER(c.campaign_template_course_name) LIKE LOWER(:query)");
              }
              if( fromDate != null && toDate != null ){
-                 sql.append(" AND c.course_added_date BETWEEN :fromDate AND :toDate ");
+                 sql.append(" AND l.date BETWEEN :fromDate AND :toDate ");
              }
              if( StringUtils.hasText(location)) {
                  sql.append( "AND l.location_name =  :location ");
