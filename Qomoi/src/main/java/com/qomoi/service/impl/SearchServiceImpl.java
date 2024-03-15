@@ -129,6 +129,8 @@ public class SearchServiceImpl implements SearchService {
                     return coursesEntity;
                 }
             });
+        } else {
+            return courseRepository.findAllByOrderByIsTrendingDesc(pageRequest);
         }
 
         start = (int) pageRequest.getOffset();
