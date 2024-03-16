@@ -15,8 +15,8 @@ import java.util.List;
 public class TrainerEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "id")
-    @SequenceGenerator(name = "id",sequenceName = "id",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id")
+    @SequenceGenerator(name = "id", sequenceName = "id", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
@@ -35,6 +35,6 @@ public class TrainerEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column (name = "slug")
+    @Column(name = "slug")
     private String slug;
 }

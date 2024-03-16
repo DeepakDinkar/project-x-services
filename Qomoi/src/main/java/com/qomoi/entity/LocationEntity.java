@@ -14,19 +14,19 @@ import java.util.Date;
 @AllArgsConstructor
 public class LocationEntity {
 
-@Id
-@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "locationId")
-@SequenceGenerator(name = "locationId",sequenceName = "locationId",allocationSize = 1)
-@Column(name = "id")
-private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "locationId")
+    @SequenceGenerator(name = "locationId", sequenceName = "locationId", allocationSize = 1)
+    @Column(name = "id")
+    private Long id;
 
-@Column(name = "course_id")
-private Long courseId;
+    @Column(name = "course_id")
+    private Long courseId;
 
-@Column(name = "location_name", nullable = true)
-private String locationName;
+    @Column(name = "location_name", nullable = true)
+    private String locationName;
 
-@Column(name = "date")
-private Date date;
+    @Column(name = "date")
+    private Date date;
 
 }

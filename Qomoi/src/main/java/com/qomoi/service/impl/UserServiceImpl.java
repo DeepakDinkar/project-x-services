@@ -4,12 +4,12 @@ package com.qomoi.service.impl;
 import com.qomoi.dto.*;
 import com.qomoi.entity.MyCoursesEntity;
 import com.qomoi.entity.PurchaseEntity;
+import com.qomoi.entity.UserDE;
+import com.qomoi.exception.NotFoundException;
 import com.qomoi.repository.MyCourseRepository;
 import com.qomoi.repository.PurchaseRepository;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
-import com.qomoi.entity.UserDE;
-import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityManager;
@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -82,24 +83,22 @@ public class UserServiceImpl {
     }
 
 
-
     public UserDE getByEmailIdAndMobileNumber(String emailId, String mobile) {
         return userRepository.findUserByEmailAndPhoneNumber(emailId, mobile);
     }
 
-    public String saveGoogleLogin(GoogleTokenResponse googleTokenResponse){
-      if(userRepository.findByEmail(googleTokenResponse.getEmail()) == null) {
-          UserDE userDE = new UserDE();
-          userDE.setLastName(googleTokenResponse.getFamily_name());
-          userDE.setFirstName(googleTokenResponse.getGiven_name());
-          userDE.setEmailId(googleTokenResponse.getEmail());
-          userDE.setIsGoogle(true);
-          userRepository.save(userDE);
-          return "saved successfully ";
-      }
-      else {
-          return "user already exists ";
-      }
+    public String saveGoogleLogin(GoogleTokenResponse googleTokenResponse) {
+        if (userRepository.findByEmail(googleTokenResponse.getEmail()) == null) {
+            UserDE userDE = new UserDE();
+            userDE.setLastName(googleTokenResponse.getFamily_name());
+            userDE.setFirstName(googleTokenResponse.getGiven_name());
+            userDE.setEmailId(googleTokenResponse.getEmail());
+            userDE.setIsGoogle(true);
+            userRepository.save(userDE);
+            return "saved successfully ";
+        } else {
+            return "user already exists ";
+        }
     }
 
     public UserDE getByResetPasswordToken(String token) {
@@ -127,29 +126,29 @@ public class UserServiceImpl {
         }
     }
 
-    public UserDE updateProfile(ProfileDto profileDto, String email){
+    public UserDE updateProfile(ProfileDto profileDto, String email) {
 
-       UserDE user = userRepository.findByEmail(email);
+        UserDE user = userRepository.findByEmail(email);
 
-       if(Objects.nonNull(user)){
-           user.setFirstName(profileDto.getFirstName());
-           user.setLastName(profileDto.getLastName());
-           user.setAddress1(profileDto.getAddress1());
-           user.setAddress2(profileDto.getAddress2());
-           user.setCountry(profileDto.getCountry());
-           user.setCity(profileDto.getCity());
-           user.setZipcode(profileDto.getZipCode());
-           user.setProfileImage(profileDto.getImageUrl());
-           return userRepository.save(user);
-       }
+        if (Objects.nonNull(user)) {
+            user.setFirstName(profileDto.getFirstName());
+            user.setLastName(profileDto.getLastName());
+            user.setAddress1(profileDto.getAddress1());
+            user.setAddress2(profileDto.getAddress2());
+            user.setCountry(profileDto.getCountry());
+            user.setCity(profileDto.getCity());
+            user.setZipcode(profileDto.getZipCode());
+            user.setProfileImage(profileDto.getImageUrl());
+            return userRepository.save(user);
+        }
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
 
-    public UserDE getProfile(String email){
+    public UserDE getProfile(String email) {
         UserDE user = userRepository.findByEmail(email);
-            if(Objects.nonNull(user)){
-                return user;
-            }
+        if (Objects.nonNull(user)) {
+            return user;
+        }
         throw new UsernameNotFoundException("User with email " + email + " not found");
     }
 
@@ -182,8 +181,8 @@ public class UserServiceImpl {
         if (StringUtils.hasText(email)) {
             for (PurchaseDto purchaseDto : purchaseDtoList) {
                 String sql = "SELECT c.campaign_template_course_name " +
-                        "FROM courses c " +
-                        "WHERE c.id = :courseId";
+                             "FROM courses c " +
+                             "WHERE c.id = :courseId";
 
                 Query query = entityManager.createNativeQuery(sql);
                 query.setParameter("courseId", purchaseDto.getCourseId());
@@ -209,7 +208,7 @@ public class UserServiceImpl {
                 purchaseEntity.setZipcode(addressDto.getZipcode());
                 purchaseEntity.setIsFutureUse(saveAddress);
 
-                if (saveAddress == true) {
+                if (saveAddress) {
                     UserDE user = userRepository.findByEmail(email);
                     user.setCountry(addressDto.getCountry());
                     user.setCity(addressDto.getCity());
@@ -244,14 +243,12 @@ public class UserServiceImpl {
     }
 
 
+    public List<PurchaseResponse> myPurchase(String email) {
 
-    public List<PurchaseResponse> myPurchase (String email) {
+        String sql = "SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date, p.slug, p.image_url " + " FROM purchase p " +
+                     " WHERE email = ? ";
 
-        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date, p.slug, p.image_url ");
-        sql.append(" FROM purchase p ");
-        sql.append(" WHERE email = ? ");
-
-        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{email},
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql, new Object[]{email},
                 new RowMapper<PurchaseResponse>() {
                     @Override
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -261,9 +258,9 @@ public class UserServiceImpl {
                         purchaseResponse.setCourseAmt(rs.getDouble("course_amt"));
                         purchaseResponse.setImageUrl(rs.getString("image_url"));
                         String location = rs.getString("location");
-                        if(StringUtils.hasText(location)){
+                        if (StringUtils.hasText(location)) {
                             purchaseResponse.setLocation(location);
-                        }else{
+                        } else {
                             purchaseResponse.setLocation(null);
                         }
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
@@ -275,14 +272,13 @@ public class UserServiceImpl {
         return list;
     }
 
-    public List<PurchaseResponse> myCourses (String email) {
+    public List<PurchaseResponse> myCourses(String email) {
 
-        StringBuilder sql = new StringBuilder("SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date, p.slug, p.image_url");
-        sql.append(" FROM purchase p ");
-        sql.append(" WHERE email = ? ");
-        sql.append(" ORDER BY course_date DESC ");
+        String sql = "SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date, p.slug, p.image_url" + " FROM purchase p " +
+                     " WHERE email = ? " +
+                     " ORDER BY course_date DESC ";
 
-        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{email},
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql, new Object[]{email},
                 new RowMapper<PurchaseResponse>() {
                     @Override
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -292,9 +288,9 @@ public class UserServiceImpl {
                         purchaseResponse.setCourseAmt(rs.getDouble("course_amt"));
                         purchaseResponse.setImageUrl(rs.getString("image_url"));
                         String location = rs.getString("location");
-                        if(StringUtils.hasText(location)){
+                        if (StringUtils.hasText(location)) {
                             purchaseResponse.setLocation(location);
-                        }else{
+                        } else {
                             purchaseResponse.setLocation(null);
                         }
                         purchaseResponse.setCourseDate(rs.getDate("course_date"));
@@ -307,14 +303,13 @@ public class UserServiceImpl {
     }
 
 
-    public List<PurchaseResponse> recentPurchase(String emailId){
+    public List<PurchaseResponse> recentPurchase(String emailId) {
 
-        StringBuilder sql = new StringBuilder("SELECT c.campaign_template_course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date");
-        sql.append(" FROM purchase p ");
-        sql.append(" JOIN courses c ON c.id = p.course_id ");
-        sql.append(" WHERE email = ?  AND DATE(p.purchase_date) = CURRENT_DATE ");
+        String sql = "SELECT c.campaign_template_course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date" + " FROM purchase p " +
+                     " JOIN courses c ON c.id = p.course_id " +
+                     " WHERE email = ?  AND DATE(p.purchase_date) = CURRENT_DATE ";
 
-        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{emailId},
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql, new Object[]{emailId},
                 new RowMapper<PurchaseResponse>() {
                     @Override
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -332,14 +327,13 @@ public class UserServiceImpl {
 
     }
 
-    public List<PurchaseResponse> getReminder(){
+    public List<PurchaseResponse> getReminder() {
 
-        StringBuilder sql = new StringBuilder(" SELECT c.campaign_template_course_name, p.email, p.course_date, p.location ");
-        sql.append(" FROM purchase p ");
-        sql.append(" JOIN courses c ON c.id = p.course_id ");
-        sql.append(" WHERE DATE(course_date) = CURRENT_DATE + INTERVAL '5 days' ");
+        String sql = " SELECT c.campaign_template_course_name, p.email, p.course_date, p.location " + " FROM purchase p " +
+                     " JOIN courses c ON c.id = p.course_id " +
+                     " WHERE DATE(course_date) = CURRENT_DATE + INTERVAL '5 days' ";
 
-        List<PurchaseResponse> list = this.jdbcTemplate.query(sql.toString(), new Object[]{},
+        List<PurchaseResponse> list = this.jdbcTemplate.query(sql, new Object[]{},
                 new RowMapper<PurchaseResponse>() {
                     @Override
                     public PurchaseResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -354,7 +348,7 @@ public class UserServiceImpl {
 
     }
 
-    public PurchaseEntity findDetails(Long id){
+    public PurchaseEntity findDetails(Long id) {
         return purchaseRepository.findById(id).orElse(null);
     }
 

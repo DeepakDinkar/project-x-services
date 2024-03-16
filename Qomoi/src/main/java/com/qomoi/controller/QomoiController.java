@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class QomoiController {
 
     @PostMapping("/callback")
-    public ResponseEntity<?> callBack(
-            @RequestBody @Valid CallBackDto callBackDto
-            ) {
+    public ResponseEntity<?> callBack(@RequestBody @Valid CallBackDto callBackDto) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

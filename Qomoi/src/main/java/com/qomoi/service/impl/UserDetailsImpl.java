@@ -1,7 +1,7 @@
 package com.qomoi.service.impl;
 
-import com.qomoi.entity.UserDE;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qomoi.entity.UserDE;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(UserDE user) {
-        List<GrantedAuthority> authorities =null;
+        List<GrantedAuthority> authorities = null;
 
         return new UserDetailsImpl(
                 user.getUserId(),

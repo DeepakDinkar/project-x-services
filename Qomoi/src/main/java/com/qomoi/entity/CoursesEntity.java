@@ -16,12 +16,12 @@ import java.util.List;
 public class CoursesEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "courseId" )
-    @SequenceGenerator(name = "courseId",sequenceName = "courseId",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "courseId")
+    @SequenceGenerator(name = "courseId", sequenceName = "courseId", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "slug" , nullable = false)
+    @Column(name = "slug", nullable = false)
     private String slug;
 
     @Column(name = "image_url")
@@ -33,10 +33,10 @@ public class CoursesEntity {
     @Column(name = "campaign_template_courseName")
     private String campaignTemplateCourseName;
 
-    @Column(name = "course_content",length = 1000)
+    @Column(name = "course_content", length = 1000)
     private String courseContent;
 
-    @Column(name = "key_take_away",length = 500)
+    @Column(name = "key_take_away", length = 500)
     private List<String> keyTakeAway;
 
     @Column(name = "is_trending")

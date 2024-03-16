@@ -35,7 +35,7 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
 
     Page<CoursesEntity> findListByCampaignTemplateCourseNameContainingIgnoreCase(String name, PageRequest pageRequest);
 
-    Page<CoursesEntity> findByCourseAddedDateBetweenOrderByIsTrendingDesc(Date startDate, Date endDate,PageRequest pageRequest);
+    Page<CoursesEntity> findByCourseAddedDateBetweenOrderByIsTrendingDesc(Date startDate, Date endDate, PageRequest pageRequest);
 
     Page<CoursesEntity> findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(Date startDate, Date endDate, String slug, PageRequest pageRequest);
 
@@ -44,7 +44,6 @@ public interface CourseRepository extends JpaRepository<CoursesEntity, Long> {
     Page<CoursesEntity> findAllByOrderByIsTrendingDesc(PageRequest pageRequest);
 
     Page<CoursesEntity> findBySlugOrderByIsTrendingDesc(PageRequest pageRequest, String slug);
-
 
 
 }

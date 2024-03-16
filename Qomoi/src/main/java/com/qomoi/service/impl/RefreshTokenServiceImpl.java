@@ -1,12 +1,10 @@
 package com.qomoi.service.impl;
 
 
+import com.qomoi.entity.RefreshToken;
 import com.qomoi.entity.UserDE;
 import com.qomoi.repository.RefreshTokenRepository;
 import com.qomoi.repository.UserRepository;
-import com.qomoi.entity.RefreshToken;
-import com.qomoi.exception.TokenRefreshException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,14 +16,15 @@ import java.util.UUID;
 
 @Service
 public class RefreshTokenServiceImpl {
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
     @Value("${pv.app.jwtRefreshExpirationMs}")
     private Long refreshTokenDurationMs;
 
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    public RefreshTokenServiceImpl(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
+    }
 
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);

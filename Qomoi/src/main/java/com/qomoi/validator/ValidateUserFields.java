@@ -1,8 +1,8 @@
 package com.qomoi.validator;
 
-import com.qomoi.utility.Constants;
 import com.qomoi.dto.SignUpRequestDTO;
 import com.qomoi.exception.MissingFieldException;
+import com.qomoi.utility.Constants;
 import org.springframework.util.StringUtils;
 
 public class ValidateUserFields {

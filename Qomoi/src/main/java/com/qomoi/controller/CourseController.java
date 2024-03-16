@@ -1,14 +1,16 @@
 package com.qomoi.controller;
 
-import com.qomoi.dto.*;
+import com.qomoi.dto.CourseLocationResponse;
+import com.qomoi.dto.TrainerResponse;
 import com.qomoi.entity.CourseVerticalEntity;
-import com.qomoi.service.CourseService;
 import com.qomoi.entity.CoursesEntity;
+import com.qomoi.service.CourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -143,7 +145,6 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
     @GetMapping("/locations")
     public ResponseEntity<List<?>> getAllLocation() {

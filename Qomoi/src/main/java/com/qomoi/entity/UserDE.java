@@ -71,7 +71,7 @@ public class UserDE {
     @Column(name = "salt")
     private String salt;
 
-    @Column(name = "profile_image",length = 100000)
+    @Column(name = "profile_image", length = 100000)
     private String profileImage;
 
 }

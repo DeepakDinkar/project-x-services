@@ -3,7 +3,9 @@ package com.qomoi.service.impl;
 import com.qomoi.dto.CourseLocationResponse;
 import com.qomoi.dto.LocationResponse;
 import com.qomoi.dto.TrainerResponse;
-import com.qomoi.entity.*;
+import com.qomoi.entity.CourseVerticalEntity;
+import com.qomoi.entity.CoursesEntity;
+import com.qomoi.entity.VerticalEntity;
 import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.LocationRepository;
 import com.qomoi.repository.VerticalRepository;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -29,7 +32,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository,LocationRepository locationRepository,JdbcTemplate jdbcTemplate) {
+    public CourseServiceImpl(CourseRepository courseRepository, VerticalRepository verticalRepository, LocationRepository locationRepository, JdbcTemplate jdbcTemplate) {
         this.courseRepository = courseRepository;
         this.verticalRepository = verticalRepository;
         this.locationRepository = locationRepository;
@@ -39,12 +42,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseLocationResponse> getAllCourse(PageRequest pageRequest) {
-        StringBuilder sql = new StringBuilder("SELECT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, l.location_name, l.date FROM courses c JOIN location l ON c.id = l.course_id");
 
         List<CourseLocationResponse> courseLocationResponses = new ArrayList<>();
         Map<Long, CourseLocationResponse> courseMap = new HashMap<>();
 
-        this.jdbcTemplate.query(sql.toString(), new Object[]{}, new RowMapper<Void>() {
+        this.jdbcTemplate.query("SELECT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, l.location_name, l.date FROM courses c JOIN location l ON c.id = l.course_id", new Object[]{}, new RowMapper<Void>() {
             @Override
             public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
                 long courseId = rs.getLong("id");
@@ -87,7 +89,6 @@ public class CourseServiceImpl implements CourseService {
     }
 
 
-
     @Override
     public Optional<CourseLocationResponse> getCourseId(Long id) {
         Optional<CoursesEntity> courseRes = courseRepository.findById(id);
@@ -104,9 +105,8 @@ public class CourseServiceImpl implements CourseService {
             courseLocationResponse.setCourseAddedDate(courseEntity.getCourseAddedDate());
             courseLocationResponse.setCourseAmt(courseEntity.getCourseAmt());
 
-            StringBuilder sql = new StringBuilder("SELECT location_name, date FROM location WHERE course_id = ?");
             List<LocationResponse> locationResponses = new ArrayList<>();
-            this.jdbcTemplate.query(sql.toString(), new Object[]{id}, (rs, rowNum) -> {
+            this.jdbcTemplate.query("SELECT location_name, date FROM location WHERE course_id = ?", new Object[]{id}, (rs, rowNum) -> {
                 LocationResponse locationResponse = new LocationResponse();
                 locationResponse.setCourseId(id);
                 locationResponse.setLocationName(rs.getString("location_name"));
@@ -117,9 +117,8 @@ public class CourseServiceImpl implements CourseService {
 
             courseLocationResponse.setLocation(locationResponses);
 
-            StringBuilder sqlTrainer = new StringBuilder("SELECT trainer_name,email,image_url,phone_number FROM trainers WHERE ? = ANY(course_id)");
             List<TrainerResponse> trainerResponses = new ArrayList<>();
-            this.jdbcTemplate.query(sqlTrainer.toString(), new Object[]{id}, (rs, rowNum) -> {
+            this.jdbcTemplate.query("SELECT trainer_name,email,image_url,phone_number FROM trainers WHERE ? = ANY(course_id)", new Object[]{id}, (rs, rowNum) -> {
                 TrainerResponse trainerResponse = new TrainerResponse();
                 trainerResponse.setTrainerName(rs.getString("trainer_name"));
                 trainerResponse.setEmail(rs.getString("email"));
@@ -192,11 +191,10 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<TrainerResponse> getAllTrainers(PageRequest pageRequest) {
-        StringBuilder sql = new StringBuilder("SELECT string_agg(c.campaign_template_course_name, ', ') AS course_names, t.trainer_name, t.phone_number, t.image_url, t.email  ");
-        sql.append(" FROM trainers t LEFT JOIN courses c ON c.id = ANY(t.course_id) ");
-        sql.append(" GROUP BY t.trainer_name, t.phone_number, t.image_url,t.email");
+        String sql = "SELECT string_agg(c.campaign_template_course_name, ', ') AS course_names, t.trainer_name, t.phone_number, t.image_url, t.email  " + " FROM trainers t LEFT JOIN courses c ON c.id = ANY(t.course_id) " +
+                     " GROUP BY t.trainer_name, t.phone_number, t.image_url,t.email";
 
-        List<TrainerResponse> trainerResponses = this.jdbcTemplate.query(sql.toString(), new Object[]{}, new RowMapper<TrainerResponse>() {
+        List<TrainerResponse> trainerResponses = this.jdbcTemplate.query(sql, new Object[]{}, new RowMapper<TrainerResponse>() {
             @Override
             public TrainerResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
                 TrainerResponse trainerResponse = new TrainerResponse();

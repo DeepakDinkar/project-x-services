@@ -1,6 +1,5 @@
 package com.qomoi.service;
 
-import com.qomoi.dto.ExploreSearchDto;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.GlobalSearchEntity;
 import org.springframework.data.domain.Page;
@@ -17,5 +16,5 @@ public interface SearchService {
 
     Page<CoursesEntity> getExploreCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, String location);
 
-    Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest,Date fromDate, Date toDate, Boolean sortBy,String location);
+    Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, Boolean sortBy, String location);
 }

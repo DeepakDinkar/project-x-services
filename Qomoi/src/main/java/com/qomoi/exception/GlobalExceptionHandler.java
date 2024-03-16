@@ -1,9 +1,8 @@
 package com.qomoi.exception;
 
 
-
-import com.qomoi.utility.Constants;
 import com.qomoi.dto.ResponseDto;
+import com.qomoi.utility.Constants;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ExistingUserFoundException.class)
-    public ResponseEntity<ResponseDto> userAlreadyExist(ExistingUserFoundException e){
+    public ResponseEntity<ResponseDto> userAlreadyExist(ExistingUserFoundException e) {
         ResponseDto errorDto = new ResponseDto();
         errorDto.setCode(0);
         errorDto.setMessage(Constants.EMAIL_ID_EXISTS);
@@ -20,7 +19,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingFieldException.class)
-    public ResponseEntity<ResponseDto> missingUserField(MissingFieldException e){
+    public ResponseEntity<ResponseDto> missingUserField(MissingFieldException e) {
         ResponseDto errorDto = new ResponseDto();
         errorDto.setCode(1);
         errorDto.setMessage(Constants.INPUT_FIELD_MISSING);
@@ -28,7 +27,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ResponseDto> missingUserField(BadCredentialsException e){
+    public ResponseEntity<ResponseDto> missingUserField(BadCredentialsException e) {
         ResponseDto errorDto = new ResponseDto();
         errorDto.setCode(2);
         errorDto.setMessage(Constants.INVALID_CREDENTIALS);
@@ -36,7 +35,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenRefreshException.class)
-    public ResponseEntity<ResponseDto> tokenRefreshException(TokenRefreshException e){
+    public ResponseEntity<ResponseDto> tokenRefreshException(TokenRefreshException e) {
         ResponseDto errorDto = new ResponseDto();
         errorDto.setCode(3);
         errorDto.setMessage(Constants.TOKEN_REFRESHED_NOT_AVAILABLE);

@@ -1,6 +1,5 @@
 package com.qomoi.dto;
 
-import com.qomoi.entity.CoursesEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

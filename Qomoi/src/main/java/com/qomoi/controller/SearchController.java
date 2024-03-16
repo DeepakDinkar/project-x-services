@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/search")
 public class SearchController {
-
     private final SearchService searchService;
 
     public SearchController(SearchService searchService) {
@@ -50,13 +49,7 @@ public class SearchController {
     }
 
     @GetMapping("/explore/{page}")
-    public ResponseEntity<Page<CoursesEntity>> getExploreCourses(
-            @PathVariable int page,
-            @RequestParam(name = "slug", required = false) String slug,
-            @RequestParam(name = "query", required = false) String query,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "fromDate", required = false) Date fromDate,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate,
-            @RequestParam(name = "location", required = false) String location) {
+    public ResponseEntity<Page<CoursesEntity>> getExploreCourses(@PathVariable int page, @RequestParam(name = "slug", required = false) String slug, @RequestParam(name = "query", required = false) String query, @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "fromDate", required = false) Date fromDate, @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate, @RequestParam(name = "location", required = false) String location) {
         try {
             int pageSize = 12;
             PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
@@ -69,11 +62,7 @@ public class SearchController {
     }
 
     @GetMapping("/verticals/{slug}/{page}")
-    public ResponseEntity<Page<CoursesEntity>> getVerticalCourses(@PathVariable String slug, @PathVariable int page, @RequestParam(name = "query", required = false) String query,
-                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "fromDate", required = false) Date fromDate,
-                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate,
-                                                                  @RequestParam(name = "sortBy", required = false) Boolean sortBy,
-                                                                  @RequestParam(name = "location" , required = false) String location) {
+    public ResponseEntity<Page<CoursesEntity>> getVerticalCourses(@PathVariable String slug, @PathVariable int page, @RequestParam(name = "query", required = false) String query, @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "fromDate", required = false) Date fromDate, @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "toDate", required = false) Date toDate, @RequestParam(name = "sortBy", required = false) Boolean sortBy, @RequestParam(name = "location", required = false) String location) {
         try {
             int pageSize = 12;
             PageRequest pageRequest = PageRequest.of(page - 1, pageSize);

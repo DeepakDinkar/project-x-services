@@ -1,23 +1,25 @@
 package com.qomoi.controller;
 
 
+import com.qomoi.dto.*;
 import com.qomoi.entity.PurchaseEntity;
+import com.qomoi.entity.UserDE;
+import com.qomoi.exception.NotFoundException;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.service.impl.UserServiceImpl;
 import com.qomoi.utility.Constants;
-import com.qomoi.dto.*;
-import com.qomoi.entity.UserDE;
-import com.qomoi.exception.NotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +38,6 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
@@ -49,9 +50,9 @@ public class UserController {
     }
 
     @PostMapping("/saveProfile")
-    public ResponseEntity<?> updateProfile( @Valid @RequestBody ProfileDto profileDto) {
+    public ResponseEntity<?> updateProfile(@Valid @RequestBody ProfileDto profileDto) {
         try {
-            if ( profileDto == null ) {
+            if (profileDto == null) {
                 return ResponseEntity.badRequest().build();
             }
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -116,17 +117,17 @@ public class UserController {
 
             for (PurchaseDto dto : purchaseDtoList) {
                 if (dto.getCourseAmt() == null || dto.getCourseId() == null || dto.getSlug() == null
-                        || dto.getImageUrl() == null || dto.getCourseDate() == null || dto.getTransactionId() == null
-                || addressInfo.getAddress1() == null || saveAddress == null || addressInfo.getAddress1() == null || addressInfo.getCountry() == null
-                || addressInfo.getCity() == null ) {
+                    || dto.getImageUrl() == null || dto.getCourseDate() == null || dto.getTransactionId() == null
+                    || addressInfo.getAddress1() == null || saveAddress == null || addressInfo.getAddress1() == null || addressInfo.getCountry() == null
+                    || addressInfo.getCity() == null) {
                     allDetailsAvailable = false;
                     break;
                 }
             }
 
             if (allDetailsAvailable) {
-                List<PurchaseEntity>  saveDetails = userService.savePurchase(purchaseDtoList,addressInfo,saveAddress, email);
-                return new ResponseEntity<>( saveDetails, HttpStatus.OK);
+                List<PurchaseEntity> saveDetails = userService.savePurchase(purchaseDtoList, addressInfo, saveAddress, email);
+                return new ResponseEntity<>(saveDetails, HttpStatus.OK);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(400, "Incomplete details in request"));
             }
@@ -143,8 +144,8 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String emailId = authentication.getName();
             List<PurchaseResponse> purchaseResponses = userService.myPurchase(emailId);
-            if(Objects.nonNull(purchaseResponses)){
-                return new ResponseEntity<>(purchaseResponses,HttpStatus.OK);
+            if (Objects.nonNull(purchaseResponses)) {
+                return new ResponseEntity<>(purchaseResponses, HttpStatus.OK);
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -159,8 +160,8 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String emailId = authentication.getName();
             List<PurchaseResponse> purchaseResponses = userService.myCourses(emailId);
-            if(Objects.nonNull(purchaseResponses)){
-                return new ResponseEntity<>(purchaseResponses,HttpStatus.OK);
+            if (Objects.nonNull(purchaseResponses)) {
+                return new ResponseEntity<>(purchaseResponses, HttpStatus.OK);
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -179,10 +180,10 @@ public class UserController {
             for (PurchaseResponse purchase : recentPurchase) {
                 if (StringUtils.hasText(email)) {
                     try {
-                        String content = "<p>Hello,</p>" + "<p>You have purchased "+ purchase.getCoursesName() + " course.</p>"
-                                + "<p> Venue : "+purchase.getLocation()
-                                + "<p> Date : "+purchase.getCourseDate()
-                                + "<p> Happy learning !!! </p>";
+                        String content = "<p>Hello,</p>" + "<p>You have purchased " + purchase.getCoursesName() + " course.</p>"
+                                         + "<p> Venue : " + purchase.getLocation()
+                                         + "<p> Date : " + purchase.getCourseDate()
+                                         + "<p> Happy learning !!! </p>";
                         String subject = "Course Purchased";
                         userService.sendEmail(email, subject, content);
                         model.addAttribute("message", "We have sent a purchase details to your email. Please check.");
@@ -211,10 +212,10 @@ public class UserController {
 
             for (PurchaseResponse purchase : recentPurchase) {
                 if (StringUtils.hasText(email)) {
-                    String content = "<p>Hello,</p>" + "<p>You have purchased "+ purchase.getCoursesName() + " course.</p>"
-                            + "<p> Venue : "+purchase.getLocation()
-                            + "<p> Date : "+purchase.getCourseDate()
-                            + "<p> Happy learning !!! </p>";
+                    String content = "<p>Hello,</p>" + "<p>You have purchased " + purchase.getCoursesName() + " course.</p>"
+                                     + "<p> Venue : " + purchase.getLocation()
+                                     + "<p> Date : " + purchase.getCourseDate()
+                                     + "<p> Happy learning !!! </p>";
                     String subject = "Course Purchased";
 
                     // Send email

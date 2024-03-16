@@ -15,8 +15,8 @@ import java.util.Date;
 public class PurchaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchaseId" )
-    @SequenceGenerator(name = "purchaseId",sequenceName = "purchaseId",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchaseId")
+    @SequenceGenerator(name = "purchaseId", sequenceName = "purchaseId", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
@@ -41,7 +41,7 @@ public class PurchaseEntity {
     @Column(name = "transaction_id")
     private String transactionId;
 
-    @Column (name = "purchase_date")
+    @Column(name = "purchase_date")
     private Date purchaseDate;
 
     @Column(name = "slug")

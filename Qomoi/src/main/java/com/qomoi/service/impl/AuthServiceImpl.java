@@ -25,7 +25,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -45,21 +44,18 @@ import java.util.UUID;
 @Transactional
 public class AuthServiceImpl {
 
-    @Value("${pv.app.jwtSecret}")
-    private String jwtSecret;
-
-    @Value("${app.ui.hostUrl}")
-    private String frontEndUrl;
-
     private final UserServiceImpl userService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final RefreshTokenServiceImpl refreshTokenService;
-
     private final UserRepository userRepository;
+    @Value("${pv.app.jwtSecret}")
+    private String jwtSecret;
+    @Value("${app.ui.hostUrl}")
+    private String frontEndUrl;
 
-    public AuthServiceImpl(UserServiceImpl userService, AuthenticationManager authenticationManager,JwtUtils jwtUtils,
-                           RefreshTokenServiceImpl refreshTokenService,UserRepository userRepository){
+    public AuthServiceImpl(UserServiceImpl userService, AuthenticationManager authenticationManager, JwtUtils jwtUtils,
+                           RefreshTokenServiceImpl refreshTokenService, UserRepository userRepository) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
@@ -70,12 +66,12 @@ public class AuthServiceImpl {
     public ResponseEntity<?> saveUser(@RequestBody SignUpRequestDTO signUpRequestDTO)
             throws MissingFieldException, ExistingUserFoundException {
 
-        try{
+        try {
             ValidateUserFields validateUserFields = new ValidateUserFields();
             validateUserFields.validateSignUpFields(signUpRequestDTO);
             UserDE userRegistered = null;
 
-            if(userRepository.existsByEmailIdOrMobile(signUpRequestDTO.getEmail(), signUpRequestDTO.getMobile()) == false ){
+            if (!userRepository.existsByEmailIdOrMobile(signUpRequestDTO.getEmail(), signUpRequestDTO.getMobile())) {
                 userRegistered = userService.saveUser(signUpRequestDTO);
                 SignupResponseDto signupResponseDto = new SignupResponseDto();
                 signupResponseDto.setFirstName(userRegistered.getFirstName());
@@ -86,15 +82,12 @@ public class AuthServiceImpl {
 
                 return ResponseEntity.status(HttpStatus.CREATED)
                         .body(new SavedResponseDto(signupResponseDto, new ResponseDto(201, "Record saved successfully")));
-            }
-            else{
+            } else {
                 throw new ExistingUserFoundException("User already exists");
             }
-        }
-        catch(ExistingUserFoundException e){
+        } catch (ExistingUserFoundException e) {
             throw new ExistingUserFoundException(e.getMessage());
-        }
-        catch (MissingFieldException e){
+        } catch (MissingFieldException e) {
             throw new MissingFieldException("Fields missing");
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -104,7 +97,7 @@ public class AuthServiceImpl {
 
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) throws Exception {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword() ));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword()));
 
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -122,7 +115,7 @@ public class AuthServiceImpl {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-                .body(new JwtResponse(jwtCookie.getValue(),userDE.getFirstName()));
+                .body(new JwtResponse(jwtCookie.getValue(), userDE.getFirstName()));
     }
 
 
@@ -145,21 +138,21 @@ public class AuthServiceImpl {
         String expiredToken = refreshTokenDto.getToken();
         if (expiredToken != null && expiredToken.length() > 0) {
             String username = jwtUtils.getUserNameFromJwtToken(expiredToken);
-            UserDE user =  userService.getByEmailId(username);
-            if(Objects.nonNull(user)){
+            UserDE user = userService.getByEmailId(username);
+            if (Objects.nonNull(user)) {
                 String newToken = jwtUtils.generateTokenFromUsername(username);
                 ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
                 return ResponseEntity.ok()
                         .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                         .body(new JwtResponse(newToken, username));
-            }else {
+            } else {
                 throw new TokenRefreshException(expiredToken, Constants.TOKEN_REFRESHED_NOT_AVAILABLE);
             }
         }
         return ResponseEntity.badRequest().body(new ResponseDto(4, Constants.TOKEN_EMPTY));
     }
 
-    public ResponseEntity<?> googleSignup( @RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException, ExistingUserFoundException {
+    public ResponseEntity<?> googleSignup(@RequestBody GoogleSigninRequest googleSigninRequest) throws GeneralSecurityException, IOException, ExistingUserFoundException {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -186,10 +179,9 @@ public class AuthServiceImpl {
                 .compact();
 
 
-        if(userRepository.existsByEmailIdAndIsNormal(googleTokenResponse.getEmail(),true)){
+        if (userRepository.existsByEmailIdAndIsNormal(googleTokenResponse.getEmail(), true)) {
             throw new ExistingUserFoundException("User already exists");
-        }
-        else{
+        } else {
             GoogleResponse googleResponse = new GoogleResponse();
             googleResponse.setToken(jwtToken);
             googleResponse.setFirstName(googleTokenResponse.getGiven_name());
@@ -203,37 +195,36 @@ public class AuthServiceImpl {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, Model model) throws MissingFieldException, NotFoundException, JsonProcessingException, NotFoundException {
+    public ResponseEntity<?> processForgotPassword(@RequestBody ForgetPasswordDto forgetPasswordDto, Model model) throws MissingFieldException, JsonProcessingException, NotFoundException {
 
         String email = forgetPasswordDto.getEmail();
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         if (!StringUtils.hasText(email)) {
             throw new MissingFieldException(Constants.EMAIL_ID_MANDATORY);
         }
-       UserDE user = userRepository.findByEmail(email);
-        if(Objects.nonNull(user)){
+        UserDE user = userRepository.findByEmail(email);
+        if (Objects.nonNull(user)) {
             userService.updateResetPasswordToken(token, email);
             try {
                 String resetPasswordLink = frontEndUrl + "/reset-password?token=" + token;
                 String subject = "Here's the link to reset your password";
 
                 String content = "<p>Hello,</p>" + "<p>You have requested to reset your password.</p>"
-                        + "<p>Click the link below to change your password:</p>" + "<p><a href=\"" + resetPasswordLink
-                        + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
-                        + "or you have not made the request.</p>";
+                                 + "<p>Click the link below to change your password:</p>" + "<p><a href=\"" + resetPasswordLink
+                                 + "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password "
+                                 + "or you have not made the request.</p>";
                 userService.sendEmail(email, subject, content);
                 model.addAttribute("message", "We have sent a reset password link to your email. Please check.");
             } catch (MessagingException | UnsupportedEncodingException e) {
                 model.addAttribute("error", "Error while sending email");
             }
             return ResponseEntity.ok().body(new ResponseDto(200, Constants.MAIL_SENT_SUCCESSFULLY));
-        }
-        else{
+        } else {
             return ResponseEntity.badRequest().body(new ResponseDto(404, Constants.ENTER_REGISTERED_EMAIL));
         }
     }
 
-    public ResponseEntity<?> processResetPassword( @RequestBody ResetPasswordDto resetPasswordDto , Model model) throws MissingFieldException, JsonProcessingException {
+    public ResponseEntity<?> processResetPassword(@RequestBody ResetPasswordDto resetPasswordDto, Model model) throws MissingFieldException, JsonProcessingException {
 
         String token = resetPasswordDto.getToken();
         String password = resetPasswordDto.getNewPassword();

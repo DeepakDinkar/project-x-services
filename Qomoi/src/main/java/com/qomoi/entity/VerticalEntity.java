@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class VerticalEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id" )
-    @SequenceGenerator(name = "id",sequenceName = "id",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id")
+    @SequenceGenerator(name = "id", sequenceName = "id", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "image_url")

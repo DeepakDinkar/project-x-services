@@ -6,14 +6,17 @@ import com.qomoi.dto.LocationResponse;
 import com.qomoi.dto.TrainerResponse;
 import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.VerticalCoursesEntity;
+import com.qomoi.entity.VerticalEntity;
 import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.VerticalService;
-import com.qomoi.entity.VerticalEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class VerticalServiceImpl implements VerticalService {
@@ -21,6 +24,7 @@ public class VerticalServiceImpl implements VerticalService {
     private final VerticalRepository verticalRepository;
     private final CourseRepository courseRepository;
     private final JdbcTemplate jdbcTemplate;
+
     public VerticalServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository, JdbcTemplate jdbcTemplate) {
 
         this.verticalRepository = verticalRepository;
@@ -69,8 +73,7 @@ public class VerticalServiceImpl implements VerticalService {
                     courseLocationResponse.setCourseAddedDate(coursesEntity.getCourseAddedDate());
 
                     List<LocationResponse> locationResponses = new ArrayList<>();
-                    StringBuilder sqlLocation = new StringBuilder("SELECT location_name, date FROM location WHERE course_id = ?");
-                    this.jdbcTemplate.query(sqlLocation.toString(), new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
+                    this.jdbcTemplate.query("SELECT location_name, date FROM location WHERE course_id = ?", new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
                         LocationResponse locationResponse = new LocationResponse();
                         locationResponse.setCourseId(coursesEntity.getId());
                         locationResponse.setLocationName(rs.getString("location_name"));
@@ -81,8 +84,7 @@ public class VerticalServiceImpl implements VerticalService {
                     courseLocationResponse.setLocation(locationResponses);
 
                     List<TrainerResponse> trainerResponses = new ArrayList<>();
-                    StringBuilder sqlTrainer = new StringBuilder("SELECT trainer_name,email,image_url,phone_number FROM trainers WHERE ? = ANY(course_id)");
-                    this.jdbcTemplate.query(sqlTrainer.toString(), new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
+                    this.jdbcTemplate.query("SELECT trainer_name,email,image_url,phone_number FROM trainers WHERE ? = ANY(course_id)", new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
                         TrainerResponse trainerResponse = new TrainerResponse();
                         trainerResponse.setTrainerName(rs.getString("trainer_name"));
                         trainerResponse.setEmail(rs.getString("email"));
@@ -102,8 +104,6 @@ public class VerticalServiceImpl implements VerticalService {
 
         return verticalCoursesEntity;
     }
-
-
 
 
 }

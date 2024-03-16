@@ -2,8 +2,8 @@ package com.qomoi.controller;
 
 
 import com.qomoi.entity.VerticalCoursesEntity;
-import com.qomoi.service.VerticalService;
 import com.qomoi.entity.VerticalEntity;
+import com.qomoi.service.VerticalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

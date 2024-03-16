@@ -143,46 +143,45 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public Page<CoursesEntity> getVerticalCourses(String slug, String query, PageRequest pageRequest, Date fromDate, Date toDate, Boolean sortBy, String location) {
-         if(StringUtils.hasText(slug) ) {
+        if (StringUtils.hasText(slug)) {
 
-             StringBuilder sql = new StringBuilder("SELECT DISTINCT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, c.trainer_id, c.course_amt, ");
-             sql.append(" l.location_name, l.date ");
-             sql.append(" FROM courses c JOIN location l ON c.id = l.course_id ");
-             sql.append(" WHERE c.slug = :slug ");
-             if(StringUtils.hasText(query)){
-                 sql.append(" AND  LOWER(c.campaign_template_course_name) LIKE LOWER(:query)");
-             }
-             if( fromDate != null && toDate != null ){
-                 sql.append(" AND l.date BETWEEN :fromDate AND :toDate ");
-             }
-             if( StringUtils.hasText(location)) {
-                 sql.append( "AND l.location_name =  :location ");
-             }
-             if(sortBy != null && sortBy.equals(Boolean.TRUE)){
-                 sql.append(" order by c.campaign_template_course_name ASC ");
-             }
-             if(sortBy != null && sortBy.equals(Boolean.FALSE)){
-                 sql.append(" order by c.campaign_template_course_name DESC ");
-             }
-             Query queryRes = entityManager.createNativeQuery(sql.toString(), CoursesEntity.class);
-             queryRes.setParameter("slug", slug);
-             if(StringUtils.hasText(query)){
-                 queryRes.setParameter("query", "%" + query + "%");
-             }
-             if(fromDate!=null){
-                 queryRes.setParameter("fromDate", fromDate);
-             }
-             if(toDate!=null){
-                 queryRes.setParameter("toDate", toDate);
-             }
-             if(StringUtils.hasText(location)){
-                 queryRes.setParameter("location", location);
-             }
+            StringBuilder sql = new StringBuilder("SELECT DISTINCT c.id, c.slug, c.campaign_template_course_name, c.course_content, c.campaign_template_rating, c.image_url, c.key_take_away, c.is_trending, c.course_added_date, c.trainer_id, c.course_amt, ");
+            sql.append(" l.location_name, l.date ");
+            sql.append(" FROM courses c JOIN location l ON c.id = l.course_id ");
+            sql.append(" WHERE c.slug = :slug ");
+            if (StringUtils.hasText(query)) {
+                sql.append(" AND  LOWER(c.campaign_template_course_name) LIKE LOWER(:query)");
+            }
+            if (fromDate != null && toDate != null) {
+                sql.append(" AND l.date BETWEEN :fromDate AND :toDate ");
+            }
+            if (StringUtils.hasText(location)) {
+                sql.append("AND l.location_name =  :location ");
+            }
+            if (sortBy != null && sortBy.equals(Boolean.TRUE)) {
+                sql.append(" order by c.campaign_template_course_name ASC ");
+            }
+            if (sortBy != null && sortBy.equals(Boolean.FALSE)) {
+                sql.append(" order by c.campaign_template_course_name DESC ");
+            }
+            Query queryRes = entityManager.createNativeQuery(sql.toString(), CoursesEntity.class);
+            queryRes.setParameter("slug", slug);
+            if (StringUtils.hasText(query)) {
+                queryRes.setParameter("query", "%" + query + "%");
+            }
+            if (fromDate != null) {
+                queryRes.setParameter("fromDate", fromDate);
+            }
+            if (toDate != null) {
+                queryRes.setParameter("toDate", toDate);
+            }
+            if (StringUtils.hasText(location)) {
+                queryRes.setParameter("location", location);
+            }
 
-             List<CoursesEntity> resultList = queryRes.getResultList();
-             return paginateResultList(resultList, pageRequest);
-         }
-        else if (StringUtils.hasText(slug) && StringUtils.hasText(query)) {
+            List<CoursesEntity> resultList = queryRes.getResultList();
+            return paginateResultList(resultList, pageRequest);
+        } else if (StringUtils.hasText(slug) && StringUtils.hasText(query)) {
             return courseRepository.findBySlugContainingIgnoreCaseAndCampaignTemplateCourseNameContainingIgnoreCaseOrderByIsTrendingDesc(slug, query, pageRequest);
         } else if (fromDate != null && toDate != null && StringUtils.hasText(slug)) {
             return courseRepository.findByCourseAddedDateBetweenAndSlugOrderByIsTrendingDesc(fromDate, toDate, slug, pageRequest);

@@ -13,27 +13,16 @@ import java.util.List;
 public class CourseLocationResponse {
 
     private Long id;
-
     private String slug;
-
     private String campaignTemplateCourseName;
-
     private String courseContent;
-
     private String campaignTemplateRating;
-
     private String imageUrl;
-
     private List<String> keyTakeAway;
-
     private Boolean isTrending;
-
     private Date courseAddedDate;
-
     private List<LocationResponse>  location;
-
     private List<TrainerResponse> trainer;
-
     private Double courseAmt;
 
 }
