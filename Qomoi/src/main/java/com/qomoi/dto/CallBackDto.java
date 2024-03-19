@@ -14,7 +14,7 @@ public class CallBackDto {
     private String mobile;
     private String email;
     private Boolean groupDiscount;
-    private String conversation;
+    private String comment;
     private PhoneOrEmail phoneOrEmail;
 
 }
