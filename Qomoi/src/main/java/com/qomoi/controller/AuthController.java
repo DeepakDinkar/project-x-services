@@ -15,6 +15,9 @@ import com.qomoi.service.EncryptDecryptKey;
 import com.qomoi.service.impl.AuthServiceImpl;
 import com.qomoi.service.impl.RefreshTokenServiceImpl;
 import com.qomoi.service.impl.UserServiceImpl;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+
+import org.springframework.web.servlet.ModelAndView;
+import com.stripe.Stripe;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 
 @RestController
 @RequestMapping("/auth")
@@ -115,4 +123,88 @@ public class AuthController {
         return addToCartRepository.findBySecretKey(key);
     }
 
+  // Payment gateway code ---------------
+
+//   =======================================================================================================================
+
+//    @PostMapping("/create-checkout-session")
+//    public ModelAndView createCheckoutSession() throws StripeException {
+//        Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
+//
+//        String YOUR_DOMAIN = "http://localhost/stripe-ui"; // Adjust port accordingly
+//        SessionCreateParams params =
+//                SessionCreateParams.builder()
+//                        .setMode(SessionCreateParams.Mode.PAYMENT)
+//                        .setSuccessUrl(YOUR_DOMAIN + "/success.html")
+//                        .setCancelUrl(YOUR_DOMAIN + "/cancel.html")
+//                        .setAutomaticTax(
+//                                SessionCreateParams.AutomaticTax.builder()
+//                                        .setEnabled(true)
+//                                        .build())
+//                        .addLineItem(
+//                                SessionCreateParams.LineItem.builder()
+//                                        .setQuantity(1L)
+//                                        .setPrice("{{PRICE_ID}}")
+//                                        .build())
+//                        .build();
+//        Session session = Session.create(params);
+//
+//        return new ModelAndView("redirect:" + session.getUrl());
+//    }
+
+    static {
+        Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
+    }
+
+    static class CreatePaymentItem {
+        private String id;
+
+        public String getId() {
+            return id;
+        }
+    }
+
+    static class CreatePayment {
+        private CreatePaymentItem[] items;
+
+        public CreatePaymentItem[] getItems() {
+            return items;
+        }
+    }
+
+    static class CreatePaymentResponse {
+        private String clientSecret;
+
+        public CreatePaymentResponse(String clientSecret) {
+            this.clientSecret = clientSecret;
+        }
+    }
+
+    static int calculateOrderAmount(CreatePaymentItem[] items) {
+        // Replace this constant with a calculation of the order's amount
+        // Calculate the order total on the server to prevent
+        // people from directly manipulating the amount on the client
+        return 1400;
+    }
+
+    @PostMapping("/create-payment-intent")
+    public CreatePaymentResponse createPaymentIntent(@RequestBody CreatePayment postBody) {
+        PaymentIntentCreateParams params =
+                PaymentIntentCreateParams.builder()
+                        .setAmount((long) calculateOrderAmount(postBody.getItems()))
+                        .setCurrency("usd")
+                        .build();
+
+        // Create a PaymentIntent with the order amount and currency
+        PaymentIntent paymentIntent = null;
+        try {
+            paymentIntent = PaymentIntent.create(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle Stripe API exception
+        }
+
+        return new CreatePaymentResponse(paymentIntent.getClientSecret());
+    }
 }
+
