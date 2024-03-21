@@ -160,7 +160,7 @@ public class AuthController {
     public ModelAndView createCheckoutSession(@RequestBody List<PurchaseEntity> purchasData) throws StripeException {
         Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
 
-        String YOUR_DOMAIN = "http://localhost/stripe-ui";
+        String YOUR_DOMAIN = "http://localhost:5173";
 
         List<SessionCreateParams.LineItem> stripeLineItems = new ArrayList<>();
         for (PurchaseEntity lineItem : purchasData) {
