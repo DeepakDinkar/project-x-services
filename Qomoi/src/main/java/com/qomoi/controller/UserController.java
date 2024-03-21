@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -199,11 +200,21 @@ public class UserController {
         }
     }
 
-    @PostMapping("/addPayment/{id}")
-    public PurchaseEntity addPayment(@PathVariable Long id, Model model) {
-        PurchaseEntity purchaseEntity = userService.findDetails(id);
-        purchaseEntity.setStatus("S");
-        PurchaseEntity savedPurchaseEntity = userService.savePayment(purchaseEntity);
+    @PostMapping("/addPayment")
+    public List<PurchaseEntity> addPayment(@RequestBody List<PurchaseEntity> purchasData, Model model) {
+
+        List<PurchaseEntity> response = new ArrayList<>();
+
+        for(PurchaseEntity list : purchasData){
+            PurchaseEntity purchaseEntity = userService.findDetails(list.getId());
+            purchaseEntity.setStatus("S");
+            PurchaseEntity savedPurchaseEntity = userService.savePayment(purchaseEntity);
+            if(savedPurchaseEntity != null){
+                response.add(savedPurchaseEntity);
+            }
+        }
+
+
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -228,7 +239,7 @@ public class UserController {
             model.addAttribute("error", "Error while sending email: " + e.getMessage());
         }
 
-        return savedPurchaseEntity;
+        return response;
     }
 
 }

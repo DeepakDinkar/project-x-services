@@ -4,6 +4,7 @@ package com.qomoi.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qomoi.dto.*;
 import com.qomoi.entity.AddToCart;
+import com.qomoi.entity.PurchaseEntity;
 import com.qomoi.exception.ExistingUserFoundException;
 import com.qomoi.exception.MissingFieldException;
 import com.qomoi.exception.NotFoundException;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.web.servlet.ModelAndView;
 import com.stripe.Stripe;
@@ -141,6 +144,7 @@ public class AuthController {
 //                                SessionCreateParams.AutomaticTax.builder()
 //                                        .setEnabled(true)
 //                                        .build())
+//
 //                        .addLineItem(
 //                                SessionCreateParams.LineItem.builder()
 //                                        .setQuantity(1L)
@@ -151,6 +155,48 @@ public class AuthController {
 //
 //        return new ModelAndView("redirect:" + session.getUrl());
 //    }
+
+    @PostMapping("/create-checkout-session")
+    public ModelAndView createCheckoutSession(@RequestBody List<PurchaseEntity> purchasData) throws StripeException {
+        Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
+
+        String YOUR_DOMAIN = "http://localhost/stripe-ui";
+
+        List<SessionCreateParams.LineItem> stripeLineItems = new ArrayList<>();
+        for (PurchaseEntity lineItem : purchasData) {
+            stripeLineItems.add(
+                    SessionCreateParams.LineItem.builder()
+//                            .setQuantity(lineItem.getQuantity())
+                            .setName(lineItem.getCourseName())
+                            .setPrice(String.valueOf(lineItem.getCourseAmt()))
+                            .build()
+            );
+        }
+
+        SessionCreateParams params =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl(YOUR_DOMAIN + "?success=true")
+                        .setCancelUrl(YOUR_DOMAIN + "?canceled=true")
+                        .setAutomaticTax(
+                                SessionCreateParams.AutomaticTax.builder()
+                                        .setEnabled(true)
+                                        .build())
+                        .addAllLineItem(stripeLineItems)
+                        .build();
+
+        Session session = Session.create(params);
+
+        return new ModelAndView("redirect:" + session.getUrl());
+    }
+
+    public class LineItem {
+        private Long quantity;
+        private String priceId;
+
+        // Constructor, getters, and setters
+    }
+
 
     static {
         Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
