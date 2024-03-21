@@ -126,54 +126,13 @@ public class AuthController {
         return addToCartRepository.findBySecretKey(key);
     }
 
-  // Payment gateway code ---------------
-
-//   =======================================================================================================================
-
-//    @PostMapping("/create-checkout-session")
-//    public ModelAndView createCheckoutSession() throws StripeException {
-//        Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
-//
-//        String YOUR_DOMAIN = "http://localhost/stripe-ui"; // Adjust port accordingly
-//        SessionCreateParams params =
-//                SessionCreateParams.builder()
-//                        .setMode(SessionCreateParams.Mode.PAYMENT)
-//                        .setSuccessUrl(YOUR_DOMAIN + "/success.html")
-//                        .setCancelUrl(YOUR_DOMAIN + "/cancel.html")
-//                        .setAutomaticTax(
-//                                SessionCreateParams.AutomaticTax.builder()
-//                                        .setEnabled(true)
-//                                        .build())
-//
-//                        .addLineItem(
-//                                SessionCreateParams.LineItem.builder()
-//                                        .setQuantity(1L)
-//                                        .setPrice("{{PRICE_ID}}")
-//                                        .build())
-//                        .build();
-//        Session session = Session.create(params);
-//
-//        return new ModelAndView("redirect:" + session.getUrl());
-//    }
-
     @PostMapping("/create-checkout-session")
-    public ModelAndView createCheckoutSession(@RequestBody List<PurchaseEntity> purchasData) throws StripeException {
+    public String createCheckoutSession(@RequestBody List<PurchaseEntity> purchaseData) throws StripeException {
         Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
 
         String YOUR_DOMAIN = "http://localhost:5173";
 
-        List<SessionCreateParams.LineItem> stripeLineItems = new ArrayList<>();
-        for (PurchaseEntity lineItem : purchasData) {
-            stripeLineItems.add(
-                    SessionCreateParams.LineItem.builder()
-//                            .setQuantity(lineItem.getQuantity())
-                            .setName(lineItem.getCourseName())
-                            .setPrice(String.valueOf(lineItem.getCourseAmt()))
-                            .build()
-            );
-        }
-
-        SessionCreateParams params =
+        SessionCreateParams.Builder paramsBuilder =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
                         .setSuccessUrl(YOUR_DOMAIN + "?success=true")
@@ -181,76 +140,30 @@ public class AuthController {
                         .setAutomaticTax(
                                 SessionCreateParams.AutomaticTax.builder()
                                         .setEnabled(true)
-                                        .build())
-                        .addAllLineItem(stripeLineItems)
-                        .build();
+                                        .build());
 
+        for (PurchaseEntity lineItem : purchaseData) {
+            paramsBuilder.addLineItem(
+                    SessionCreateParams.LineItem.builder()
+                            .setQuantity(1L)
+                            .setPriceData(
+                                    SessionCreateParams.LineItem.PriceData.builder()
+                                            .setCurrency("usd")
+                                            .setUnitAmount((long) (lineItem.getCourseAmt() * 100L))
+                                            .setProductData(
+                                                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                            .setName(lineItem.getCourseName())
+                                                            .build()
+                                            )
+                                            .build()
+                            )
+                            .build());
+        }
+
+        SessionCreateParams params = paramsBuilder.build();
         Session session = Session.create(params);
 
-        return new ModelAndView("redirect:" + session.getUrl());
-    }
-
-    public class LineItem {
-        private Long quantity;
-        private String priceId;
-
-        // Constructor, getters, and setters
-    }
-
-
-    static {
-        Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
-    }
-
-    static class CreatePaymentItem {
-        private String id;
-
-        public String getId() {
-            return id;
-        }
-    }
-
-    static class CreatePayment {
-        private CreatePaymentItem[] items;
-
-        public CreatePaymentItem[] getItems() {
-            return items;
-        }
-    }
-
-    static class CreatePaymentResponse {
-        private String clientSecret;
-
-        public CreatePaymentResponse(String clientSecret) {
-            this.clientSecret = clientSecret;
-        }
-    }
-
-    static int calculateOrderAmount(CreatePaymentItem[] items) {
-        // Replace this constant with a calculation of the order's amount
-        // Calculate the order total on the server to prevent
-        // people from directly manipulating the amount on the client
-        return 1400;
-    }
-
-    @PostMapping("/create-payment-intent")
-    public CreatePaymentResponse createPaymentIntent(@RequestBody CreatePayment postBody) {
-        PaymentIntentCreateParams params =
-                PaymentIntentCreateParams.builder()
-                        .setAmount((long) calculateOrderAmount(postBody.getItems()))
-                        .setCurrency("usd")
-                        .build();
-
-        // Create a PaymentIntent with the order amount and currency
-        PaymentIntent paymentIntent = null;
-        try {
-            paymentIntent = PaymentIntent.create(params);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Handle Stripe API exception
-        }
-
-        return new CreatePaymentResponse(paymentIntent.getClientSecret());
+        return session.getUrl();
     }
 }
 
