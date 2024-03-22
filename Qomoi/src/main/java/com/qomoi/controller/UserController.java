@@ -1,16 +1,25 @@
 package com.qomoi.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qomoi.dto.*;
 import com.qomoi.entity.PurchaseEntity;
+import com.qomoi.entity.StripeSeesion;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
+import com.qomoi.repository.StripeSeesionRepository;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.service.impl.UserServiceImpl;
 import com.qomoi.utility.Constants;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +39,10 @@ import java.util.Objects;
 public class UserController {
 
     private final UserServiceImpl userService;
+
+    @Autowired
+    private StripeSeesionRepository stripeSeesionRepository;
+
     private final UserRepository userRepository;
     @Value("${front.end}")
     private String frontEndUrl;
@@ -107,7 +120,7 @@ public class UserController {
     }
 
     @PostMapping("/savePurchase")
-    public ResponseEntity<?> savePurchase(@Valid @RequestBody PurchaseInfo purchaseInfo) {
+    public String savePurchase(@Valid @RequestBody PurchaseInfo purchaseInfo) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
@@ -128,13 +141,15 @@ public class UserController {
 
             if (allDetailsAvailable) {
                 List<PurchaseEntity> saveDetails = userService.savePurchase(purchaseDtoList, addressInfo, saveAddress, email);
-                return new ResponseEntity<>(saveDetails, HttpStatus.OK);
+                return createCheckoutSession(saveDetails);
+//                return new ResponseEntity<>(saveDetails, HttpStatus.OK);
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(400, "Incomplete details in request"));
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(400, "Incomplete details in request"));
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return null;
         }
     }
 
@@ -240,6 +255,66 @@ public class UserController {
         }
 
         return response;
+    }
+
+
+    public String createCheckoutSession(List<PurchaseEntity> purchaseData) throws StripeException {
+        Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
+
+        String YOUR_DOMAIN = "http://localhost:5173";
+
+        String purchaseDataJson = convertListToJson(purchaseData);
+
+        StripeSeesion seesionData = new StripeSeesion();
+
+        seesionData.setJsonData(purchaseDataJson);
+
+        StripeSeesion response = stripeSeesionRepository.save(seesionData);
+
+        SessionCreateParams.Builder paramsBuilder =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl(YOUR_DOMAIN + "?success=true")
+                        .setCancelUrl(YOUR_DOMAIN + "?canceled=true")
+                        .setClientReferenceId(String.valueOf(response.getId()))
+                        .setAutomaticTax(
+                                SessionCreateParams.AutomaticTax.builder()
+                                        .setEnabled(true)
+                                        .build());
+
+        for (PurchaseEntity lineItem : purchaseData) {
+            paramsBuilder.addLineItem(
+                    SessionCreateParams.LineItem.builder()
+                            .setQuantity(1L)
+                            .setPriceData(
+                                    SessionCreateParams.LineItem.PriceData.builder()
+                                            .setCurrency("usd")
+                                            .setUnitAmount((long) (lineItem.getCourseAmt() * 100L))
+                                            .setProductData(
+                                                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                            .setName(lineItem.getCourseName())
+                                                            .addImage(lineItem.getImageUrl())
+                                                            .build()
+                                            )
+                                            .build()
+                            )
+                            .build());
+        }
+
+        SessionCreateParams params = paramsBuilder.build();
+        Session session = Session.create(params);
+
+        return session.getUrl();
+    }
+
+    private static String convertListToJson(List<PurchaseEntity> purchaseData) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(purchaseData);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

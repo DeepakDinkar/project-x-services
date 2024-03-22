@@ -5,12 +5,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qomoi.dto.*;
 import com.qomoi.entity.AddToCart;
 import com.qomoi.entity.PurchaseEntity;
+import com.qomoi.entity.StripeSeesion;
 import com.qomoi.exception.ExistingUserFoundException;
 import com.qomoi.exception.MissingFieldException;
 import com.qomoi.exception.NotFoundException;
 import com.qomoi.jwt.JwtUtils;
 import com.qomoi.modal.KeyList;
 import com.qomoi.repository.AddToCartRepository;
+import com.qomoi.repository.StripeSeesionRepository;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.service.EncryptDecryptKey;
 import com.qomoi.service.impl.AuthServiceImpl;
@@ -20,22 +22,33 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.web.servlet.ModelAndView;
 import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.model.Event;
+import com.stripe.net.Webhook;
+import com.google.gson.JsonSyntaxException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @RestController
 @RequestMapping("/auth")
@@ -49,6 +62,9 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final AddToCartRepository addToCartRepository;
     private final EncryptDecryptKey encryptDecryptKey;
+
+    @Autowired
+    private StripeSeesionRepository stripeSeesionRepository;
 
     public AuthController(UserServiceImpl userService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, RefreshTokenServiceImpl refreshTokenService, UserRepository userRepository, PasswordEncoder passwordEncoder, AuthServiceImpl authService, AddToCartRepository addToCartRepository, EncryptDecryptKey encryptDecryptKey) {
         this.userService = userService;
@@ -132,11 +148,20 @@ public class AuthController {
 
         String YOUR_DOMAIN = "http://localhost:5173";
 
+        String purchaseDataJson = convertListToJson(purchaseData);
+
+        StripeSeesion seesionData = new StripeSeesion();
+
+        seesionData.setJsonData(purchaseDataJson);
+
+        StripeSeesion response = stripeSeesionRepository.save(seesionData);
+
         SessionCreateParams.Builder paramsBuilder =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
                         .setSuccessUrl(YOUR_DOMAIN + "?success=true")
                         .setCancelUrl(YOUR_DOMAIN + "?canceled=true")
+                        .setClientReferenceId(String.valueOf(response.getId()))
                         .setAutomaticTax(
                                 SessionCreateParams.AutomaticTax.builder()
                                         .setEnabled(true)
@@ -153,6 +178,7 @@ public class AuthController {
                                             .setProductData(
                                                     SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                             .setName(lineItem.getCourseName())
+                                                            .addImage(lineItem.getImageUrl())
                                                             .build()
                                             )
                                             .build()
@@ -164,6 +190,69 @@ public class AuthController {
         Session session = Session.create(params);
 
         return session.getUrl();
+    }
+
+    @PostMapping("/stripe-webhook")
+    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload,
+                                                      @RequestHeader("Stripe-Signature") String sigHeader) {
+        String webhookSecret = "whsec_a8b753d721004e52e031c08b8f03135e40aea57f8e1743275fe6312af2e4f6b9";
+
+        try {
+            Event event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
+
+            if ("checkout.session.completed".equals(event.getType())) {
+                System.out.println(payload);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode rootNode = mapper.readTree(payload);
+                JsonNode dataNode = rootNode.get("data");
+                JsonNode objectNode = dataNode.get("object");
+                String clientReferenceId = objectNode.get("client_reference_id").asText();
+                StripeSeesion successData = stripeSeesionRepository.findById(Long.valueOf(clientReferenceId)).orElse(null);
+                List<PurchaseEntity> response = convertJsonToList(successData.getJsonData());
+                addPayment(response);
+                System.out.println("Payment succeeded: " + event.getId());
+            }
+            return ResponseEntity.ok().build();
+        } catch (SignatureVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signature verification failed");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error handling webhook");
+        }
+    }
+
+    private static String convertListToJson(List<PurchaseEntity> purchaseData) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(purchaseData);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<PurchaseEntity> convertJsonToList(String json) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            List<PurchaseEntity> purchaseData = mapper.readValue(json, new TypeReference<List<PurchaseEntity>>() {});
+            return purchaseData;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<PurchaseEntity> addPayment(List<PurchaseEntity> purchasData) {
+        List<PurchaseEntity> response = new ArrayList<>();
+        for(PurchaseEntity list : purchasData){
+            PurchaseEntity purchaseEntity = userService.findDetails(list.getId());
+            purchaseEntity.setStatus("S");
+            PurchaseEntity savedPurchaseEntity = userService.savePayment(purchaseEntity);
+            if(savedPurchaseEntity != null){
+                response.add(savedPurchaseEntity);
+            }
+        }
+        return response;
     }
 }
 
