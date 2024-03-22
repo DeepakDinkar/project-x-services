@@ -130,13 +130,13 @@ public class UserController {
             Boolean saveAddress = purchaseInfo.getSaveAddress();
 
             for (PurchaseDto dto : purchaseDtoList) {
-                if (dto.getCourseAmt() == null || dto.getCourseId() == null || dto.getSlug() == null
-                    || dto.getImageUrl() == null || dto.getCourseDate() == null || dto.getTransactionId() == null
-                    || addressInfo.getAddress1() == null || saveAddress == null || addressInfo.getAddress1() == null || addressInfo.getCountry() == null
-                    || addressInfo.getCity() == null) {
-                    allDetailsAvailable = false;
-                    break;
-                }
+//                if (dto.getCourseAmt() == null || dto.getCourseId() == null || dto.getSlug() == null
+//                    || dto.getImageUrl() == null || dto.getCourseDate() == null || dto.getTransactionId() == null
+//                    || addressInfo.getAddress1() == null || saveAddress == null || addressInfo.getAddress1() == null || addressInfo.getCountry() == null
+//                    || addressInfo.getCity() == null) {
+//                    allDetailsAvailable = false;
+//                    break;
+//                }
             }
 
             if (allDetailsAvailable) {
