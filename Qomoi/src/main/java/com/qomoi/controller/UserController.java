@@ -261,7 +261,7 @@ public class UserController {
     public String createCheckoutSession(List<PurchaseEntity> purchaseData) throws StripeException {
         Stripe.apiKey = "sk_test_51Or9WRHIxaQosNkX3sO0uqeuHjxLIP48KdFSimkAmus1lfQNH25UM5i3eSE0DTend1kl037HWymTeEQDqbs4J0ru00B04na9NL";
 
-        String YOUR_DOMAIN = "http://localhost:5173";
+        String YOUR_DOMAIN = "https://project-x-wine-ten.vercel.app";
 
         String purchaseDataJson = convertListToJson(purchaseData);
 
