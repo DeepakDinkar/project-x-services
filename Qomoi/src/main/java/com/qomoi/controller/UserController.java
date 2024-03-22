@@ -274,8 +274,8 @@ public class UserController {
         SessionCreateParams.Builder paramsBuilder =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl(YOUR_DOMAIN + "?success=true")
-                        .setCancelUrl(YOUR_DOMAIN + "?canceled=true")
+                        .setSuccessUrl(YOUR_DOMAIN + "/checkout" + "?success=true")
+                        .setCancelUrl(YOUR_DOMAIN + "/checkout" + "?cancelled=true")
                         .setClientReferenceId(String.valueOf(response.getId()))
                         .setAutomaticTax(
                                 SessionCreateParams.AutomaticTax.builder()

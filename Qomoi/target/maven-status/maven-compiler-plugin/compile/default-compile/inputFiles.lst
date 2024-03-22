@@ -1,3 +1,4 @@
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/repository/StripeSeesionRepository.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/dto/LoginRequestDTO.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/dto/ForgetPasswordDto.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/repository/CourseRepository.java
@@ -52,6 +53,7 @@
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/dto/TrainerResponse.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/entity/UserDE.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/controller/AuthController.java
+/Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/entity/StripeSeesion.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/dto/ProfileDto.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/dto/PhoneOrEmail.java
 /Users/DG14/Documents/Personal/Qomoi/project-x-services/Qomoi/src/main/java/com/qomoi/dto/ResponseDto.java
