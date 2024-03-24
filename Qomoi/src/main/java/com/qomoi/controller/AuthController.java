@@ -244,6 +244,9 @@ public class AuthController {
 
     public List<PurchaseEntity> addPayment(List<PurchaseEntity> purchasData) {
         List<PurchaseEntity> response = new ArrayList<>();
+        String email = "";
+        String content = "<p>Hello,</p> <p>You have purchased </p>";
+        int count = 1;
         for(PurchaseEntity list : purchasData){
             PurchaseEntity purchaseEntity = userService.findDetails(list.getId());
             purchaseEntity.setStatus("S");
@@ -251,8 +254,51 @@ public class AuthController {
             if(savedPurchaseEntity != null){
                 response.add(savedPurchaseEntity);
             }
+            email = savedPurchaseEntity.getEmail();
+            content += "<p>" + count + ". Course Name :" + savedPurchaseEntity.getCourseName() + "</p>"
+                    + "<p> Venue : " + savedPurchaseEntity.getLocation()
+                    + "<p> Date : " + savedPurchaseEntity.getCourseDate()
+                    + "<p> Happy learning !!! </p>";
+            count++;
+        }
+        String subject = "Course Purchased";
+        try {
+            if (StringUtils.hasText(email)) {
+                userService.sendEmail(email, subject, content);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
         return response;
     }
+
+    @PostMapping("/mail-data")
+    public ResponseEntity<?> mailCheck(@RequestBody List<PurchaseEntity> purchasData) {
+        String email = "";
+        String content = "<p>Hello,</p> <p>You have purchased </p>";
+        int count = 1;
+        try {
+            for (PurchaseEntity list : purchasData) {
+                email = list.getEmail();
+                content += "<p>" + count + ". Course Name :" + list.getCourseName() + "</p>"
+                        + "<p> Venue : " + list.getLocation()
+                        + "<p> Date : " + list.getCourseDate();
+                count++;
+            }
+            content += "<p> Happy learning !!! </p>";
+            System.out.println(content);
+
+            String subject = "QOMOI - Course Purchased";
+
+            if (StringUtils.hasText(email)) {
+                userService.sendEmail(email, subject, content);
+            }
+        } catch (Exception e) {
+            System.out.println("Error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
 }
 
