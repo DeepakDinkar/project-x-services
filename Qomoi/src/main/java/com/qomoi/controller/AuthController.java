@@ -301,5 +301,47 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/stripe-event-listner")
+    public ResponseEntity<String> stripeEventListner(@RequestBody String payload,
+                                                     @RequestHeader("Stripe-Signature") String sigHeader) throws JsonProcessingException {
+        String webhookSecret = "whsec_a8b753d721004e52e031c08b8f03135e40aea57f8e1743275fe6312af2e4f6b9";
+
+        Event event;
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
+        } catch (JsonSyntaxException | SignatureVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signature verification failed");
+        }
+
+        switch (event.getType()) {
+            case "checkout.session.async_payment_failed":
+                System.out.println("checkout.session.async_payment_failed----------------: ");
+                break;
+            case "checkout.session.async_payment_succeeded":
+                System.out.println("checkout.session.completed----------------: ");
+                System.out.println(payload);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode rootNode = mapper.readTree(payload);
+                JsonNode dataNode = rootNode.get("data");
+                JsonNode objectNode = dataNode.get("object");
+                String clientReferenceId = objectNode.get("client_reference_id").asText();
+                StripeSeesion successData = stripeSeesionRepository.findById(Long.valueOf(clientReferenceId)).orElse(null);
+                List<PurchaseEntity> response = convertJsonToList(successData.getJsonData());
+                addPayment(response);
+                System.out.println("Payment succeeded: " + event.getId());
+                break;
+            case "checkout.session.completed":
+                System.out.println("checkout.session.completed----------------: ");
+                break;
+            case "checkout.session.expired":
+                System.out.println("checkout.session.expired----------------: ");
+                break;
+            default:
+                System.out.println("Unhandled event type: " + event.getType());
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
 }
 
