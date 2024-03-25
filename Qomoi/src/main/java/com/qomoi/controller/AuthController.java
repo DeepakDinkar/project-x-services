@@ -307,9 +307,13 @@ public class AuthController {
         String webhookSecret = "whsec_a8b753d721004e52e031c08b8f03135e40aea57f8e1743275fe6312af2e4f6b9";
 
         Event event;
+        System.out.println("1checkout.called----------------: ");
+        System.out.println("========================");
         try {
+            System.out.println("In try");
             event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
         } catch (JsonSyntaxException | SignatureVerificationException e) {
+            System.out.println("Signature verification failed");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signature verification failed");
         }
 
