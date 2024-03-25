@@ -196,11 +196,12 @@ public class AuthController {
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload,
                                                       @RequestHeader("Stripe-Signature") String sigHeader) {
         String webhookSecret = "whsec_a8b753d721004e52e031c08b8f03135e40aea57f8e1743275fe6312af2e4f6b9";
-
+        System.out.println("Payment listner called: ");
         try {
             Event event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
 
             if ("checkout.session.completed".equals(event.getType())) {
+                System.out.println("checkout.session.completed----------------: ");
                 System.out.println(payload);
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode rootNode = mapper.readTree(payload);
