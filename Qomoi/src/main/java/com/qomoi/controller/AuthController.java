@@ -313,6 +313,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signature verification failed");
         }
 
+        System.out.println("checkout.called----------------: ");
+        System.out.println(event);
+        System.out.println("========================");
         switch (event.getType()) {
             case "checkout.session.async_payment_failed":
                 System.out.println("checkout.session.async_payment_failed----------------: ");
