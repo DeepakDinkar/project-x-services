@@ -49,6 +49,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.json.JSONObject;
 
 @RestController
 @RequestMapping("/auth")
@@ -307,47 +308,31 @@ public class AuthController {
         String webhookSecret = "whsec_a8b753d721004e52e031c08b8f03135e40aea57f8e1743275fe6312af2e4f6b9";
 
         Event event;
-        System.out.println("1checkout.called----------------: ");
-        System.out.println("========================");
         System.out.println(payload);
-        System.out.println(sigHeader);
-        try {
-            System.out.println("In try");
-            event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
-        } catch (JsonSyntaxException | SignatureVerificationException e) {
-            System.out.println("Signature verification failed");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signature verification failed");
+
+        JSONObject jsonObject = new JSONObject(payload);
+        JSONObject dataObject = jsonObject.getJSONObject("data").getJSONObject("object");
+
+        String eventType = jsonObject.getString("type");
+        String paymentStatus = dataObject.getString("payment_status");
+
+        System.out.println("Event Type: " + eventType);
+        System.out.println("Payment Status: " + paymentStatus);
+
+        if ("checkout.session.completed".equals(eventType) && "paid".equals(paymentStatus)) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(payload);
+            JsonNode dataNode = rootNode.get("data");
+            JsonNode objectNode = dataNode.get("object");
+            String clientReferenceId = objectNode.get("client_reference_id").asText();
+            StripeSeesion successData = stripeSeesionRepository.findById(Long.valueOf(clientReferenceId)).orElse(null);
+            List<PurchaseEntity> response = convertJsonToList(successData.getJsonData());
+            addPayment(response);
+            System.out.println("Payment succeeded: ");
+        }else {
+            System.out.println("Payment failed: ");
         }
 
-        System.out.println("checkout.called----------------: ");
-        System.out.println(event);
-        System.out.println("========================");
-        switch (event.getType()) {
-            case "checkout.session.async_payment_failed":
-                System.out.println("checkout.session.async_payment_failed----------------: ");
-                break;
-            case "checkout.session.async_payment_succeeded":
-                System.out.println("checkout.session.completed----------------: ");
-                System.out.println(payload);
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode rootNode = mapper.readTree(payload);
-                JsonNode dataNode = rootNode.get("data");
-                JsonNode objectNode = dataNode.get("object");
-                String clientReferenceId = objectNode.get("client_reference_id").asText();
-                StripeSeesion successData = stripeSeesionRepository.findById(Long.valueOf(clientReferenceId)).orElse(null);
-                List<PurchaseEntity> response = convertJsonToList(successData.getJsonData());
-                addPayment(response);
-                System.out.println("Payment succeeded: " + event.getId());
-                break;
-            case "checkout.session.completed":
-                System.out.println("checkout.session.completed----------------: ");
-                break;
-            case "checkout.session.expired":
-                System.out.println("checkout.session.expired----------------: ");
-                break;
-            default:
-                System.out.println("Unhandled event type: " + event.getType());
-        }
 
         return ResponseEntity.ok().build();
     }
