@@ -309,6 +309,8 @@ public class AuthController {
         Event event;
         System.out.println("1checkout.called----------------: ");
         System.out.println("========================");
+        System.out.println(payload);
+        System.out.println(sigHeader);
         try {
             System.out.println("In try");
             event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
