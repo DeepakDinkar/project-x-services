@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StripeSeesionRepository extends JpaRepository<StripeSeesion, Long> {
+    StripeSeesion findByPaymentIntent(String payIntent);
 }

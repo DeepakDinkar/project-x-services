@@ -50,6 +50,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.json.JSONObject;
+import com.stripe.model.*;
+import com.stripe.net.Webhook;
 
 @RestController
 @RequestMapping("/auth")
@@ -190,6 +192,10 @@ public class AuthController {
         SessionCreateParams params = paramsBuilder.build();
         Session session = Session.create(params);
 
+        response.setPaymentIntent(session.getPaymentIntent());
+
+        stripeSeesionRepository.save(response);
+
         return session.getUrl();
     }
 
@@ -305,7 +311,7 @@ public class AuthController {
     @PostMapping("/stripe-event-listner")
     public ResponseEntity<String> stripeEventListner(@RequestBody String payload,
                                                      @RequestHeader("Stripe-Signature") String sigHeader) throws JsonProcessingException {
-        String webhookSecret = "whsec_a8b753d721004e52e031c08b8f03135e40aea57f8e1743275fe6312af2e4f6b9";
+        String webhookSecret = "whsec_QPWmdpvicQnd0yymjw9gkHhvMJGHfWDZ";
 
         Event event;
         System.out.println(payload);
@@ -335,6 +341,185 @@ public class AuthController {
 
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/stripe-payment-listner")
+    public ResponseEntity<String> stripePayment(@RequestBody String payload,
+                                                     @RequestHeader("Stripe-Signature") String sigHeader) throws JsonProcessingException {
+        String endpointSecret = "whsec_H7Unz1g4nD4UmFPKHwZsdwkOW9Q9IP1W";
+//        String endpointSecret = "whsec_a8b753d721004e52e031c08b8f03135e40aea57f8e1743275fe6312af2e4f6b9";
+
+
+        Event event = null;
+        JSONObject jsonObject = new JSONObject(payload);
+        JSONObject dataObject = jsonObject.getJSONObject("data").getJSONObject("object");
+        String payIntent = dataObject.getString("id");
+        StripeSeesion stripeSeesionData = stripeSeesionRepository.findByPaymentIntent(payIntent);
+
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+        } catch (JsonSyntaxException e) {
+            return ResponseEntity.status(400).build();
+        } catch (SignatureVerificationException e) {
+            return ResponseEntity.status(400).build();
+        }
+
+        EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+        StripeObject stripeObject = null;
+        if (dataObjectDeserializer.getObject().isPresent()) {
+            stripeObject = dataObjectDeserializer.getObject().get();
+        } else {
+            // Deserialization failed, probably due to an API version mismatch.
+            // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
+            // instructions on how to handle this case, or return an error here.
+        }
+        // Handle the event
+        switch (event.getType()) {
+            case "charge.captured": {
+                System.out.println("charge.captured");
+                break;
+            }
+            case "charge.expired": {
+                System.out.println("charge.expired");
+                break;
+            }
+            case "charge.failed": {
+                System.out.println("charge.failed");
+                break;
+            }
+            case "charge.pending": {
+                System.out.println("charge.pending");
+                break;
+            }
+            case "charge.refunded": {
+                System.out.println("charge.refunded");
+                break;
+            }
+            case "charge.succeeded": {
+                System.out.println("charge.succeeded");
+                break;
+            }
+            case "charge.updated": {
+                System.out.println("charge.updated");
+                break;
+            }
+            case "charge.dispute.closed": {
+                System.out.println("charge.dispute.closed");
+                break;
+            }
+            case "charge.dispute.created": {
+                System.out.println("charge.dispute.created");
+                break;
+            }
+            case "charge.dispute.funds_reinstated": {
+                System.out.println("charge.dispute.funds_reinstated");
+                break;
+            }
+            case "charge.dispute.funds_withdrawn": {
+                System.out.println("charge.dispute.funds_withdrawn");
+                break;
+            }
+            case "charge.dispute.updated": {
+                System.out.println("charge.dispute.updated");
+                break;
+            }
+            case "charge.refund.updated": {
+                System.out.println("charge.refund.updated");
+                break;
+            }
+            case "checkout.session.async_payment_failed": {
+                System.out.println("checkout.session.async_payment_failed");
+                break;
+            }
+            case "checkout.session.async_payment_succeeded": {
+                System.out.println("checkout.session.async_payment_succeeded");
+                break;
+            }
+            case "checkout.session.completed": {
+                System.out.println("checkout.session.completed");
+                break;
+            }
+            case "checkout.session.expired": {
+                System.out.println("checkout.session.expired");
+                break;
+            }
+            case "payment_intent.amount_capturable_updated": {
+                System.out.println("payment_intent.amount_capturable_updated");
+                break;
+            }
+            case "payment_intent.canceled": {
+                StripeSeesion successData = stripeSeesionRepository.findById(Long.valueOf(stripeSeesionData.getId())).orElse(null);
+                List<PurchaseEntity> response = convertJsonToList(successData.getJsonData());
+                failedPayment(response);
+                System.out.println("payment_intent.canceled");
+                break;
+            }
+            case "payment_intent.created": {
+                System.out.println("payment_intent.created");
+                break;
+            }
+            case "payment_intent.partially_funded": {
+                System.out.println("payment_intent.partially_funded");
+                break;
+            }
+            case "payment_intent.payment_failed": {
+                StripeSeesion successData = stripeSeesionRepository.findById(Long.valueOf(stripeSeesionData.getId())).orElse(null);
+                List<PurchaseEntity> response = convertJsonToList(successData.getJsonData());
+                failedPayment(response);
+                System.out.println("payment_intent.payment_failed");
+                break;
+            }
+            case "payment_intent.processing": {
+                System.out.println("payment_intent.processing");
+                break;
+            }
+            case "payment_intent.requires_action": {
+                System.out.println("payment_intent.requires_action");
+                break;
+            }
+            case "payment_intent.succeeded": {
+                System.out.println("Payment Intent: ");
+
+                StripeSeesion successData = stripeSeesionRepository.findById(stripeSeesionData.getId()).orElse(null);
+//                System.out.println(successData);
+                List<PurchaseEntity> response = convertJsonToList(successData.getJsonData());
+//                System.out.println(response);
+                if(!successData.getMailTriggered()){
+                    System.out.println("Mail initiated: ");
+                    addPayment(response);
+                }
+                successData.setMailTriggered(true);
+                stripeSeesionRepository.save(successData);
+                System.out.println("Payment succeeded: ");
+                System.out.println("payment_intent.succeeded");
+                break;
+            }
+
+            default:
+                System.out.println("Unhandled event type: " + event.getType());
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    public List<PurchaseEntity> failedPayment(List<PurchaseEntity> purchasData) {
+        List<PurchaseEntity> response = new ArrayList<>();
+        String email = "";
+        String content = "<p>Hello,</p>"
+                + "<p>We inform you that your purchase has failed due to unsuccessful payment or cancellation.</p>"
+                + "<p>Thank you for your understanding.</p>";
+        for(PurchaseEntity list : purchasData){
+            PurchaseEntity purchaseEntity = userService.findDetails(list.getId());
+            email = purchaseEntity.getEmail();
+        }
+        String subject = "QOMOI - Course Purchase Failed";
+        try {
+            if (StringUtils.hasText(email)) {
+                userService.sendEmail(email, subject, content);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return response;
     }
 
 }

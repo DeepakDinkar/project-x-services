@@ -1,21 +1,22 @@
 package com.qomoi.service.impl;
 
 
+import com.google.gson.Gson;
 import com.qomoi.dto.*;
+import com.qomoi.entity.BillingAddress;
 import com.qomoi.entity.MyCoursesEntity;
 import com.qomoi.entity.PurchaseEntity;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
-import com.qomoi.repository.MyCourseRepository;
-import com.qomoi.repository.PurchaseRepository;
-import com.qomoi.repository.RefreshTokenRepository;
-import com.qomoi.repository.UserRepository;
+import com.qomoi.modal.AddressJson;
+import com.qomoi.repository.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -45,6 +46,9 @@ public class UserServiceImpl {
     private final JavaMailSender mailSender;
 
     private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private BillingAddressRepository billingAddressRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -139,7 +143,20 @@ public class UserServiceImpl {
             user.setCity(profileDto.getCity());
             user.setZipcode(profileDto.getZipCode());
             user.setProfileImage(profileDto.getImageUrl());
-            return userRepository.save(user);
+            UserDE response = userRepository.save(user);
+            AddressJson addressJson = new AddressJson();
+            addressJson.setAddress1(profileDto.getAddress1());
+            addressJson.setAddress2(profileDto.getAddress2());
+            addressJson.setZipcode(profileDto.getZipCode());
+            addressJson.setCity(profileDto.getCity());
+            addressJson.setCountry(profileDto.getCountry());
+            Gson gson = new Gson();
+            String json = gson.toJson(addressJson);
+            BillingAddress billingAddress = new BillingAddress();
+            billingAddress.setJsonData(json);
+            billingAddress.setUserK(response.getUserId());
+            billingAddressRepository.save(billingAddress);
+            return response;
         }
         throw new EntityNotFoundException("User with email " + email + " not found");
     }
@@ -210,13 +227,27 @@ public class UserServiceImpl {
 
                 if (saveAddress) {
                     UserDE user = userRepository.findByEmail(email);
-                    user.setCountry(addressDto.getCountry());
-                    user.setCity(addressDto.getCity());
-                    user.setAddress1(addressDto.getAddress1());
-                    user.setAddress2(addressDto.getAddress2());
-                    user.setState(addressDto.getState());
-                    user.setZipcode(addressDto.getZipcode());
-                    userRepository.save(user);
+                    AddressJson addressJson = new AddressJson();
+                    addressJson.setAddress1(addressDto.getAddress1());
+                    addressJson.setAddress2(addressDto.getAddress2());
+//                    addressJson.setZipcode(addressDto.getZipCode());
+                    addressJson.setCity(addressDto.getCity());
+                    addressJson.setCountry(addressDto.getCountry());
+                    Gson gson = new Gson();
+                    String json = gson.toJson(addressJson);
+                    BillingAddress billingAddress = new BillingAddress();
+                    billingAddress.setJsonData(json);
+                    billingAddress.setUserK(user.getUserId());
+                    billingAddressRepository.save(billingAddress);
+//
+//
+//                    user.setCountry(addressDto.getCountry());
+//                    user.setCity(addressDto.getCity());
+//                    user.setAddress1(addressDto.getAddress1());
+//                    user.setAddress2(addressDto.getAddress2());
+//                    user.setState(addressDto.getState());
+//                    user.setZipcode(addressDto.getZipcode());
+//                    userRepository.save(user);
                 }
 
                 PurchaseEntity savedPurchase = purchaseRepository.save(purchaseEntity);
@@ -246,7 +277,7 @@ public class UserServiceImpl {
     public List<PurchaseResponse> myPurchase(String email) {
 
         String sql = "SELECT p.course_name, p.location, p.course_date, p.course_amt, p.transaction_id, p.purchase_date, p.slug, p.image_url " + " FROM purchase p " +
-                     " WHERE email = ? ";
+                     " WHERE email = ? and status = 'S' ";
 
         List<PurchaseResponse> list = this.jdbcTemplate.query(sql, new Object[]{email},
                 new RowMapper<PurchaseResponse>() {

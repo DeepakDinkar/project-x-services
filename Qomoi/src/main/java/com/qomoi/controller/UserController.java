@@ -4,10 +4,14 @@ package com.qomoi.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qomoi.dto.*;
+import com.qomoi.entity.BillingAddress;
 import com.qomoi.entity.PurchaseEntity;
 import com.qomoi.entity.StripeSeesion;
 import com.qomoi.entity.UserDE;
 import com.qomoi.exception.NotFoundException;
+import com.qomoi.modal.AddressJson;
+import com.qomoi.modal.ProfileResponse;
+import com.qomoi.repository.BillingAddressRepository;
 import com.qomoi.repository.StripeSeesionRepository;
 import com.qomoi.repository.UserRepository;
 import com.qomoi.service.impl.UserServiceImpl;
@@ -42,6 +46,9 @@ public class UserController {
 
     @Autowired
     private StripeSeesionRepository stripeSeesionRepository;
+
+    @Autowired
+    private BillingAddressRepository billingAddressRepository;
 
     private final UserRepository userRepository;
     @Value("${front.end}")
@@ -110,7 +117,11 @@ public class UserController {
                 profileDto.setCity(userDE.getCity());
                 profileDto.setCountry(userDE.getCountry());
                 profileDto.setZipCode(userDE.getZipcode());
-                return ResponseEntity.status(HttpStatus.OK).body(profileDto);
+                List<BillingAddress> billingAddressList = billingAddressRepository.findByUserK(userDE.getUserId());
+                ProfileResponse responseList = new ProfileResponse();
+                responseList.setProfileDto(profileDto);
+                responseList.setBillingAddressList(billingAddressList);
+                return ResponseEntity.status(HttpStatus.OK).body(responseList);
             }
             throw new EntityNotFoundException("User with email " + email + " not found");
         } catch (Exception e) {
@@ -303,6 +314,10 @@ public class UserController {
 
         SessionCreateParams params = paramsBuilder.build();
         Session session = Session.create(params);
+
+        response.setPaymentIntent(session.getPaymentIntent());
+
+        stripeSeesionRepository.save(response);
 
         return session.getUrl();
     }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "stripe_session")
@@ -19,4 +20,10 @@ public class StripeSeesion {
 
     @Column(name = "json_data", columnDefinition = "TEXT")
     private String jsonData;
+
+    @Column(name = "mail_triggered")
+    private Boolean mailTriggered = false;
+
+    @Column(name = "payment_intent", columnDefinition = "TEXT")
+    private String paymentIntent;
 }

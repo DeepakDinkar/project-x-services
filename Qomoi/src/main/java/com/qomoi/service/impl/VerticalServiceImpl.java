@@ -10,6 +10,7 @@ import com.qomoi.entity.VerticalEntity;
 import com.qomoi.repository.CourseRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.VerticalService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,7 @@ public class VerticalServiceImpl implements VerticalService {
 
 
     @Override
+    @Cacheable(value = "SLUG", key = "slug")
     public VerticalCoursesEntity getVerticalCoursesBySlug(String slug) {
 
         VerticalCoursesEntity verticalCoursesEntity = new VerticalCoursesEntity();
