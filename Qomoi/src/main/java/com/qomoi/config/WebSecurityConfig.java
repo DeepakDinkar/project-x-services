@@ -1,6 +1,5 @@
 package com.qomoi.config;
 
-
 import com.qomoi.jwt.AuthEntryPointJwt;
 import com.qomoi.jwt.AuthTokenFilter;
 import com.qomoi.service.impl.UserDetailsServiceImpl;

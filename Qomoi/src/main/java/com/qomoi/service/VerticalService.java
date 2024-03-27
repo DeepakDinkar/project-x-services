@@ -12,5 +12,7 @@ public interface VerticalService {
 
     void saveTopic(VerticalEntity verticalEntity);
 
-    VerticalCoursesEntity getVerticalCoursesBySlug(String slug);
+//     VerticalCoursesEntity getVerticalCoursesLocBySlug(String slug) ;
+
+     VerticalCoursesEntity getVerticalCoursesBySlug(String slug);
 }

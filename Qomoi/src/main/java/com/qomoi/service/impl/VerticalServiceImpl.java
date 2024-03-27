@@ -8,6 +8,8 @@ import com.qomoi.entity.CoursesEntity;
 import com.qomoi.entity.VerticalCoursesEntity;
 import com.qomoi.entity.VerticalEntity;
 import com.qomoi.repository.CourseRepository;
+import com.qomoi.repository.LocationRepository;
+import com.qomoi.repository.TrainersRepository;
 import com.qomoi.repository.VerticalRepository;
 import com.qomoi.service.VerticalService;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,11 +28,17 @@ public class VerticalServiceImpl implements VerticalService {
     private final CourseRepository courseRepository;
     private final JdbcTemplate jdbcTemplate;
 
-    public VerticalServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository, JdbcTemplate jdbcTemplate) {
+    private final LocationRepository locationRepository;
+    private final TrainersRepository trainersRepository;
+
+    public VerticalServiceImpl(VerticalRepository verticalRepository, CourseRepository courseRepository, JdbcTemplate jdbcTemplate,LocationRepository locationRepository,TrainersRepository trainersRepository ) {
 
         this.verticalRepository = verticalRepository;
         this.courseRepository = courseRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.locationRepository = locationRepository;
+        this.trainersRepository = trainersRepository;
+
     }
 
     @Override
@@ -44,10 +52,72 @@ public class VerticalServiceImpl implements VerticalService {
     }
 
 
-    @Override
-    @Cacheable(value = "SLUG", key = "slug")
-    public VerticalCoursesEntity getVerticalCoursesBySlug(String slug) {
+//    @Override
+//    @Cacheable(value = "SLUG", key = "slug")
+//    public VerticalCoursesEntity getVerticalCoursesLocBySlug(String slug) {
+//
+//        VerticalCoursesEntity verticalCoursesEntity = new VerticalCoursesEntity();
+//        VerticalEntity verticalEntity = verticalRepository.getVerticalEntityBySlug(slug);
+//
+//        if (Objects.nonNull(verticalEntity)) {
+//            Optional<List<CoursesEntity>> coursesListOptional = courseRepository.findCoursesBySlug(slug);
+//
+//            coursesListOptional.ifPresent(coursesList -> {
+//                verticalCoursesEntity.setSlug(verticalEntity.getSlug());
+//                verticalCoursesEntity.setTitle(verticalEntity.getTitle());
+//                verticalCoursesEntity.setImageUrl(verticalEntity.getImageUrl());
+//
+//                List<CourseLocationResponse> courseLocationResponses = new ArrayList<>();
+//
+//                for (CoursesEntity coursesEntity : coursesList) {
+//                    CourseLocationResponse courseLocationResponse = new CourseLocationResponse();
+//                    courseLocationResponse.setId(coursesEntity.getId());
+//                    courseLocationResponse.setSlug(coursesEntity.getSlug());
+//                    courseLocationResponse.setCourseAmt(coursesEntity.getCourseAmt());
+//                    courseLocationResponse.setCampaignTemplateCourseName(coursesEntity.getCampaignTemplateCourseName());
+//                    courseLocationResponse.setCourseContent(coursesEntity.getCourseContent());
+//                    courseLocationResponse.setCampaignTemplateRating(coursesEntity.getCampaignTemplateRating());
+//                    courseLocationResponse.setImageUrl(coursesEntity.getImageUrl());
+//                    courseLocationResponse.setKeyTakeAway(coursesEntity.getKeyTakeAway());
+//                    courseLocationResponse.setIsTrending(coursesEntity.getIsTrending());
+//                    courseLocationResponse.setCourseAddedDate(coursesEntity.getCourseAddedDate());
+//
+//                    List<LocationResponse> locationResponses = new ArrayList<>();
+//                    this.jdbcTemplate.query("SELECT location_name, date FROM location WHERE course_id = ?", new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
+//                        LocationResponse locationResponse = new LocationResponse();
+//                        locationResponse.setCourseId(coursesEntity.getId());
+//                        locationResponse.setLocationName(rs.getString("location_name"));
+//                        locationResponse.setDate(rs.getDate("date"));
+//                        locationResponses.add(locationResponse);
+//                        return null;
+//                    });
+//                    courseLocationResponse.setLocation(locationResponses);
+//
+//                    List<TrainerResponse> trainerResponses = new ArrayList<>();
+//                    this.jdbcTemplate.query("SELECT trainer_name,email,image_url,phone_number FROM trainers WHERE ? = ANY(course_id)", new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
+//                        TrainerResponse trainerResponse = new TrainerResponse();
+//                        trainerResponse.setTrainerName(rs.getString("trainer_name"));
+//                        trainerResponse.setEmail(rs.getString("email"));
+//                        trainerResponse.setPhoneNumber(rs.getString("phone_number"));
+//                        trainerResponse.setImageUrl(rs.getString("image_url"));
+//                        trainerResponses.add(trainerResponse);
+//                        return null;
+//                    });
+//                    courseLocationResponse.setTrainer(trainerResponses);
+//
+//                    courseLocationResponses.add(courseLocationResponse);
+//                }
+//
+//                verticalCoursesEntity.setCourses(courseLocationResponses);
+//            });
+//        }
+//
+//        return verticalCoursesEntity;
+//    }
 
+
+
+    public VerticalCoursesEntity getVerticalCoursesBySlug(String slug) {
         VerticalCoursesEntity verticalCoursesEntity = new VerticalCoursesEntity();
         VerticalEntity verticalEntity = verticalRepository.getVerticalEntityBySlug(slug);
 
@@ -59,10 +129,10 @@ public class VerticalServiceImpl implements VerticalService {
                 verticalCoursesEntity.setTitle(verticalEntity.getTitle());
                 verticalCoursesEntity.setImageUrl(verticalEntity.getImageUrl());
 
-                List<CourseLocationResponse> courseLocationResponses = new ArrayList<>();
+                List<CoursesEntity> coursesEntities = new ArrayList<>();
 
                 for (CoursesEntity coursesEntity : coursesList) {
-                    CourseLocationResponse courseLocationResponse = new CourseLocationResponse();
+                    CoursesEntity courseLocationResponse = new CoursesEntity();
                     courseLocationResponse.setId(coursesEntity.getId());
                     courseLocationResponse.setSlug(coursesEntity.getSlug());
                     courseLocationResponse.setCourseAmt(coursesEntity.getCourseAmt());
@@ -74,38 +144,16 @@ public class VerticalServiceImpl implements VerticalService {
                     courseLocationResponse.setIsTrending(coursesEntity.getIsTrending());
                     courseLocationResponse.setCourseAddedDate(coursesEntity.getCourseAddedDate());
 
-                    List<LocationResponse> locationResponses = new ArrayList<>();
-                    this.jdbcTemplate.query("SELECT location_name, date FROM location WHERE course_id = ?", new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
-                        LocationResponse locationResponse = new LocationResponse();
-                        locationResponse.setCourseId(coursesEntity.getId());
-                        locationResponse.setLocationName(rs.getString("location_name"));
-                        locationResponse.setDate(rs.getDate("date"));
-                        locationResponses.add(locationResponse);
-                        return null;
-                    });
-                    courseLocationResponse.setLocation(locationResponses);
-
-                    List<TrainerResponse> trainerResponses = new ArrayList<>();
-                    this.jdbcTemplate.query("SELECT trainer_name,email,image_url,phone_number FROM trainers WHERE ? = ANY(course_id)", new Object[]{coursesEntity.getId()}, (rs, rowNum) -> {
-                        TrainerResponse trainerResponse = new TrainerResponse();
-                        trainerResponse.setTrainerName(rs.getString("trainer_name"));
-                        trainerResponse.setEmail(rs.getString("email"));
-                        trainerResponse.setPhoneNumber(rs.getString("phone_number"));
-                        trainerResponse.setImageUrl(rs.getString("image_url"));
-                        trainerResponses.add(trainerResponse);
-                        return null;
-                    });
-                    courseLocationResponse.setTrainer(trainerResponses);
-
-                    courseLocationResponses.add(courseLocationResponse);
+                    coursesEntities.add(courseLocationResponse);
                 }
 
-                verticalCoursesEntity.setCourses(courseLocationResponses);
+                verticalCoursesEntity.setCourses(coursesEntities);
             });
         }
 
         return verticalCoursesEntity;
     }
+
 
 
 }

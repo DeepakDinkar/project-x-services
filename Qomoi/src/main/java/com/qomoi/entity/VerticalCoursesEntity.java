@@ -15,5 +15,5 @@ public class VerticalCoursesEntity {
     private String slug;
     private String title;
     private String imageUrl;
-    private List<CourseLocationResponse> courses;
+    private List<CoursesEntity> courses;
 }
